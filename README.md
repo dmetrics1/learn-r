@@ -91,7 +91,7 @@ learn-r/
 
 ## 👤 Autor
 
-**Daniel Molina Barrios** — Economista & Data Scientist · Santa Marta, Colombia
+**Daniel Molina Barrios** — Economista & Data Scientist
 
 [![GitHub](https://img.shields.io/badge/GitHub-2563EB?style=flat-square&logo=github&logoColor=white)](https://github.com/dmetrics1)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-7C3AED?style=flat-square&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/daniel-molina-b76a4323b/)
