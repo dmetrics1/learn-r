@@ -1,0 +1,10 @@
+# Respaldos y temporales
+*.bak
+*.tmp
+*~
+
+# Configuración local de herramientas
+.claude/
+.vscode/
+.DS_Store
+Thumbs.db
