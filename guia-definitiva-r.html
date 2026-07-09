@@ -603,7 +603,7 @@ table.data tr:hover td{background:var(--surface-2)}
         <li><strong>Vectorización nativa.</strong> En R operas sobre columnas enteras de datos de un solo golpe, sin escribir bucles. Es el mismo modelo mental de Excel ("aplicar la fórmula a toda la columna"), pero programable y auditable.</li>
         <li><strong>Estadística de serie.</strong> Regresiones (<code>lm()</code>), pruebas de hipótesis (<code>t.test()</code>), distribuciones y tablas de frecuencia vienen incluidas sin instalar nada. En otros lenguajes eso requiere librerías externas.</li>
         <li><strong>Gráficos de calidad de publicación.</strong> Con <code>ggplot2</code> produces figuras listas para un informe de consultoría, un paper o un periódico.</li>
-        <li><strong>CRAN: ~22.000 paquetes revisados.</strong> Cada paquete de CRAN pasa controles automáticos diarios en varias plataformas. Si existe una técnica estadística publicada, casi seguro hay un paquete que la implementa.</li>
+        <li><strong>CRAN: más de 21.000 paquetes revisados.</strong> Cada paquete de CRAN pasa controles automáticos diarios en varias plataformas. Si existe una técnica estadística publicada, casi seguro hay un paquete que la implementa.</li>
         <li><strong>Reportes reproducibles.</strong> Con Quarto y R Markdown, el informe y el análisis viven en el mismo documento: cambian los datos, se regenera el PDF/Word/HTML completo.</li>
       </ul>
       <p>Mira la vectorización en acción con un caso típico de economía: ajustar una serie de salarios por un aumento pactado.</p>
@@ -1443,7 +1443,7 @@ feb mar abr may jun
 14.7 -2.3 16.1  7.7 19.0
 [1] "jun"
 [1] 0.5</div></div>
-      <p>Fíjate en el último truco: <code>mean()</code> de un vector lógico da la <em>proporción</em> de <code>TRUE</code> (porque <code>TRUE</code> vale 1 y <code>FALSE</code> vale 0). Igual, <code>sum()</code> de un lógico cuenta cuántos cumplen la condición. Son dos de los ídems más usados del análisis de datos en R.</p>
+      <p>Fíjate en el último truco: <code>mean()</code> de un vector lógico da la <em>proporción</em> de <code>TRUE</code> (porque <code>TRUE</code> vale 1 y <code>FALSE</code> vale 0). Igual, <code>sum()</code> de un lógico cuenta cuántos cumplen la condición. Son dos de los modismos (idioms) más usados del análisis de datos en R.</p>
 
       <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>Buena práctica:</strong> antes de calcular nada con un vector nuevo, inspecciónalo: <code>length()</code>, <code>summary()</code> y <code>head()</code> te dicen en segundos si tiene la longitud esperada, valores raros o <code>NA</code>. Recuerda que si hay <code>NA</code>, funciones como <code>mean()</code> devuelven <code>NA</code> salvo que uses <code>mean(x, na.rm = TRUE)</code>.</p></div>
 
@@ -3092,8 +3092,10 @@ convertir_temp(25, "K")     # 298.15</code></pre>
 
 resumen(c(1, 2, NA, 4))                # NA porque hay un faltante
 resumen(c(1, 2, NA, 4), na.rm = TRUE)  # los ... pasan na.rm a mean y sd</code></pre>
-<div class="out">media    de
- 2.33  1.53 </div></div>
+<div class="out">   media       de
+      NA       NA
+   media       de
+2.333333 1.527525</div></div>
 
       <h2>Ámbito léxico: por qué no tocar variables globales</h2>
       <p>R usa <strong>ámbito léxico</strong>: una función busca las variables donde fue <em>escrita</em>, no donde fue <em>llamada</em>. Dentro de una función, las asignaciones crean variables <em>locales</em> que desaparecen al terminar. Esto es una virtud: la función no ensucia tu entorno global. Modificar globales desde adentro rompe esa promesa y hace que el resultado dependa de un estado invisible.</p>
@@ -3588,7 +3590,7 @@ modelo &lt;- mtcars |> lm(mpg ~ wt, data = _)</code></pre></div>
       <span class="section-label sl2">Nivel Intermedio</span>
       <div class="breadcrumbs"><a data-nav="inicio">Inicio</a><span class="sep">/</span><span>Nivel Intermedio</span><span class="sep">/</span><span>dplyr</span></div>
       <h1 class="page-title">dplyr: manipular datos</h1>
-      <p class="lead">dplyr no es una colección de funciones sueltas: es una <strong>gramática</strong>. Cada verbo obedece un mismo contrato: entra un data frame y sale un data frame. Como la salida es del mismo tipo que la entrada, puedes encadenar verbos con la tubería <code>|&gt;</code> y leer una transformación compleja como una frase: "toma las ventas, quédate con las del trimestre, agrúpalas por región y resume el total". Si interiorizas seis verbos y ese contrato, cubres el 90% de la manipulación de datos tabulares. Versión actual: <strong>dplyr 1.2</strong>.</p>
+      <p class="lead">dplyr no es una colección de funciones sueltas: es una <strong>gramática</strong>. Cada verbo obedece un mismo contrato: entra un data frame y sale un data frame. Como la salida es del mismo tipo que la entrada, puedes encadenar verbos con la tubería <code>|&gt;</code> y leer una transformación compleja como una frase: "toma las ventas, quédate con las del trimestre, agrúpalas por región y resume el total". Si interiorizas seis verbos y ese contrato, cubres el 90% de la manipulación de datos tabulares.</p>
 
       <h2>El modelo mental: entra un data frame, sale un data frame</h2>
       <p>Esa uniformidad es la idea clave. En R base saltas entre <code>[]</code>, <code>$</code>, <code>subset()</code>, <code>aggregate()</code> y <code>apply()</code>, cada uno con su sintaxis. En dplyr, todo verbo recibe la tabla como primer argumento y devuelve otra tabla, así que el resultado de un paso siempre puede alimentar al siguiente. La tubería <code>|&gt;</code> solo mueve ese objeto hacia la derecha: <code>x |&gt; f(y)</code> es <code>f(x, y)</code>.</p>
@@ -4040,8 +4042,11 @@ dmy("18/06/2026")          # día/mes/año     → 2026-06-18
 mdy("06-18-2026")          # mes-día-año     → 2026-06-18
 ymd_hms("2026-06-18 14:30:00")   # con hora  → 2026-06-18 14:30:00 UTC
 
-# Acepta formatos variados sin que cambies la función:
-dmy(c("18/06/2026", "1 ene 2026", "18-06-2026"))</code></pre></div>
+# Acepta separadores variados sin que cambies la función:
+dmy(c("18/06/2026", "1-6-2026", "18-06-2026"))
+
+# ¿Meses con nombre? dependen del idioma del sistema; especifícalo:
+dmy("1 ene 2026", locale = "es_CO")   # 2026-01-01</code></pre></div>
 
       <div class="callout danger"><span class="cic"><svg class="ci"><use href="#i-stop"/></svg></span><p><strong>El orden importa: "03/04" es ambiguo.</strong> ¿Es el 3 de abril o el 4 de marzo? Depende del origen de tus datos. <code>dmy("03/04/2026")</code> lo lee como 3 de abril; <code>mdy("03/04/2026")</code> como 4 de marzo. Elegir la función incorrecta no da error: da una fecha <em>silenciosamente equivocada</em>. Averigua el formato de tu fuente antes de parsear y verifica con un par de casos donde día &gt; 12.</p></div>
 
@@ -4065,13 +4070,17 @@ hour(fecha); minute(fecha)     # 14 ; 30</code></pre></div>
         <li><strong>Durations</strong> (<code>dmonths()</code>, <code>ddays()</code>, <code>dyears()</code>): tiempo en <em>segundos exactos</em>. Un <code>ddays(30)</code> son siempre 30 × 86400 segundos, sin importar el calendario.</li>
       </ul>
       <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R · lubridate</span><button class="copy">Copiar</button></div>
-<pre><code class="language-r">ymd("2026-01-31") + months(1)   # 2026-02-28  (period: "un mes calendario")
-ymd("2026-01-31") + ddays(30)   # 2026-03-02  (duration: 30 días exactos)
+<pre><code class="language-r">ymd("2026-01-31") + months(1)    # NA   ← ¡el 31 de febrero no existe!
+ymd("2026-01-31") %m+% months(1) # "2026-02-28"  (%m+% ajusta a fin de mes)
+ymd("2026-01-31") + ddays(30)    # "2026-03-02"  (duration: 30 días exactos)
 
-ymd("2024-02-29") + years(1)    # 2025-02-28  (period ajusta al no-bisiesto)
-ymd("2024-02-29") + dyears(1)   # 2025-02-28 06:00:00 (duration: 365.25 días)</code></pre></div>
+ymd("2024-02-29") + years(1)     # NA   ← el 29 de febrero no existe en 2025
+ymd("2024-02-29") %m+% years(1)  # "2025-02-28"  (%m+% retrocede al día válido)
+ymd("2024-02-29") + dyears(1)    # "2025-02-28 06:00:00" (duration: 365.25 días)</code></pre></div>
 
-      <div class="callout warn"><span class="cic"><svg class="ci"><use href="#i-alert"/></svg></span><p><strong>Cuándo usar cuál:</strong> para lógica de negocio humana ("la factura vence en 1 mes", "renovar en 1 año") usa <strong>periods</strong>: <code>months(1)</code>. Para intervalos físicos exactos ("¿cuántos segundos pasaron entre dos eventos?") usa <strong>durations</strong>: <code>ddays()</code>. Confundirlos produce errores de un día que aparecen justo en fin de mes o en febrero.</p></div>
+      <div class="callout danger"><span class="cic"><svg class="ci"><use href="#i-stop"/></svg></span><p><strong>La trampa que confunde a todos:</strong> sumar un <em>period</em> con <code>+</code> <strong>no ajusta</strong> automáticamente. Si el resultado cae en una fecha que no existe (31 de febrero, 29 de febrero de un año no bisiesto), <code>+ months()</code> devuelve <code>NA</code>, no la fecha "más cercana". Para el comportamiento humano "un mes calendario que respeta el fin de mes" usa el operador <code>%m+%</code> (o <code>add_with_rollback()</code>), que retrocede al último día válido del mes.</p></div>
+
+      <div class="callout warn"><span class="cic"><svg class="ci"><use href="#i-alert"/></svg></span><p><strong>Periods vs. durations:</strong> para lógica de negocio humana ("la factura vence en 1 mes") usa <strong>periods</strong> con <code>%m+%</code>. Para intervalos físicos exactos ("¿cuántos segundos pasaron entre dos eventos?") usa <strong>durations</strong>: <code>ddays()</code>. Confundirlos produce errores de un día que aparecen justo en fin de mes o en febrero.</p></div>
 
       <h2>Redondear fechas: floor / ceiling / round</h2>
       <p>Para agregar por periodos (ventas por mes, por semana) necesitas "aplastar" cada fecha al inicio de su periodo. Ese es el trabajo de <code>floor_date</code>.</p>
@@ -4112,9 +4121,9 @@ as.numeric(today() - ymd("2000-01-01"))   # días transcurridos</code></pre></di
       <details class="acc"><summary>Ver solución</summary><div class="accbody">
 <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R · lubridate</span><button class="copy">Copiar</button></div>
 <pre><code class="language-r">emision <- ymd("2026-01-31")
-emision + months(1)   # 2026-02-28  (un mes de calendario)
-emision + ddays(30)   # 2026-03-02  (30 días exactos)</code></pre></div>
-<p><code>months(1)</code> es un <em>period</em>: respeta que febrero de 2026 termina el 28, así que "un mes después del 31 de enero" se ajusta al 28. <code>ddays(30)</code> es una <em>duration</em>: cuenta 30 días físicos, que caen en marzo. La diferencia nace de mezclar tiempo de calendario con tiempo físico.</p></div></details>
+emision %m+% months(1)   # "2026-02-28"  (un mes de calendario, con rollback)
+emision + ddays(30)      # "2026-03-02"  (30 días exactos)</code></pre></div>
+<p>Ojo con el operador: <code>emision + months(1)</code> daría <code>NA</code> porque el 31 de febrero no existe. Por eso usamos <code>%m+%</code>, que respeta que febrero de 2026 termina el 28 y ajusta "un mes después del 31 de enero" al día 28. <code>ddays(30)</code> es una <em>duration</em>: cuenta 30 días físicos, que caen en marzo. La diferencia nace de mezclar tiempo de calendario con tiempo físico.</p></div></details>
 
       <div class="pager"><a data-go="stringr"><small>Anterior</small><b>← stringr</b></a><a class="next" data-go="ggplot2"><small>Siguiente</small><b>ggplot2 →</b></a></div>
     </section>
@@ -4831,7 +4840,7 @@ retrasos</code></pre>
  5 OO              11.9       26 SkyWest Airlines Inc.
  6 MQ              10.8    25710 Envoy Air
  # ... 10 filas mas</div></div>
-      <p><strong>Lectura:</strong> Frontier (F9) encabeza con casi 22 minutos de retraso medio, pero ojo: solo 681 vuelos. ExpressJet (EV), en cambio, llega tarde 15,8 minutos <em>en 51.108 vuelos</em>: ese promedio es rocoso y afecta a muchísima más gente. El <code>left_join</code> con <code>airlines</code> fue clave: sin él estarías mirando códigos como "EV" que no le dicen nada a tu jefe.</p>
+      <p><strong>Lectura:</strong> Frontier (F9) encabeza con casi 22 minutos de retraso medio, pero ojo: solo 681 vuelos. ExpressJet (EV), en cambio, llega tarde 15,8 minutos <em>en 51.108 vuelos</em>: ese promedio es sólido y afecta a muchísima más gente. El <code>left_join</code> con <code>airlines</code> fue clave: sin él estarías mirando códigos como "EV" que no le dicen nada a tu jefe.</p>
 
       <div class="callout tip"><span class="cic"><svg class="ci"><use href="#i-bulb"/></svg></span><p><strong>Siempre mira el tamaño de muestra:</strong> un promedio calculado sobre 26 vuelos (SkyWest) no es comparable con uno sobre 51.000. Antes de sacar conclusiones, revisa <code>n_vuelos</code>. Es el reflejo que separa a un analista de alguien que solo ordena columnas.</p></div>
 

@@ -603,7 +603,7 @@ table.data tr:hover td{background:var(--surface-2)}
         <li><strong>Native vectorization.</strong> In R you operate on entire columns of data in one stroke, without writing loops. It is the same mental model as Excel ("apply the formula to the whole column"), but programmable and auditable.</li>
         <li><strong>Statistics out of the box.</strong> Regressions (<code>lm()</code>), hypothesis tests (<code>t.test()</code>), distributions, and frequency tables come included without installing anything. In other languages that requires external libraries.</li>
         <li><strong>Publication-quality graphics.</strong> With <code>ggplot2</code> you produce figures ready for a consulting report, a paper, or a newspaper.</li>
-        <li><strong>CRAN: ~22,000 reviewed packages.</strong> Every CRAN package goes through daily automated checks on several platforms. If a statistical technique has been published, there is almost certainly a package that implements it.</li>
+        <li><strong>CRAN: more than 21,000 reviewed packages.</strong> Every CRAN package goes through daily automated checks on several platforms. If a statistical technique has been published, there is almost certainly a package that implements it.</li>
         <li><strong>Reproducible reports.</strong> With Quarto and R Markdown, the report and the analysis live in the same document: when the data changes, the entire PDF/Word/HTML regenerates.</li>
       </ul>
       <p>See vectorization in action with a classic economics case: adjusting a series of salaries for a negotiated raise.</p>
@@ -3090,8 +3090,10 @@ convert_temp(25, "K")     # 298.15</code></pre>
 
 describe(c(1, 2, NA, 4))                # NA because there is a missing value
 describe(c(1, 2, NA, 4), na.rm = TRUE)  # the ... pass na.rm to mean and sd</code></pre>
-<div class="out">mean    sd
- 2.33  1.53 </div></div>
+<div class="out">    mean       sd
+      NA       NA
+    mean       sd
+2.333333 1.527525</div></div>
 
       <h2>Lexical scope: why not to touch global variables</h2>
       <p>R uses <strong>lexical scope</strong>: a function looks for variables where it was <em>written</em>, not where it was <em>called</em>. Inside a function, assignments create <em>local</em> variables that vanish when it ends. This is a virtue: the function does not pollute your global environment. Modifying globals from inside breaks that promise and makes the result depend on invisible state.</p>
@@ -3586,7 +3588,7 @@ model &lt;- mtcars |> lm(mpg ~ wt, data = _)</code></pre></div>
       <span class="section-label sl2">Intermediate Level</span>
       <div class="breadcrumbs"><a data-nav="inicio">Home</a><span class="sep">/</span><span>Intermediate Level</span><span class="sep">/</span><span>dplyr</span></div>
       <h1 class="page-title">dplyr: manipulating data</h1>
-      <p class="lead">dplyr is not a collection of loose functions: it is a <strong>grammar</strong>. Every verb obeys the same contract: a data frame goes in and a data frame comes out. Because the output is the same type as the input, you can chain verbs with the pipe <code>|&gt;</code> and read a complex transformation as a sentence: "take the sales, keep the ones from this quarter, group them by region, and summarise the total". If you internalize six verbs and that contract, you cover 90% of tabular data manipulation. Current version: <strong>dplyr 1.2</strong>.</p>
+      <p class="lead">dplyr is not a collection of loose functions: it is a <strong>grammar</strong>. Every verb obeys the same contract: a data frame goes in and a data frame comes out. Because the output is the same type as the input, you can chain verbs with the pipe <code>|&gt;</code> and read a complex transformation as a sentence: "take the sales, keep the ones from this quarter, group them by region, and summarise the total". If you internalize six verbs and that contract, you cover 90% of tabular data manipulation.</p>
 
       <h2>The mental model: a data frame in, a data frame out</h2>
       <p>That uniformity is the key idea. In base R you jump between <code>[]</code>, <code>$</code>, <code>subset()</code>, <code>aggregate()</code>, and <code>apply()</code>, each with its own syntax. In dplyr, every verb takes the table as its first argument and returns another table, so the result of one step can always feed the next. The pipe <code>|&gt;</code> simply moves that object to the right: <code>x |&gt; f(y)</code> is <code>f(x, y)</code>.</p>
@@ -4038,8 +4040,11 @@ dmy("18/06/2026")          # day/month/year  → 2026-06-18
 mdy("06-18-2026")          # month-day-year  → 2026-06-18
 ymd_hms("2026-06-18 14:30:00")   # with time → 2026-06-18 14:30:00 UTC
 
-# It accepts varied formats without you changing the function:
-dmy(c("18/06/2026", "1 jan 2026", "18-06-2026"))</code></pre></div>
+# It accepts varied separators without you changing the function:
+dmy(c("18/06/2026", "1-6-2026", "18-06-2026"))
+
+# Named months? They depend on the system language; state it explicitly:
+dmy("1 jan 2026", locale = "en_US")   # 2026-01-01</code></pre></div>
 
       <div class="callout danger"><span class="cic"><svg class="ci"><use href="#i-stop"/></svg></span><p><strong>Order matters: "03/04" is ambiguous.</strong> Is it April 3rd or March 4th? It depends on the origin of your data. <code>dmy("03/04/2026")</code> reads it as April 3rd; <code>mdy("03/04/2026")</code> as March 4th. Choosing the wrong function doesn't raise an error: it gives a <em>silently wrong</em> date. Find out your source's format before parsing, and verify with a couple of cases where day &gt; 12.</p></div>
 
@@ -4063,13 +4068,17 @@ hour(date); minute(date)      # 14 ; 30</code></pre></div>
         <li><strong>Durations</strong> (<code>dmonths()</code>, <code>ddays()</code>, <code>dyears()</code>): time in <em>exact seconds</em>. A <code>ddays(30)</code> is always 30 × 86400 seconds, regardless of the calendar.</li>
       </ul>
       <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R · lubridate</span><button class="copy">Copy</button></div>
-<pre><code class="language-r">ymd("2026-01-31") + months(1)   # 2026-02-28  (period: "one calendar month")
-ymd("2026-01-31") + ddays(30)   # 2026-03-02  (duration: 30 exact days)
+<pre><code class="language-r">ymd("2026-01-31") + months(1)    # NA   ← February 31st doesn't exist!
+ymd("2026-01-31") %m+% months(1) # "2026-02-28"  (%m+% rolls back to month-end)
+ymd("2026-01-31") + ddays(30)    # "2026-03-02"  (duration: 30 exact days)
 
-ymd("2024-02-29") + years(1)    # 2025-02-28  (period adjusts to non-leap year)
-ymd("2024-02-29") + dyears(1)   # 2025-02-28 06:00:00 (duration: 365.25 days)</code></pre></div>
+ymd("2024-02-29") + years(1)     # NA   ← Feb 29th doesn't exist in 2025
+ymd("2024-02-29") %m+% years(1)  # "2025-02-28"  (%m+% rolls back to a valid day)
+ymd("2024-02-29") + dyears(1)    # "2025-02-28 06:00:00" (duration: 365.25 days)</code></pre></div>
 
-      <div class="callout warn"><span class="cic"><svg class="ci"><use href="#i-alert"/></svg></span><p><strong>When to use which:</strong> for human business logic ("the invoice is due in 1 month", "renew in 1 year") use <strong>periods</strong>: <code>months(1)</code>. For exact physical intervals ("how many seconds passed between two events?") use <strong>durations</strong>: <code>ddays()</code>. Confusing them produces off-by-one-day errors that show up right at the end of the month or in February.</p></div>
+      <div class="callout danger"><span class="cic"><svg class="ci"><use href="#i-stop"/></svg></span><p><strong>The trap that catches everyone:</strong> adding a <em>period</em> with <code>+</code> does <strong>not</strong> auto-adjust. If the result lands on a date that doesn't exist (February 31st, February 29th of a non-leap year), <code>+ months()</code> returns <code>NA</code>, not the "nearest" date. For the human behavior "one calendar month that respects month-end" use the <code>%m+%</code> operator (or <code>add_with_rollback()</code>), which rolls back to the last valid day of the month.</p></div>
+
+      <div class="callout warn"><span class="cic"><svg class="ci"><use href="#i-alert"/></svg></span><p><strong>Periods vs. durations:</strong> for human business logic ("the invoice is due in 1 month") use <strong>periods</strong> with <code>%m+%</code>. For exact physical intervals ("how many seconds passed between two events?") use <strong>durations</strong>: <code>ddays()</code>. Confusing them produces off-by-one-day errors that show up right at the end of the month or in February.</p></div>
 
       <h2>Rounding dates: floor / ceiling / round</h2>
       <p>To aggregate by periods (sales per month, per week) you need to "flatten" each date to the start of its period. That's the job of <code>floor_date</code>.</p>
@@ -4110,9 +4119,9 @@ as.numeric(today() - ymd("2000-01-01"))   # days elapsed</code></pre></div>
       <details class="acc"><summary>View solution</summary><div class="accbody">
 <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R · lubridate</span><button class="copy">Copy</button></div>
 <pre><code class="language-r">issued <- ymd("2026-01-31")
-issued + months(1)   # 2026-02-28  (one calendar month)
-issued + ddays(30)   # 2026-03-02  (30 exact days)</code></pre></div>
-<p><code>months(1)</code> is a <em>period</em>: it respects that February 2026 ends on the 28th, so "one month after January 31st" adjusts to the 28th. <code>ddays(30)</code> is a <em>duration</em>: it counts 30 physical days, which land in March. The difference arises from mixing calendar time with physical time.</p></div></details>
+issued %m+% months(1)   # "2026-02-28"  (one calendar month, with rollback)
+issued + ddays(30)      # "2026-03-02"  (30 exact days)</code></pre></div>
+<p>Mind the operator: <code>issued + months(1)</code> would return <code>NA</code> because February 31st doesn't exist. That's why we use <code>%m+%</code>, which respects that February 2026 ends on the 28th and adjusts "one month after January 31st" to the 28th. <code>ddays(30)</code> is a <em>duration</em>: it counts 30 physical days, which land in March. The difference arises from mixing calendar time with physical time.</p></div></details>
 
       <div class="pager"><a data-go="stringr"><small>Previous</small><b>← stringr</b></a><a class="next" data-go="ggplot2"><small>Next</small><b>Visualization with ggplot2 →</b></a></div>
     </section>
@@ -4828,7 +4837,7 @@ delays</code></pre>
  5 OO              11.9       26 SkyWest Airlines Inc.
  6 MQ              10.8    25710 Envoy Air
  # ... 10 more rows</div></div>
-      <p><strong>Reading:</strong> Frontier (F9) leads with almost 22 minutes of mean delay, but watch out: only 681 flights. ExpressJet (EV), by contrast, arrives 15.8 minutes late <em>across 51,108 flights</em>: that average is rock-solid and affects far more people. The <code>left_join</code> with <code>airlines</code> was key: without it you'd be staring at codes like "EV" that mean nothing to your boss.</p>
+      <p><strong>Reading:</strong> Frontier (F9) leads with almost 22 minutes of mean delay, but watch out: only 681 flights. ExpressJet (EV), by contrast, arrives 15.8 minutes late <em>across 51,108 flights</em>: that average is rock-solid (in the good sense) and affects far more people. The <code>left_join</code> with <code>airlines</code> was key: without it you'd be staring at codes like "EV" that mean nothing to your boss.</p>
 
       <div class="callout tip"><span class="cic"><svg class="ci"><use href="#i-bulb"/></svg></span><p><strong>Always look at the sample size:</strong> an average computed over 26 flights (SkyWest) isn't comparable to one over 51,000. Before drawing conclusions, check <code>n_flights</code>. That reflex is what separates an analyst from someone who just sorts columns.</p></div>
 
