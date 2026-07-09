@@ -17,6 +17,12 @@ Guía completa e interactiva para dominar **R** de verdad: del primer `install.p
 
 ---
 
+## 📸 Vistazo
+
+| Interfaz de RStudio | Dashboard con Quarto |
+|:---:|:---:|
+| ![RStudio](img/rstudio-script.png) | ![Dashboard](img/quarto-dashboard.png) |
+
 ## ✨ Qué encontrarás
 
 - **3 niveles progresivos** — Básico → Intermedio → Avanzado, pensados para no perderte nunca.
