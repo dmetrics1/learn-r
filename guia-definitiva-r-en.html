@@ -2724,7 +2724,7 @@ Petal.Width          0.82       -0.37         0.96        1.00</div></div>
       <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R · sales_analysis.R</span><button class="copy">Copy</button></div>
 <pre><code class="language-r"># ============================================================
 # Monthly sales analysis — Caribbean Region
-# Author: L. Durango   ·   Last edited: 2026-07-08
+# Author: Daniel Molina   ·   Last edited: 2026-07-08
 # Goal: compute net sales and flag outlier months
 # ============================================================
 
@@ -3868,7 +3868,7 @@ wide</code></pre></div>
       <p>Often a single column hides several variables ("2026-06-18", "Ana Pérez"). <code>separate_wider_delim()</code> (the modern form, which replaces <code>separate()</code>) splits them by a delimiter; <code>unite()</code> does the opposite.</p>
       <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R · tidyr</span><button class="copy">Copy</button></div>
 <pre><code class="language-r">df <- tibble(date = c("2026-06-18","2026-07-01"),
-             name = c("Ana","Luis"), last_name = c("Pérez","Durán"))
+             name = c("Ana","Daniel"), last_name = c("Pérez","Molina"))
 
 # Split 'date' into three columns
 df |> separate_wider_delim(
@@ -3878,14 +3878,14 @@ df |> separate_wider_delim(
 # Join name + last_name
 df |> unite("full_name", name, last_name, sep = " ")</code></pre></div>
       <div class="out"># separate_wider_delim →
-  year  month day   name   last_name
-  2026  06    18    Ana    Pérez
-  2026  07    01    Luis   Durán
+  year  month day   name    last_name
+  2026  06    18    Ana     Pérez
+  2026  07    01    Daniel  Molina
 
 # unite →
   date         full_name
   2026-06-18   Ana Pérez
-  2026-07-01   Luis Durán</div>
+  2026-07-01   Daniel Molina</div>
 
       <div class="callout warn"><span class="cic"><svg class="ci"><use href="#i-alert"/></svg></span><p><strong>Watch out for types:</strong> after <code>separate_wider_delim()</code>, <code>year</code>, <code>month</code>, and <code>day</code> are <em>text</em>, not numbers (notice the "06" and "01" with a leading zero). Convert with <code>mutate(year = as.integer(year))</code> if you're going to do arithmetic. For dates, it's almost always better to parse directly with lubridate rather than splitting.</p></div>
 
@@ -3930,12 +3930,12 @@ long |>
       <h3>Length, case, whitespace, and padding</h3>
       <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R · stringr</span><button class="copy">Copy</button></div>
 <pre><code class="language-r">library(stringr)
-x <- c("Ana Pérez", "luis durán", "  CARLA  ")
+x <- c("Ana Pérez", "daniel molina", "  CARLA  ")
 
-str_length(x)              # 9 10 9  (counts spaces)
+str_length(x)              # 9 13 9  (counts spaces)
 str_to_upper(x)            # "ANA PÉREZ" ...
 str_to_lower(x)            # "ana pérez" ...
-str_to_title(x)            # "Ana Pérez" "Luis Durán" "  Carla  "
+str_to_title(x)            # "Ana Pérez" "Daniel Molina" "  Carla  "
 str_trim(x)                # strips leading/trailing spaces: "CARLA"
 str_squish(x)              # also collapses multiple internal spaces
 str_pad("7", width = 4, pad = "0")   # "0007"  (handy for codes)</code></pre></div>
@@ -3983,22 +3983,22 @@ str_split("a,b,c", ",")                   # list(c("a","b","c"))</code></pre></d
       <h2>Real example: cleaning a contacts database</h2>
       <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R · stringr + dplyr</span><button class="copy">Copy</button></div>
 <pre><code class="language-r">contacts <- tibble(
-  name  = c("  ana pérez ", "LUIS  DURÁN", "Carla Gómez"),
+  name  = c("  ana pérez ", "DANIEL  MOLINA", "Carla Gómez"),
   phone = c("tel: (300) 555-1212", "mobile 311.444.9090", "3155551234"),
   code  = c("FACT-A12", "FACT-B34", "REC-C99")
 )
 
 contacts |>
   mutate(
-    name   = str_to_title(str_squish(name)),          # "Ana Pérez", "Luis Durán"
+    name   = str_to_title(str_squish(name)),          # "Ana Pérez", "Daniel Molina"
     phone  = str_remove_all(phone, "[^0-9]"),          # digits only: "3005551212"
     prefix = str_extract(code, "^[A-Z]+"),             # "FACT", "REC"
     number = str_extract(code, "\\d+")                 # "12", "34", "99"
   )</code></pre></div>
-      <div class="out">name         phone        code      prefix number
-Ana Pérez    3005551212   FACT-A12  FACT   12
-Luis Durán   3114449090   FACT-B34  FACT   34
-Carla Gómez  3155551234   REC-C99   REC    99</div>
+      <div class="out">name           phone        code      prefix number
+Ana Pérez      3005551212   FACT-A12  FACT   12
+Daniel Molina  3114449090   FACT-B34  FACT   34
+Carla Gómez    3155551234   REC-C99   REC    99</div>
 
       <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>Cleaning idea:</strong> to normalize phone numbers it's almost never worth describing the exact format (parentheses, dots, dashes vary too much). It's more robust to <em>delete everything that isn't a digit</em> with <code>str_remove_all(phone, "[^0-9]")</code> and keep the clean sequence. Fewer rules, more resistant to messiness.</p></div>
 
@@ -4386,7 +4386,7 @@ mean in group 1 (manual):     24.39</div></div>
       <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">Quarto · report.qmd</span><button class="copy">Copy</button></div>
 <pre><code class="language-r">---
 title: "Sales report"
-author: "Luis Durán"
+author: "Daniel Molina"
 date: today
 format: html
 execute:

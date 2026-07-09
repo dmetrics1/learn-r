@@ -2726,7 +2726,7 @@ Petal.Width          0.82       -0.37         0.96        1.00</div></div>
       <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R · analisis_ventas.R</span><button class="copy">Copiar</button></div>
 <pre><code class="language-r"># ============================================================
 # Análisis de ventas mensuales — Región Caribe
-# Autor: L. Durango   ·   Última edición: 2026-07-08
+# Autor: Daniel Molina   ·   Última edición: 2026-07-08
 # Objetivo: calcular ventas netas y detectar meses atípicos
 # ============================================================
 
@@ -3870,7 +3870,7 @@ ancho</code></pre></div>
       <p>A menudo una columna esconde varias variables ("2026-06-18", "Ana Pérez"). <code>separate_wider_delim()</code> (la forma moderna, que reemplaza a <code>separate()</code>) las divide por un delimitador; <code>unite()</code> hace lo contrario.</p>
       <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R · tidyr</span><button class="copy">Copiar</button></div>
 <pre><code class="language-r">df <- tibble(fecha = c("2026-06-18","2026-07-01"),
-             nombre = c("Ana","Luis"), apellido = c("Pérez","Durán"))
+             nombre = c("Ana","Daniel"), apellido = c("Pérez","Molina"))
 
 # Partir 'fecha' en tres columnas
 df |> separate_wider_delim(
@@ -3880,14 +3880,14 @@ df |> separate_wider_delim(
 # Unir nombre + apellido
 df |> unite("nombre_completo", nombre, apellido, sep = " ")</code></pre></div>
       <div class="out"># separate_wider_delim →
-  anio  mes   dia   nombre apellido
-  2026  06    18    Ana    Pérez
-  2026  07    01    Luis   Durán
+  anio  mes   dia   nombre  apellido
+  2026  06    18    Ana     Pérez
+  2026  07    01    Daniel  Molina
 
 # unite →
   fecha        nombre_completo
   2026-06-18   Ana Pérez
-  2026-07-01   Luis Durán</div>
+  2026-07-01   Daniel Molina</div>
 
       <div class="callout warn"><span class="cic"><svg class="ci"><use href="#i-alert"/></svg></span><p><strong>Ojo con los tipos:</strong> tras <code>separate_wider_delim()</code>, <code>anio</code>, <code>mes</code> y <code>dia</code> son <em>texto</em>, no números (fíjate en el "06" y "01" con cero a la izquierda). Convierte con <code>mutate(anio = as.integer(anio))</code> si vas a hacer aritmética. Para fechas, casi siempre es mejor parsear directamente con lubridate en lugar de separar.</p></div>
 
@@ -3932,12 +3932,12 @@ largo |>
       <h3>Longitud, caso, espacios y relleno</h3>
       <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R · stringr</span><button class="copy">Copiar</button></div>
 <pre><code class="language-r">library(stringr)
-x <- c("Ana Pérez", "luis durán", "  CARLA  ")
+x <- c("Ana Pérez", "daniel molina", "  CARLA  ")
 
-str_length(x)              # 9 10 9  (cuenta espacios)
+str_length(x)              # 9 13 9  (cuenta espacios)
 str_to_upper(x)            # "ANA PÉREZ" ...
 str_to_lower(x)            # "ana pérez" ...
-str_to_title(x)            # "Ana Pérez" "Luis Durán" "  Carla  "
+str_to_title(x)            # "Ana Pérez" "Daniel Molina" "  Carla  "
 str_trim(x)                # quita espacios de los extremos: "CARLA"
 str_squish(x)              # además colapsa espacios internos múltiples
 str_pad("7", width = 4, pad = "0")   # "0007"  (útil para códigos)</code></pre></div>
@@ -3985,22 +3985,22 @@ str_split("a,b,c", ",")                   # list(c("a","b","c"))</code></pre></d
       <h2>Ejemplo real: limpiar una base de contactos</h2>
       <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R · stringr + dplyr</span><button class="copy">Copiar</button></div>
 <pre><code class="language-r">contactos <- tibble(
-  nombre = c("  ana pérez ", "LUIS  DURÁN", "Carla Gómez"),
+  nombre = c("  ana pérez ", "DANIEL  MOLINA", "Carla Gómez"),
   tel    = c("tel: (300) 555-1212", "movil 311.444.9090", "3155551234"),
   codigo = c("FACT-A12", "FACT-B34", "REC-C99")
 )
 
 contactos |>
   mutate(
-    nombre = str_to_title(str_squish(nombre)),        # "Ana Pérez", "Luis Durán"
+    nombre = str_to_title(str_squish(nombre)),        # "Ana Pérez", "Daniel Molina"
     tel    = str_remove_all(tel, "[^0-9]"),            # solo dígitos: "3005551212"
     prefijo = str_extract(codigo, "^[A-Z]+"),          # "FACT", "REC"
     numero  = str_extract(codigo, "\\d+")              # "12", "34", "99"
   )</code></pre></div>
-      <div class="out">nombre       tel          codigo   prefijo numero
-Ana Pérez    3005551212   FACT-A12  FACT    12
-Luis Durán   3114449090   FACT-B34  FACT    34
-Carla Gómez  3155551234   REC-C99   REC     99</div>
+      <div class="out">nombre         tel          codigo   prefijo numero
+Ana Pérez      3005551212   FACT-A12  FACT    12
+Daniel Molina  3114449090   FACT-B34  FACT    34
+Carla Gómez    3155551234   REC-C99   REC     99</div>
 
       <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>Idea de limpieza:</strong> para normalizar teléfonos casi nunca vale la pena describir el formato exacto (paréntesis, puntos, guiones varían demasiado). Es más robusto <em>borrar todo lo que no sea dígito</em> con <code>str_remove_all(tel, "[^0-9]")</code> y quedarte con la secuencia limpia. Menos reglas, más resistente a la suciedad.</p></div>
 
@@ -4389,7 +4389,7 @@ mean in group 1 (manual):     24.39</div></div>
       <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">Quarto · informe.qmd</span><button class="copy">Copiar</button></div>
 <pre><code class="language-r">---
 title: "Informe de ventas"
-author: "Luis Durán"
+author: "Daniel Molina"
 date: today
 format: html
 execute:
