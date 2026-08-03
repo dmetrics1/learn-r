@@ -2492,6 +2492,8 @@ Honda Civic    30.4   4</div></div></div></details>
       <div class="breadcrumbs"><a data-nav="inicio">Home</a><span class="sep">/</span><span>Basic Level</span><span class="sep">/</span><span>Import / export</span></div>
       <h1 class="page-title">Importing and exporting data</h1>
       <p class="lead">90% of real projects don't start with clean data: they start with a file somebody else put together — a CSV exported from an accounting system, an Excel file with three title rows, an official statistics download with broken accents. Importing well is your first professional R skill.</p>
+      <p>In the previous chapter you took the data frame apart from the inside; in this one you'll learn how it gets filled. Until now, every dataset in this guide was typed by you with <code>c()</code> — didactic, but unreal: at work, data comes from outside, in files you don't control, with formatting decisions made by someone else (or some other software) years ago.</p>
+      <p>And that is why this chapter exists: importing is the border where the real world touches R, and it is also where the most silent errors of the whole workflow are born — the amounts column that arrived as text, the date that arrived as a serial number, the accent turned into hieroglyphics. None of them stops your script; all of them corrupt your results. The good news is that they are few, predictable, and one line away from a fix, if you know how to recognize them.</p>
       <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>By the end you'll know how to:</strong> import CSV, Excel, SPSS/Stata and JSON (and save to CSV, xlsx and <code>.rds</code>), read the column-type report and audit with <code>str()</code>, fix the classic disasters (semicolons and decimal commas, broken accents, Excel serial dates, headers below row 1), and use projects with <code>here()</code> instead of absolute paths.</p></div>
 
       <p>The good news: R reads practically any format. The bad news: every format has its traps, and almost all of them are predictable. This section gives you the tools plus the catalog of classic disasters so that none of them catches you off guard.</p>
@@ -2626,6 +2628,7 @@ parse_number("$ 1.250.300,50",
 as.Date(45292, origin = "1899-12-30")   # Excel serial → real date</code></pre>
 <div class="out">[1] 1250300.5
 [1] "2024-01-01"</div></div>
+      <p>Read the two rescues: <code>parse_number()</code> extracted the clean number from a string with a currency symbol, dots for thousands and a decimal comma — it is the vacuum cleaner for dirty monetary columns. And the serial 45292 became January 1st, 2024 thanks to the <code>"1899-12-30"</code> origin (yes, December 30 and not 31: Excel has dragged a historical leap-year bug since 1900, and that shifted origin compensates for it).</p>
 
       <div class="callout warn"><span class="cic"><svg class="ci"><use href="#i-alert"/></svg></span><p><strong>After importing, audit:</strong> always run <code>str()</code> or <code>summary()</code> on what you just read. A "successful" import (no error) does not guarantee correct types: an amounts column stored as text is a silent error that only blows up when you try to sum it.</p></div>
 
@@ -2642,6 +2645,8 @@ sales <- read_delim("sales_2025.csv", delim = ";",
 str(sales)      # audit: amounts as num/dbl and accents intact</code></pre></div>
 <p><code>read_csv2("sales_2025.csv", locale = locale(encoding = "Latin1"))</code> also works: <code>read_csv2()</code> already assumes <code>;</code> and the decimal comma, so the encoding was the only missing piece.</p></div></details>
 
+      <div class="challenge"><div class="xhead"><svg class="ci"><use href="#i-trophy"/></svg>Challenge</div><p>The accounting team hands you two files for Monday's report: <code>sales_january.csv</code> (separated by <code>;</code>, decimal commas, broken accents when you open it) and <code>customers.xlsx</code> (real headers on row 3 and the date column as serials like <code>45658</code>). Write the complete import script: correct reads with <code>readr</code>/<code>readxl</code>, paths with <code>here()</code>, an audit with <code>str()</code> of each table, and both saved into <code>data/processed/</code> as <code>.rds</code>. Deliverable: the commented script plus two sentences identifying which of the 5 disasters from the table showed up and how you fixed them.</p></div>
+
       <div class="exercise"><div class="xhead"><svg class="ci"><use href="#i-pencil"/></svg>Practice exercise</div><p>A client sends you <code>report.xlsx</code>: the data live in the <code>"Data"</code> sheet, the real headers are on row 4, and the <code>date</code> column arrives as numbers like <code>45658</code>. Write the complete import.</p></div>
       <details class="acc"><summary>View solution</summary><div class="accbody">
 <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R</span><button class="copy">Copy</button></div>
@@ -2653,7 +2658,7 @@ data$date <- as.Date(data$date, origin = "1899-12-30")
 data <- read_excel("report.xlsx", sheet = "Data", skip = 3,
                    col_types = c("text", "date", "numeric"))</code></pre></div></div></details>
 
-      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>In short:</strong> R reads almost any format, but each one has predictable traps. Read the column-type report on import and always audit with <code>str()</code> or <code>summary()</code> — a "successful" read is not a correct one. Fix the classic disasters (semicolons and decimal commas with <code>read_csv2()</code>, broken accents with <code>locale(encoding=)</code>, Excel serial dates, headers below row 1), and work inside a project with <code>here()</code>, keeping raw data in CSV/Excel and processed results in <code>.rds</code>.</p></div>
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>In short:</strong> R reads almost any format, but each one has predictable traps. Read the column-type report on import and always audit with <code>str()</code> or <code>summary()</code> — a "successful" read is not a correct one. Fix the classic disasters (semicolons and decimal commas with <code>read_csv2()</code>, broken accents with <code>locale(encoding=)</code>, Excel serial dates, headers below row 1), and work inside a project with <code>here()</code>, keeping raw data in CSV/Excel and processed results in <code>.rds</code>. In the next chapter, with the data now inside, comes the vocabulary for interrogating it: the essential functions of analysis.</p></div>
 
       <div class="pager"><a data-go="dataframes"><small>Previous</small><b>← Data frames</b></a><a class="next" data-go="funciones-basicas"><small>Next</small><b>Essential functions →</b></a></div>
     </section>
@@ -2663,6 +2668,8 @@ data <- read_excel("report.xlsx", sheet = "Data", skip = 3,
       <div class="breadcrumbs"><a data-nav="inicio">Home</a><span class="sep">/</span><span>Basic Level</span><span class="sep">/</span><span>Essential functions</span></div>
       <h1 class="page-title">Essential functions</h1>
       <p class="lead">A function takes arguments and returns a result. R ships with hundreds ready to use; this is the analyst's minimum vocabulary — the 30 functions that appear in practically every data-analysis script. Mastering them is the equivalent of knowing Excel's essential formulas, but on steroids.</p>
+      <p>You already know how to bring data in from outside; this chapter gives you the vocabulary to interrogate it. The analogy is learning a language: with the thousand most frequent words you understand most conversations, and with these ~30 functions you read and write most analysis scripts. The rest of the language is not memorized: it is looked up — and that is exactly what the next chapter is about.</p>
+      <p>Notice how this chapter is organized: by <em>questions</em>, not alphabetically. How much do they add up to, which is typical, how much do they vary? (numeric summaries). How many are there, which ones repeat? (ordering and counting). Where is it, is there any, do they all pass? (logicals). How do I present it? (text and rounding). When you think of the question, the function's name will come on its own.</p>
       <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>By the end you'll know how to:</strong> reach for the core vocabulary of numeric summaries, ordering/counting and text/rounding helpers, handle missing values deliberately with <code>na.rm = TRUE</code> after counting them, count and compute proportions with <code>sum()</code>/<code>mean()</code> over a condition, format figures with <code>sprintf()</code> and <code>format()</code>, and anticipate banker's rounding.</p></div>
 
       <h2>The essential vocabulary, by category</h2>
@@ -2704,6 +2711,7 @@ quantile(x)</code></pre>
 [1]  4 42
     0%    25%    50%    75%   100%
   4.00   9.75  15.50  21.25  42.00 </div></div>
+      <p>A quick read that already tells you things: the mean (18) sits above the median (15.5) because the 42 —an outlier— pulls the mean upward; the median resists. And <code>quantile()</code> hands you the quartiles in one go: the central half of the data lives between 9.75 and 21.25. That mean-median contrast is the cheapest skewness diagnosis in existence.</p>
       <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R</span><button class="copy">Copy</button></div>
 <pre><code class="language-r">ages <- c(31, 25, 28)
 sort(ages)                # sorted values
@@ -2759,6 +2767,16 @@ paste(c("Cali", "Bogotá"), collapse = " - ")  # collapses a vector into ONE str
 <div class="out">[1] "Region 1" "Region 2" "Region 3"
 [1] "ind_gdp" "ind_cpi"
 [1] "Cali - Bogotá"</div></div>
+      <p>And for cleaning and standardizing dirty text —ghost spaces, inconsistent casing, extracting pieces— this is the first-aid kit:</p>
+      <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R</span><button class="copy">Copy</button></div>
+<pre><code class="language-r">codes <- c(" bog ", "MED", "cali")
+toupper(trimws(codes))      # no spaces and uppercase: standardized
+nchar("Barranquilla")       # how many characters it has
+substr("2026-03-15", 1, 4)  # extract the year from a date-as-text</code></pre>
+<div class="out">[1] "BOG"  "MED"  "CALI"
+[1] 12
+[1] "2026"</div></div>
+      <p>The first one is a cleaning classic: <code>" bog "</code>, <code>"MED"</code> and <code>"cali"</code> look like "the same thing" but to R they are three different strings — <code>trimws()</code> strips the spaces and <code>toupper()</code> unifies the case, and only then will a <code>table()</code> or a table join treat them as equal. This pattern comes back on steroids in the <code>stringr</code> module.</p>
       <p>In <code>sprintf()</code>, the key codes are <code>%d</code> (integer), <code>%.2f</code> (decimal with 2 digits), <code>%s</code> (text) and <code>%%</code> for a literal percent sign:</p>
       <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R</span><button class="copy">Copy</button></div>
 <pre><code class="language-r">sprintf("Annual inflation: %.2f%%", 5.847)
@@ -2831,6 +2849,12 @@ sprintf("Total: $%s thousand · Monthly average: $%.0f thousand",
 [1] 4
 [1] 407.5
 [1] "Total: $9,420 thousand · Monthly average: $1570 thousand"</div></div>
+      <p>Let's read the workflow's figures:</p>
+      <ul>
+        <li><strong>Audit:</strong> 2 of 8 months unreported. That proportion (25% missing) should accompany any figure you deliver.</li>
+        <li><strong>Computation:</strong> the total (9,420) and the average (1,570) come from the six months with data; <code>which.max()</code> locates the best month at position 7, and 4 of the 6 measured months beat the 1,500 target.</li>
+        <li><strong>Report:</strong> <code>sprintf()</code> + <code>format()</code> turn the raw numbers into the sentence ready for the email — with thousands separators and no fake decimals.</li>
+      </ul>
       <p>Note the order of the workflow: first audit the <code>NA</code>s, then compute with a deliberate <code>na.rm</code>, and only at the end format for the report. That is the skeleton of any executive summary produced in R.</p>
 
       <div class="exercise"><div class="xhead"><svg class="ci"><use href="#i-pencil"/></svg>Practice exercise</div><p>Given <code>sales &lt;- c(120, 80, NA, 200, 95)</code>: (a) compute the total and the mean ignoring <code>NA</code>; (b) how many months exceeded 100?; (c) at which position is the best month?; (d) build with <code>sprintf()</code> the sentence <code>"The best month sold 200 units"</code>.</p></div>
@@ -2854,7 +2878,7 @@ sprintf("The best month sold %.0f units", max(sales, na.rm = TRUE))</code></pre>
 
       <div class="challenge"><div class="xhead"><svg class="ci"><use href="#i-trophy"/></svg>Challenge</div><p>With <code>airquality</code>: report, in a single sentence built with <code>sprintf()</code>, the average ozone level (<code>Ozone</code>, with 1 decimal), the number of days measured and the percentage of missing data in that column. Hints: <code>mean(..., na.rm = TRUE)</code>, <code>sum(!is.na(...))</code> and <code>mean(is.na(...)) * 100</code>.</p></div>
 
-      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>In short:</strong> this is the analyst's core vocabulary — summaries (<code>sum</code>, <code>mean</code>, <code>sd</code>, <code>quantile</code>), ordering and counting (<code>sort</code>, <code>order</code>, <code>table</code>), and text/rounding helpers (<code>paste</code>, <code>sprintf</code>, <code>format</code>, <code>round</code>). Use <code>na.rm = TRUE</code> deliberately but count the <code>NA</code>s first; remember <code>sum()</code>/<code>mean()</code> over a condition count and give proportions; and expect banker's rounding when a total looks "off by a cent".</p></div>
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>In short:</strong> this is the analyst's core vocabulary — summaries (<code>sum</code>, <code>mean</code>, <code>sd</code>, <code>quantile</code>), ordering and counting (<code>sort</code>, <code>order</code>, <code>table</code>), and text/rounding helpers (<code>paste</code>, <code>sprintf</code>, <code>format</code>, <code>round</code>). Use <code>na.rm = TRUE</code> deliberately but count the <code>NA</code>s first; remember <code>sum()</code>/<code>mean()</code> over a condition count and give proportions; and expect banker's rounding when a total looks "off by a cent". In the next chapter you'll learn not to depend on memory: how to read the help, decipher errors and ask good questions.</p></div>
 
       <div class="pager"><a data-go="import-export"><small>Previous</small><b>← Importing and exporting data</b></a><a class="next" data-go="ayuda"><small>Next</small><b>Help and documentation →</b></a></div>
     </section>
@@ -2863,6 +2887,7 @@ sprintf("The best month sold %.0f units", max(sales, na.rm = TRUE))</code></pre>
       <div class="breadcrumbs"><a data-nav="inicio">Home</a><span class="sep">/</span><span>Basic Level</span><span class="sep">/</span><span>Help</span></div>
       <h1 class="page-title">Help and documentation</h1>
       <p class="lead">Nobody memorizes all of R: professionals consult documentation every single day. Knowing <em>where</em> to look, <em>how</em> to read a help page, and <em>how</em> to decipher an error is a skill just as important as programming itself, and you train it like any other.</p>
+      <p>This chapter closes the theoretical part of the level, and it is no coincidence that it is this one. You just met ~30 functions with their arguments, and you will have noticed already: it is not possible (or necessary) to remember them all. What separates the stuck beginner from the one who keeps moving is not memory — it is solving in two minutes the "what was that argument called?" and the "why does this fail?". Here you learn exactly that: the skill that makes all the others self-sufficient.</p>
       <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>By the end you'll know how to:</strong> read a help page by its sections (starting with Examples), search with <code>?</code> vs <code>??</code> and vignettes, take an error message apart (which function failed and the key text) while distinguishing error, warning and message, search effectively online, and ask for help with a minimal reprex.</p></div>
 
       <p>Think about it: the difference between a beginner who gets stuck and one who keeps moving is rarely how much they know by heart. It's that the second one turns every error into an effective search. In this section you'll learn that entire workflow: built-in documentation, reading errors, searching online, and asking for help (from humans or an AI) in a way that gets you good answers.</p>
@@ -2882,6 +2907,7 @@ example(mean)  # runs the help page's examples in your console</code></pre>
 mean&gt; xm <- mean(x)
 mean&gt; c(xm, mean(x, trim = 0.10))
 [1] 8.75 5.50</div></div>
+      <p>Even the help page's example teaches something: the vector is 0 through 10 plus an outlying 50. The plain mean gives 8.75, dragged up by the 50; with <code>trim = 0.10</code>, R discards the most extreme 10% on each side (here, the 0 and the 50) and the "trimmed" mean drops to 5.50 — an argument you may not have known and just learned by running <code>example(mean)</code>. That is how this skill works in practice.</p>
 
       <p>Help pages feel intimidating at first because they're designed as <em>reference</em>, not as a tutorial. The trick is knowing which section to check depending on what you need:</p>
 
@@ -2964,6 +2990,8 @@ reprex::reprex(mean(c(23, 31, NA, 45)))</code></pre></div>
 
       <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>Golden rule when asking for help:</strong> the effort you put into the question comes back to you in the answer. A good reprex also has a magical side effect: by shrinking your problem down to its minimum, half the time you find the bug yourself before you even post.</p></div>
 
+      <p>Two pieces of information almost always worth including at the end of a question: your R version and the versions of the packages involved. <code>sessionInfo()</code> prints it all at once, and many "mysterious" problems turn out to be simply different versions of a package between your machine and the answerer's.</p>
+
       <h2>Where to ask and what to consult</h2>
       <ul>
         <li><strong>Posit Community</strong> (forum.posit.co): the most beginner-friendly community.</li>
@@ -2990,7 +3018,9 @@ seq(from = 1, to = 10, length.out = 4)   # length.out spreads n equally spaced p
       <p>Recommended search: <code>invalid 'type' (character) of argument in R</code>. Note that we didn't include the <code>"10"</code>: that part is specific to your code and only gets in the way of the search. The root cause: <code>sum()</code> expects numbers and got text; the typical fix is converting with <code>as.numeric()</code>.</p>
       </div></details>
 
-      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>In short:</strong> professionals consult documentation daily, so make it a skill. Read help pages by section — starting with Examples — use <code>?</code> for exact names and <code>??</code> to search by topic, and take errors apart (which function failed plus the key text) while distinguishing error, warning and message. When stuck, search the generic message in English; when asking, post a minimal, self-contained reprex.</p></div>
+      <div class="challenge"><div class="xhead"><svg class="ci"><use href="#i-trophy"/></svg>Challenge</div><p>In an inherited script you find the line <code>aggregate(salary ~ area, data, FUN = mean)</code> and you have never seen <code>aggregate()</code>. Without searching the internet, using only this chapter's tools: (1) open its help page and identify in <strong>Description</strong> what it does and in <strong>Value</strong> what it returns; (2) run one of its <strong>Examples</strong>; (3) reproduce the same calculation with the <code>tapply()</code> you met in the data frames chapter and check that the results agree. Deliverable: three sentences — what <code>aggregate()</code> does, how its output differs from <code>tapply()</code>'s, and which one you would prefer for a report and why.</p></div>
+
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>In short:</strong> professionals consult documentation daily, so make it a skill. Read help pages by section — starting with Examples — use <code>?</code> for exact names and <code>??</code> to search by topic, and take errors apart (which function failed plus the key text) while distinguishing error, warning and message. When stuck, search the generic message in English; when asking, post a minimal, self-contained reprex. And with this you close the level's theory: the next chapter brings no new concepts, just the capstone project where everything you learned works together.</p></div>
 
       <div class="pager"><a data-go="funciones-basicas"><small>Previous</small><b>← Essential functions</b></a><a class="next" data-go="proyecto-1"><small>Next</small><b>★ Capstone project →</b></a></div>
     </section>

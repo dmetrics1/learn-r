@@ -2501,6 +2501,8 @@ Honda Civic    30.4   4</div></div></div></details>
       <div class="breadcrumbs"><a data-nav="inicio">Inicio</a><span class="sep">/</span><span>Nivel Básico</span><span class="sep">/</span><span>Importar / exportar</span></div>
       <h1 class="page-title">Importación y exportación de datos</h1>
       <p class="lead">El 90% de los proyectos reales no empieza con datos limpios: empieza con un archivo que alguien más armó — un CSV exportado de un sistema contable, un Excel con tres filas de título, una base del DANE con tildes rotas. Importar bien es la primera habilidad profesional de R.</p>
+      <p>En el capítulo anterior desarmaste el data frame por dentro; en este aprenderás cómo se llena. Hasta ahora todos los datos de la guía los escribiste tú con <code>c()</code> — didáctico, pero irreal: en el trabajo, los datos llegan de afuera, en archivos que no controlas, con decisiones de formato que tomó otra persona (u otro software) hace años.</p>
+      <p>Y ahí está el porqué de este capítulo: la importación es la frontera donde el mundo real toca a R, y es también donde nacen los errores más silenciosos de todo el flujo — la columna de montos que llegó como texto, la fecha que llegó como serial, la tilde convertida en jeroglífico. Ninguno detiene tu script; todos corrompen tus resultados. La buena noticia es que son pocos, predecibles y con solución de una línea, si sabes reconocerlos.</p>
 
       <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>Al terminar sabrás:</strong> importar CSV, Excel, SPSS/Stata, JSON y RDS con <code>readr</code>, <code>readxl</code> y <code>haven</code>; resolver los problemas típicos de LatAm (separador <code>;</code>, coma decimal, encoding Latin-1, seriales de fecha de Excel); usar rutas relativas con proyectos y <code>here()</code>; y exportar en el formato adecuado a cada destinatario.</p></div>
 
@@ -2636,6 +2638,7 @@ parse_number("$ 1.250.300,50",
 as.Date(45292, origin = "1899-12-30")   # serial de Excel → fecha real</code></pre>
 <div class="out">[1] 1250300.5
 [1] "2024-01-01"</div></div>
+      <p>Lee los dos rescates: <code>parse_number()</code> extrajo el número limpio de una cadena con símbolo de pesos, puntos de miles y coma decimal — es la aspiradora para columnas monetarias sucias. Y el serial 45292 se convirtió en el 1.º de enero de 2024 gracias al origen <code>"1899-12-30"</code> (sí, diciembre 30 y no 31: Excel arrastra desde 1900 un error histórico con los años bisiestos, y ese origen desplazado lo compensa).</p>
 
       <div class="callout warn"><span class="cic"><svg class="ci"><use href="#i-alert"/></svg></span><p><strong>Después de importar, audita:</strong> corre siempre <code>str()</code> o <code>summary()</code> sobre lo recién leído. Un import "exitoso" (sin error) no garantiza tipos correctos: la columna de montos como texto es un error silencioso que solo explota cuando intentas sumar.</p></div>
 
@@ -2652,6 +2655,8 @@ ventas <- read_delim("ventas_2025.csv", delim = ";",
 str(ventas)     # auditar: montos como num/dbl y tildes correctas</code></pre></div>
 <p>También sirve <code>read_csv2("ventas_2025.csv", locale = locale(encoding = "Latin1"))</code>: <code>read_csv2()</code> ya asume <code>;</code> y coma decimal, así que solo faltaba el encoding.</p></div></details>
 
+      <div class="challenge"><div class="xhead"><svg class="ci"><use href="#i-trophy"/></svg>Reto</div><p>El área contable te entrega dos archivos para el informe del lunes: <code>ventas_enero.csv</code> (separado por <code>;</code>, coma decimal, tildes rotas al abrirlo) y <code>clientes.xlsx</code> (encabezados reales en la fila 3 y la columna de fecha como seriales tipo <code>45658</code>). Escribe el script de importación completo: lecturas correctas con <code>readr</code>/<code>readxl</code>, rutas con <code>here()</code>, auditoría con <code>str()</code> de cada tabla, y guardado de ambas en <code>data/processed/</code> como <code>.rds</code>. Entregable: el script comentado más dos frases identificando cuáles de los 5 desastres de la tabla aparecieron y cómo los resolviste.</p></div>
+
       <div class="exercise"><div class="xhead"><svg class="ci"><use href="#i-pencil"/></svg>Ejercicio propuesto</div><p>Un cliente te envía <code>informe.xlsx</code>: los datos están en la hoja <code>"Datos"</code>, los encabezados reales en la fila 4, y la columna <code>fecha</code> llega como números tipo <code>45658</code>. Escribe la importación completa.</p></div>
       <details class="acc"><summary>Ver solución</summary><div class="accbody">
 <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R</span><button class="copy">Copiar</button></div>
@@ -2663,7 +2668,7 @@ datos$fecha <- as.Date(datos$fecha, origin = "1899-12-30")
 datos <- read_excel("informe.xlsx", sheet = "Datos", skip = 3,
                     col_types = c("text", "date", "numeric"))</code></pre></div></div></details>
 
-      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>En resumen:</strong> lee siempre el reporte de tipos y audita con <code>str()</code>/<code>summary()</code> tras importar, porque un import sin error no garantiza tipos correctos. Para archivos "colombianos" usa <code>read_csv2()</code> y <code>locale()</code>; para tildes rotas, <code>locale(encoding = "Latin1")</code>. Trabaja con proyectos y <code>here()</code> en vez de rutas absolutas, y guarda resultados intermedios en <code>.rds</code>.</p></div>
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>En resumen:</strong> lee siempre el reporte de tipos y audita con <code>str()</code>/<code>summary()</code> tras importar, porque un import sin error no garantiza tipos correctos. Para archivos "colombianos" usa <code>read_csv2()</code> y <code>locale()</code>; para tildes rotas, <code>locale(encoding = "Latin1")</code>. Trabaja con proyectos y <code>here()</code> en vez de rutas absolutas, y guarda resultados intermedios en <code>.rds</code>. En el siguiente capítulo, con los datos ya adentro, toca el vocabulario para interrogarlos: las funciones esenciales del análisis.</p></div>
 
       <div class="pager"><a data-go="dataframes"><small>Anterior</small><b>← Data Frames</b></a><a class="next" data-go="funciones-basicas"><small>Siguiente</small><b>Funciones básicas →</b></a></div>
     </section>
@@ -2673,6 +2678,8 @@ datos <- read_excel("informe.xlsx", sheet = "Datos", skip = 3,
       <div class="breadcrumbs"><a data-nav="inicio">Inicio</a><span class="sep">/</span><span>Nivel Básico</span><span class="sep">/</span><span>Funciones básicas</span></div>
       <h1 class="page-title">Funciones básicas</h1>
       <p class="lead">Una función toma argumentos y devuelve un resultado. R trae cientos listas para usar; este es el vocabulario mínimo del analista — las 30 funciones que aparecen en prácticamente todo script de análisis de datos. Dominarlas equivale a manejar las fórmulas esenciales de Excel, pero con esteroides.</p>
+      <p>Ya sabes traer datos de afuera; este capítulo te da el vocabulario para interrogarlos. La analogía es la de aprender un idioma: con las mil palabras más frecuentes entiendes la mayoría de las conversaciones, y con estas ~30 funciones lees y escribes la mayoría de los scripts de análisis. El resto del idioma no se memoriza: se consulta — y justo de eso trata el próximo capítulo.</p>
+      <p>Fíjate en cómo está organizado: por <em>preguntas</em>, no por orden alfabético. ¿Cuánto suman, cuál es el típico, cuánto varían? (resumen numérico). ¿Cuántos hay, cuáles se repiten? (orden y conteo). ¿Dónde está, hay alguno, cumplen todos? (lógicas). ¿Cómo lo presento? (texto y redondeo). Cuando pienses en la pregunta, el nombre de la función llegará solo.</p>
 
       <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>Al terminar sabrás:</strong> manejar el vocabulario esencial de funciones (resumen numérico, orden, conteo, texto y lógicas), usar <code>na.rm = TRUE</code> con conciencia, contar y calcular proporciones con <code>sum()</code> y <code>mean()</code> sobre condiciones, formatear cifras con <code>sprintf()</code> y <code>format()</code>, y entender el redondeo del banquero.</p></div>
 
@@ -2715,6 +2722,7 @@ quantile(x)</code></pre>
 [1]  4 42
     0%    25%    50%    75%   100%
   4.00   9.75  15.50  21.25  42.00 </div></div>
+      <p>Una lectura rápida que ya te dice cosas: el promedio (18) queda por encima de la mediana (15.5) porque el 42 —un valor atípico— jala la media hacia arriba; la mediana resiste. Y <code>quantile()</code> te entrega los cuartiles de una vez: la mitad central de los datos vive entre 9.75 y 21.25. Ese contraste media-mediana es el diagnóstico de asimetría más barato que existe.</p>
       <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R</span><button class="copy">Copiar</button></div>
 <pre><code class="language-r">edades <- c(31, 25, 28)
 sort(edades)              # valores ordenados
@@ -2770,6 +2778,16 @@ paste(c("Cali", "Bogotá"), collapse = " - ")  # colapsa un vector en UN texto</
 <div class="out">[1] "Región 1" "Región 2" "Región 3"
 [1] "ind_pib" "ind_ipc"
 [1] "Cali - Bogotá"</div></div>
+      <p>Y para limpiar y estandarizar texto sucio —espacios fantasma, mayúsculas inconsistentes, extraer pedazos— este es el kit de primeros auxilios:</p>
+      <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R</span><button class="copy">Copiar</button></div>
+<pre><code class="language-r">codigos <- c(" bog ", "MED", "cali")
+toupper(trimws(codigos))    # sin espacios y en mayúsculas: estandarizado
+nchar("Barranquilla")       # cuántos caracteres tiene
+substr("2026-03-15", 1, 4)  # extraer el año de una fecha-texto</code></pre>
+<div class="out">[1] "BOG"  "MED"  "CALI"
+[1] 12
+[1] "2026"</div></div>
+      <p>El primero es un clásico de limpieza: <code>" bog "</code>, <code>"MED"</code> y <code>"cali"</code> son visualmente "lo mismo" pero para R son tres textos distintos — <code>trimws()</code> quita los espacios y <code>toupper()</code> unifica el caso, y solo entonces un <code>table()</code> o un cruce de tablas los tratará como iguales. Este patrón reaparecerá con esteroides en el módulo de <code>stringr</code>.</p>
       <p>En <code>sprintf()</code>, los códigos clave son <code>%d</code> (entero), <code>%.2f</code> (decimal con 2 cifras), <code>%s</code> (texto) y <code>%%</code> para el símbolo de porcentaje literal:</p>
       <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R</span><button class="copy">Copiar</button></div>
 <pre><code class="language-r">sprintf("Inflación anual: %.2f%%", 5.847)
@@ -2842,6 +2860,12 @@ sprintf("Total: $%s miles · Promedio mensual: $%.0f miles",
 [1] 4
 [1] 407.5
 [1] "Total: $9.420 miles · Promedio mensual: $1570 miles"</div></div>
+      <p>Leamos las cifras del flujo:</p>
+      <ul>
+        <li><strong>Auditoría:</strong> 2 de 8 meses sin reporte. Esa proporción (25 % faltante) debe acompañar cualquier cifra que entregues.</li>
+        <li><strong>Cálculo:</strong> el total (9.420) y el promedio (1.570) salen de los seis meses con dato; <code>which.max()</code> ubica el mejor mes en la posición 7, y 4 de los 6 meses medidos superaron la meta de 1.500.</li>
+        <li><strong>Reporte:</strong> <code>sprintf()</code> + <code>format()</code> convierten los números crudos en la frase lista para el correo — con separador de miles estilo latino y sin decimales falsos.</li>
+      </ul>
       <p>Observa el orden del flujo: primero auditar los <code>NA</code>, luego calcular con <code>na.rm</code> consciente, y solo al final formatear para el reporte. Ese es el esqueleto de cualquier resumen ejecutivo hecho en R.</p>
 
       <div class="exercise"><div class="xhead"><svg class="ci"><use href="#i-pencil"/></svg>Ejercicio propuesto</div><p>Dado <code>ventas &lt;- c(120, 80, NA, 200, 95)</code>: (a) calcula el total y el promedio ignorando <code>NA</code>; (b) ¿cuántos meses superaron 100?; (c) ¿en qué posición está el mejor mes?; (d) construye con <code>sprintf()</code> la frase <code>"El mejor mes vendió 200 unidades"</code>.</p></div>
@@ -2865,7 +2889,7 @@ sprintf("El mejor mes vendió %.0f unidades", max(ventas, na.rm = TRUE))</code><
 
       <div class="challenge"><div class="xhead"><svg class="ci"><use href="#i-trophy"/></svg>Reto</div><p>Con <code>airquality</code>: reporta en una sola frase construida con <code>sprintf()</code> el promedio de ozono (<code>Ozone</code>, con 1 decimal), el número de días medidos y el porcentaje de datos faltantes de esa columna. Pistas: <code>mean(..., na.rm = TRUE)</code>, <code>sum(!is.na(...))</code> y <code>mean(is.na(...)) * 100</code>.</p></div>
 
-      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>En resumen:</strong> <code>sum(condición)</code> cuenta y <code>mean(condición)</code> da proporciones; audita los <code>NA</code> con <code>sum(is.na(x))</code> antes de usar <code>na.rm = TRUE</code>. <code>paste</code>/<code>sprintf</code>/<code>format</code> formatean solo al final del cálculo, y <code>round()</code> usa el redondeo del banquero (el <code>.5</code> va al par más cercano), lo que explica los descuadres de un peso.</p></div>
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>En resumen:</strong> <code>sum(condición)</code> cuenta y <code>mean(condición)</code> da proporciones; audita los <code>NA</code> con <code>sum(is.na(x))</code> antes de usar <code>na.rm = TRUE</code>. <code>paste</code>/<code>sprintf</code>/<code>format</code> formatean solo al final del cálculo, y <code>round()</code> usa el redondeo del banquero (el <code>.5</code> va al par más cercano), lo que explica los descuadres de un peso. En el siguiente capítulo aprenderás a no depender de la memoria: cómo leer la ayuda, descifrar errores y preguntar bien.</p></div>
 
       <div class="pager"><a data-go="import-export"><small>Anterior</small><b>← Importar/exportar</b></a><a class="next" data-go="ayuda"><small>Siguiente</small><b>Ayuda y documentación →</b></a></div>
     </section>
@@ -2875,6 +2899,7 @@ sprintf("El mejor mes vendió %.0f unidades", max(ventas, na.rm = TRUE))</code><
       <div class="breadcrumbs"><a data-nav="inicio">Inicio</a><span class="sep">/</span><span>Nivel Básico</span><span class="sep">/</span><span>Ayuda</span></div>
       <h1 class="page-title">Ayuda y documentación</h1>
       <p class="lead">Nadie memoriza R completo: los profesionales consultan documentación todos los días. Saber <em>dónde</em> buscar, <em>cómo</em> leer una página de ayuda y <em>cómo</em> descifrar un error es una habilidad tan importante como programar, y se entrena igual que cualquier otra.</p>
+      <p>Este capítulo cierra la parte teórica del nivel, y no es casualidad que sea este. Acabas de conocer ~30 funciones con sus argumentos, y ya lo habrás notado: no es posible (ni necesario) recordarlos todos. Lo que separa al principiante estancado del que avanza no es la memoria — es saber resolver en dos minutos el "¿cómo se llamaba ese argumento?" y el "¿por qué falla esto?". Aquí aprendes exactamente eso, la habilidad que hace autosuficientes a todas las demás.</p>
 
       <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>Al terminar sabrás:</strong> leer una página de ayuda por secciones (Description, Usage, Arguments, Value, Examples), usar las herramientas integradas (<code>?</code>, <code>??</code>, <code>args()</code>, <code>vignette()</code>), descifrar errores y warnings, buscar en internet con técnica y preparar un reprex mínimo para pedir ayuda.</p></div>
 
@@ -2895,6 +2920,7 @@ example(mean)  # ejecuta los ejemplos de la ayuda en tu consola</code></pre>
 mean&gt; xm <- mean(x)
 mean&gt; c(xm, mean(x, trim = 0.10))
 [1] 8.75 5.50</div></div>
+      <p>Hasta el ejemplo de la ayuda enseña algo: el vector es 0 a 10 más un 50 atípico. La media normal da 8.75, jalada por el 50; con <code>trim = 0.10</code>, R descarta el 10 % más extremo de cada lado (aquí, el 0 y el 50) y la media "recortada" cae a 5.50 — un argumento que quizá no conocías y que acabas de aprender ejecutando <code>example(mean)</code>. Así funciona esta habilidad en la práctica.</p>
 
       <p>Las páginas de ayuda intimidan al principio porque están pensadas como <em>referencia</em>, no como tutorial. El truco es saber qué sección mirar según lo que necesitas:</p>
 
@@ -2977,6 +3003,8 @@ reprex::reprex(mean(c(23, 31, NA, 45)))</code></pre></div>
 
       <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>Regla de oro al pedir ayuda:</strong> el esfuerzo que inviertes en la pregunta se te devuelve en la respuesta. Un buen reprex además tiene un efecto secundario mágico: al reducir tu problema a lo mínimo, la mitad de las veces encuentras el error tú mismo antes de publicar.</p></div>
 
+      <p>Dos datos que casi siempre vale la pena incluir al final de una pregunta: tu versión de R y la de los paquetes implicados. <code>sessionInfo()</code> lo imprime todo de una vez, y muchos problemas "misteriosos" resultan ser simplemente versiones distintas de un paquete entre tu máquina y la de quien responde.</p>
+
       <h2>Dónde preguntar y qué consultar</h2>
       <ul>
         <li><strong>Posit Community</strong> (forum.posit.co): la comunidad más amable con principiantes.</li>
@@ -3003,7 +3031,9 @@ seq(from = 1, to = 10, length.out = 4)   # length.out reparte n puntos iguales
       <p>Búsqueda recomendada: <code>invalid 'type' (character) of argument in R</code>. Nota que no incluimos el <code>"10"</code>: esa parte es específica de tu código y solo estorba en la búsqueda. La causa de fondo: <code>sum()</code> espera números y recibió texto; la solución típica es convertir con <code>as.numeric()</code>.</p>
       </div></details>
 
-      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>En resumen:</strong> nadie memoriza R; quien avanza convierte cada error en una búsqueda eficaz. Empieza por la sección <strong>Examples</strong> de la ayuda, distingue un error (detiene todo) de un warning (sigue, pero puede dar basura), busca en inglés la parte genérica del mensaje y, si preguntas, hazlo con un reprex mínimo y reproducible.</p></div>
+      <div class="challenge"><div class="xhead"><svg class="ci"><use href="#i-trophy"/></svg>Reto</div><p>En un script heredado encuentras la línea <code>aggregate(salario ~ area, datos, FUN = mean)</code> y nunca has visto <code>aggregate()</code>. Sin buscar en internet, solo con las herramientas de este capítulo: (1) abre su ayuda e identifica en <strong>Description</strong> qué hace y en <strong>Value</strong> qué devuelve; (2) ejecuta uno de sus <strong>Examples</strong>; (3) reproduce el mismo cálculo con el <code>tapply()</code> que conociste en el capítulo de data frames y comprueba que los resultados coinciden. Entregable: tres frases — qué hace <code>aggregate()</code>, en qué se diferencia su salida de la de <code>tapply()</code>, y cuál preferirías para un informe y por qué.</p></div>
+
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>En resumen:</strong> nadie memoriza R; quien avanza convierte cada error en una búsqueda eficaz. Empieza por la sección <strong>Examples</strong> de la ayuda, distingue un error (detiene todo) de un warning (sigue, pero puede dar basura), busca en inglés la parte genérica del mensaje y, si preguntas, hazlo con un reprex mínimo y reproducible. Con esto cierras la teoría del nivel: en el siguiente capítulo no hay conceptos nuevos, sino el proyecto integrador donde todo lo aprendido trabaja junto.</p></div>
 
       <div class="pager"><a data-go="funciones-basicas"><small>Anterior</small><b>← Funciones básicas</b></a><a class="next" data-go="proyecto-1"><small>Siguiente</small><b>★ Proyecto integrador →</b></a></div>
     </section>
