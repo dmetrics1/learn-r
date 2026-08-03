@@ -817,6 +817,8 @@ Running under: Windows 11 x64 (build 26200)
       <div class="breadcrumbs"><a data-nav="inicio">Inicio</a><span class="sep">/</span><span>Nivel Básico</span><span class="sep">/</span><span>Interfaz</span></div>
       <h1 class="page-title">La interfaz de RStudio</h1>
       <p class="lead">RStudio organiza tu trabajo en cuatro paneles. Entender qué hace cada uno —y cómo fluye el código entre ellos— te ahorrará horas y te dará, desde el primer día, hábitos de analista profesional.</p>
+      <p>En el capítulo anterior instalaste las dos piezas del entorno: R, el motor, y RStudio, la cabina. Ahora toca aprender a pilotear. La primera vez que abres RStudio, la pantalla puede intimidar: cuatro regiones llenas de pestañas, botones y menús. Este capítulo existe para convertir esa primera impresión en un mapa mental claro: qué hace cada panel, cuál necesitas en cada momento y cómo viaja tu código de uno a otro.</p>
+      <p>Hay algo más en juego que la comodidad. La diferencia entre alguien que "usa R" y un analista profesional casi nunca está en cuántas funciones conoce, sino en sus hábitos de trabajo: dónde vive su código, cómo lo ejecuta y si su análisis puede reproducirse mañana en otra máquina. Esos hábitos se deciden aquí, en la interfaz, desde el primer día. Por eso este capítulo mezcla descripción (qué es cada panel) con método (cómo trabajar): las dos cosas se aprenden juntas o no se aprenden.</p>
 
       <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>Al terminar sabrás:</strong> identificar los cuatro paneles de RStudio y cómo fluye el código entre ellos (Source → Console → Environment), trabajar siempre desde un script y un proyecto <code>.Rproj</code> con rutas relativas, y aplicar los atajos y la configuración que hacen tu trabajo reproducible.</p></div>
 
@@ -829,6 +831,7 @@ Running under: Windows 11 x64 (build 26200)
         <figcaption>En Tools → Global Options defines el comportamiento de tu sesión (workspace y .RData).</figcaption>
       </figure>
       <h2>Los cuatro paneles</h2>
+      <p>Un modelo mental útil: RStudio es una cocina profesional. El <strong>Source</strong> es el recetario donde escribes y afinas la receta; la <strong>Console</strong> es el fogón donde se cocina cada instrucción; el <strong>Environment</strong> es la despensa que muestra qué ingredientes (objetos) tienes preparados; y el panel de <strong>Files/Plots/Packages/Help</strong> es el mesón de servicio: ahí aparecen los platos terminados (gráficos), los utensilios disponibles (paquetes) y el manual de cada técnica (ayuda). Nadie cocina en serio directamente sobre el fogón sin receta; tampoco se analiza en serio sin script.</p>
       <div class="tablewrap"><table class="data">
         <tr><th>Panel</th><th>Para qué sirve</th><th>Detalle que importa</th></tr>
         <tr><td><strong>Source</strong> (arriba izq.)</td><td>Editor de scripts <code>.R</code>, documentos Quarto y visor de datos</td><td>Aquí <em>escribes y guardas</em> tu código. Es tu documento de trabajo permanente. Si no lo ves, abre uno con <em>File → New File → R Script</em>.</td></tr>
@@ -836,6 +839,7 @@ Running under: Windows 11 x64 (build 26200)
         <tr><td><strong>Environment / History</strong> (arriba der.)</td><td>Objetos en memoria (vectores, data frames, funciones) e historial de comandos</td><td>Es tu "radiografía de la memoria": si un objeto no aparece aquí, no existe. Un data frame muestra sus dimensiones (p. ej. <em>500 obs. of 8 variables</em>) y se puede inspeccionar con clic.</td></tr>
         <tr><td><strong>Files / Plots / Packages / Help</strong> (abajo der.)</td><td>Archivos del proyecto, gráficos, paquetes instalados y documentación</td><td>La pestaña <em>Help</em> es oro: <code>?mean</code> en la consola abre ahí la documentación oficial de la función <code>mean()</code>.</td></tr>
       </table></div>
+      <p>Un habitante del Source que merece mención propia es el <strong>visor de datos</strong>: ejecuta <code>View(mtcars)</code> (con V mayúscula) y la tabla se abre como una hoja de cálculo de solo lectura, con búsqueda, orden por columnas y filtros. Es la forma cómoda de <em>mirar</em> los datos; para <em>modificarlos</em>, siempre código en el script. El mismo visor se abre al hacer clic sobre un data frame en el panel Environment.</p>
 
       <h2>El flujo de trabajo real</h2>
       <p>Los paneles no son cuatro compartimentos aislados: forman un circuito por el que tu código fluye. El ciclo que repetirás cientos de veces al día es:</p>
@@ -853,7 +857,17 @@ mean(ipc_mensual)                          # promedio mensual
 sum(ipc_mensual)                           # inflación acumulada aproximada</code></pre>
 <div class="out">[1] 0.54
 [1] 2.16</div></div>
-      <p>Tras la primera línea, mira el panel <strong>Environment</strong>: verás <code>ipc_mensual</code> con sus cuatro valores. Ese es el circuito completo: Source → Console → Environment.</p>
+      <p>Leamos lo que pasó, línea a línea:</p>
+      <ul>
+        <li><strong><code>ipc_mensual &lt;- c(...)</code>:</strong> la consola no imprime nada —es una asignación—, pero en <strong>Environment</strong> aparece <code>ipc_mensual</code> con sus cuatro valores. Silencio en la consola + objeto nuevo en Environment: así se ve una asignación exitosa.</li>
+        <li><strong><code>mean(ipc_mensual)</code>:</strong> imprime <code>[1] 0.54</code>, el promedio de las cuatro variaciones ((0.62 + 0.45 + 0.71 + 0.38) / 4). No usaste <code>&lt;-</code>, así que el resultado se muestra y se pierde: no queda guardado en ningún objeto.</li>
+        <li><strong><code>sum(ipc_mensual)</code>:</strong> imprime <code>[1] 2.16</code>, la variación acumulada aproximada del cuatrimestre.</li>
+      </ul>
+      <p>Ese es el circuito completo —Source → Console → Environment— y es idéntico al de un proyecto real: cuando cargues el CSV de un cliente, el objeto aparecerá en Environment, y cada cálculo que ejecutes desde el script se imprimirá en la consola o quedará guardado con <code>&lt;-</code> para el paso siguiente.</p>
+
+      <h2>Dos gestos de consola que te ahorrarán sustos</h2>
+      <p>Hay dos situaciones de consola que todo principiante encuentra en su primera semana. La primera: ejecutas una línea y el prompt cambia de <code>&gt;</code> a <code>+</code>. No es un error: R detectó una expresión incompleta —casi siempre un paréntesis o una comilla sin cerrar— y espera que la termines. Puedes escribir lo que falta, o presionar <kbd>Esc</kbd> para cancelar y empezar de nuevo. Si el <code>+</code> te aparece "sin razón", revisa la línea anterior: algo quedó abierto.</p>
+      <p>La segunda: no necesitas reescribir comandos. Con el cursor en la consola, la flecha <kbd>↑</kbd> recorre el historial de comandos (y la pestaña <em>History</em> lo muestra completo, con un botón para reenviar líneas al script). Es útil para repetir una prueba rápida; pero recuerda la regla de oro: si un comando vale la pena repetirse, su lugar es el script.</p>
 
       <h2>Por qué nunca trabajar solo en la consola</h2>
       <p>La consola es una conversación efímera: lo que escribes ahí se pierde al cerrar la sesión. El script es el documento: la <strong>receta completa y reproducible</strong> de tu análisis. La regla profesional es simple: <em>la consola es para probar; el script es la verdad</em>. Todo lo que quieras conservar —cargar datos, limpiar, calcular, graficar— debe vivir en el script, de modo que ejecutarlo de arriba abajo reproduzca el análisis entero. Cuando un cliente te pida "el mismo informe pero con los datos de este trimestre", cambiarás el archivo de entrada, correrás el script y listo. Si hubieras trabajado en la consola, tocaría reconstruir todo de memoria.</p>
@@ -863,6 +877,7 @@ sum(ipc_mensual)                           # inflación acumulada aproximada</co
       <h2>Proyectos de RStudio (.Rproj): tu unidad de trabajo</h2>
       <p>Un <strong>Proyecto</strong> (<em>File → New Project → New Directory</em>) es una carpeta que RStudio trata como unidad autocontenida, marcada con un archivo <code>.Rproj</code>. El beneficio central es el <strong>directorio de trabajo</strong>: al abrir el proyecto, R se sitúa automáticamente en esa carpeta, así que puedes leer datos con rutas <em>relativas</em> como <code>"datos/ventas.csv"</code> en lugar de rutas absolutas como <code>"C:/Users/luis/Documents/consultoria/cliente/datos/ventas.csv"</code>.</p>
       <p>¿Por qué importa tanto? <strong>Portabilidad.</strong> La ruta absoluta solo existe en <em>tu</em> máquina; la relativa funciona en la de tu colega, en el servidor del cliente y en Posit Cloud. Comprimes la carpeta del proyecto, la envías, y el análisis corre tal cual. Además, cada proyecto mantiene su propio historial y sesión, de modo que puedes alternar entre el proyecto del cliente A y el del cliente B sin que se contaminen.</p>
+      <p>Dentro del proyecto, adopta desde ya una estructura mínima de carpetas: <code>datos/</code> para los archivos originales (que nunca se editan a mano), <code>scripts/</code> para el código numerado en orden de ejecución (<code>01_importar.R</code>, <code>02_limpiar.R</code>…) y <code>salidas/</code> para gráficos y tablas exportadas. No es burocracia: cuando un análisis crece, esa separación entre datos crudos, lógica y resultados es lo que te permite volver a él seis meses después —o entregárselo a otra persona— sin arqueología.</p>
 
       <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>Buena práctica desde el inicio:</strong> un análisis = un proyecto. Y evita <code>setwd()</code> con rutas absolutas: es la forma clásica de escribir código que solo funciona en tu computador. El proyecto resuelve el directorio de trabajo por ti.</p></div>
 
@@ -900,7 +915,7 @@ sum(ipc_mensual)                           # inflación acumulada aproximada</co
 
       <div class="challenge"><div class="xhead"><svg class="ci"><use href="#i-trophy"/></svg>Reto</div><p>Deja tu RStudio listo para trabajar en serio: desactiva el guardado de <code>.RData</code>, elige tema y tamaño de fuente, y verifica con <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>K</kbd> que ubicas los atajos de ejecutar, asignar e insertar pipe. Cierra RStudio, reábrelo desde el archivo <code>practica-r.Rproj</code> y confirma que Environment arranca vacío: esa pantalla limpia es tu nueva normalidad.</p></div>
 
-      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>En resumen:</strong> RStudio tiene cuatro paneles y el código fluye del script (Source) a la consola y al Environment. El script, no la consola, es la verdad reproducible, y un análisis = un proyecto <code>.Rproj</code> con rutas relativas. Desactiva el guardado de <code>.RData</code> y apóyate en los atajos para trabajar como un profesional desde el primer día.</p></div>
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>En resumen:</strong> RStudio tiene cuatro paneles y el código fluye del script (Source) a la consola y al Environment. El script, no la consola, es la verdad reproducible, y un análisis = un proyecto <code>.Rproj</code> con rutas relativas. Desactiva el guardado de <code>.RData</code> y apóyate en los atajos para trabajar como un profesional desde el primer día. En el siguiente capítulo dejamos la cabina y entramos al lenguaje: los tipos de datos, las reglas que deciden qué operaciones son válidas sobre cada valor.</p></div>
 
       <div class="pager"><a data-go="instalacion"><small>Anterior</small><b>← Instalación</b></a><a class="next" data-go="tipos-datos"><small>Siguiente</small><b>Tipos de datos →</b></a></div>
     </section>
@@ -910,6 +925,8 @@ sum(ipc_mensual)                           # inflación acumulada aproximada</co
       <div class="breadcrumbs"><a data-nav="inicio">Inicio</a><span class="sep">/</span><span>Nivel Básico</span><span class="sep">/</span><span>Tipos de datos</span></div>
       <h1 class="page-title">Tipos de datos</h1>
       <p class="lead">Todo valor en R pertenece a un tipo, y el tipo decide qué operaciones son válidas: puedes sumar dos números, pero no un número y un texto. Dominar el sistema de tipos es la vacuna contra la mitad de los errores que verás en análisis de datos reales.</p>
+      <p>Con la cabina configurada, empieza el lenguaje. Y el lenguaje empieza por una pregunta que R se hace ante cada valor que le entregas: ¿qué es esto —un número, un texto, un verdadero/falso— y qué se puede hacer con ello? Cada columna de cada dataset que analizarás tiene un tipo, y la mayoría de los dolores de cabeza del primer año —el promedio que da error, la columna de salarios que llegó "rara" desde Excel, el filtro que devuelve cosas absurdas— se reducen a un tipo inesperado en el lugar equivocado.</p>
+      <p>Este capítulo existe porque R toma decisiones de tipo <em>en silencio</em>. Nunca te pregunta "¿quieres convertir esto a texto?": lo convierte y sigue. Esa política tiene una lógica elegante —la conocerás como jerarquía de coerción— y dos consecuencias que debes dominar: mezclas de tipos que degradan tus datos sin avisar, y comparaciones de decimales que fallan por la aritmética binaria del computador. Cuando entiendas ambas, los resultados "misteriosos" se vuelven comportamiento predecible.</p>
 
       <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>Al terminar sabrás:</strong> distinguir los tipos básicos (<code>double</code>, <code>integer</code>, <code>character</code>, <code>logical</code>), entender la coerción implícita y explícita, por qué <code>0.1 + 0.2</code> no es <code>0.3</code>, y manejar los valores especiales <code>NA</code>, <code>NULL</code>, <code>NaN</code> e <code>Inf</code>.</p></div>
 
@@ -962,6 +979,13 @@ sqrt(2)^2 - 2                     # el error es diminuto, pero existe</code></pr
 [1] 0.29999999999999998890
 [1] FALSE
 [1] 4.440892e-16</div></div>
+      <p>Leamos el experimento:</p>
+      <ul>
+        <li><strong><code>0.1 + 0.2 == 0.3</code> da <code>FALSE</code>:</strong> no porque R sume mal, sino porque compara dos números <em>casi</em> iguales que difieren en el decimal decimoséptimo.</li>
+        <li><strong><code>print(..., digits = 20)</code>:</strong> revela lo que R guarda de verdad: <code>0.30000000000000004441</code> por un lado y <code>0.29999999999999998890</code> por el otro. Con los 7 dígitos visibles por defecto, ambos se muestran como <code>0.3</code>: la diferencia existe, pero normalmente no la ves.</li>
+        <li><strong><code>sqrt(2)^2 - 2</code>:</strong> el error es del orden de <code>4.4e-16</code>, es decir, quince ceros después de la coma. Irrelevante para casi cualquier análisis; letal para una comparación exacta con <code>==</code>.</li>
+      </ul>
+      <p>En un proyecto real, esta trampa aparece al conciliar montos: sumas cuotas que deberían dar exactamente el total facturado, comparas con <code>==</code>, y obtienes <code>FALSE</code> con números que se ven idénticos en pantalla. No es un dato dañado: es punto flotante.</p>
       <p>Los <code>integer</code>, en cambio, son exactos, pero tienen techo: el máximo es <code>.Machine$integer.max</code> (2 147 483 647, unos 2,1 mil millones). Para montos monetarios grandes o el PIB en pesos, usa <code>double</code>: pierde exactitud teórica en decimales, pero maneja magnitudes enormes sin desbordarse.</p>
       <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R</span><button class="copy">Copiar</button></div>
 <pre><code class="language-r">.Machine$integer.max
@@ -971,6 +995,7 @@ sqrt(2)^2 - 2                     # el error es diminuto, pero existe</code></pr
 [1] NA
 Warning message: NAs produced by integer overflow
 [1] 2147483648</div></div>
+      <p>La lectura del bloque: el mayor entero posible es 2 147 483 647; sumarle 1 <em>como entero</em> desborda y R devuelve <code>NA</code> con una advertencia, mientras que la misma suma <em>como double</em> funciona sin drama. Para conteos y años el entero sobra; para agregados monetarios grandes (una nómina completa, un presupuesto nacional en pesos) el techo entero queda corto con facilidad, y por eso <code>double</code> es el tipo de trabajo del análisis económico.</p>
 
       <div class="callout warn"><span class="cic"><svg class="ci"><use href="#i-alert"/></svg></span><p><strong>Nunca compares decimales con <code>==</code>:</strong> el error de punto flotante no es un bug de R, es una limitación de todo computador (le pasa igual a Python, Excel y Stata). En la sección de operadores verás las alternativas correctas: <code>all.equal()</code> y <code>dplyr::near()</code>.</p></div>
 
@@ -994,6 +1019,7 @@ class(hoy)</code></pre>
 [1] "logical"
 [1] "double"
 [1] "Date"</div></div>
+      <p>Las seis primeras líneas muestran parejas tipo/clase de valores simples: coinciden o casi. La sorpresa llega con la fecha: <code>typeof(hoy)</code> dice <code>"double"</code> —una fecha se guarda como el número de días transcurridos desde el 1 de enero de 1970— pero <code>class(hoy)</code> dice <code>"Date"</code>, y esa etiqueta hace que <code>print()</code>, <code>format()</code> y la aritmética la traten como calendario y no como número. Cuando un objeto se comporte "raro", pregunta primero por su <code>class()</code>: es el contrato que las funciones consultan para decidir qué hacer con él.</p>
 
       <h2>Coerción implícita: la jerarquía que R aplica sin avisar</h2>
       <p>Un vector en R solo puede contener un tipo. Si mezclas tipos, R no protesta: convierte ("promueve") todo al tipo más flexible siguiendo una jerarquía fija, siempre en la dirección que no pierde información:</p>
@@ -1016,6 +1042,7 @@ mean(supera_minimo)  # proporción que lo supera</code></pre>
 [1] "1"   "dos"
 [1] 3
 [1] 0.6</div></div>
+      <p>Los tres primeros resultados confirman la jerarquía: <code>TRUE</code> se vuelve <code>1</code> junto a un entero, el entero se vuelve double junto a un decimal, y todo se vuelve texto junto a un <code>"dos"</code> —nota las comillas en <code>"1"</code>: ese número ya no suma—. Las dos últimas líneas muestran la coerción a tu favor: de cinco personas, <code>sum()</code> cuenta 3 por encima del mínimo y <code>mean()</code> lo convierte en el 60 %.</p>
 
       <div class="callout tip"><span class="cic"><svg class="ci"><use href="#i-bulb"/></svg></span><p><strong>Truco de analista:</strong> <code>sum()</code> sobre un vector lógico cuenta los <code>TRUE</code> y <code>mean()</code> calcula la proporción. <code>mean(salarios &gt; 2000000)</code> te da directamente el porcentaje de personas que ganan más de dos millones, sin filtrar ni contar a mano.</p></div>
 
@@ -1035,6 +1062,7 @@ as.logical("hola")       # imposible -> NA (este SIN warning)</code></pre>
 [1] NA
 Warning message: NAs introduced by coercion
 [1] NA</div></div>
+      <p>Fíjate en tres detalles con consecuencias: <code>as.integer(3.9)</code> devuelve <code>3</code> porque <em>trunca</em> hacia cero (para redondear existe <code>round()</code>); <code>as.numeric("no disp.")</code> produce <code>NA</code> <em>con</em> warning, que en un script largo es fácil pasar por alto; y <code>as.logical("hola")</code> produce <code>NA</code> <em>sin</em> warning alguno. La conversión imposible no detiene tu código: lo contamina en silencio, y por eso la inspección previa importa tanto.</p>
 
       <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>Buena práctica:</strong> al importar datos, si una columna que debería ser numérica llega como <code>character</code>, es señal de que trae basura (texto como <code>"N/D"</code>, separadores de miles, símbolos de peso). Antes de aplicar <code>as.numeric()</code> a ciegas, inspecciona con <code>unique()</code> qué valores la están contaminando: cada warning de coerción es un dato que se convierte en <code>NA</code> silenciosamente.</p></div>
 
@@ -1072,6 +1100,14 @@ is.finite(c(1.5, Inf, NA, NaN))   # solo el primero es "número usable"</code></
 [1] Inf
 [1] -Inf
 [1]  TRUE FALSE FALSE FALSE</div></div>
+      <p>Este bloque condensa el manejo de faltantes que usarás a diario:</p>
+      <ul>
+        <li><strong><code>mean(ingresos)</code> da <code>NA</code>:</strong> un solo faltante contamina el agregado, porque R se niega a inventar: "no puedo promediar lo que no conozco".</li>
+        <li><strong><code>mean(..., na.rm = TRUE)</code> da <code>2162500</code>:</strong> el promedio de los cuatro ingresos conocidos. <code>na.rm</code> significa <em>NA remove</em>, y la decisión de usarlo debe ser consciente: estás calculando sobre quienes sí respondieron.</li>
+        <li><strong><code>sum(is.na(...))</code> y <code>which(is.na(...))</code>:</strong> cuántos faltantes hay (1) y dónde está (posición 3). Son el primer diagnóstico de calidad de cualquier columna.</li>
+        <li><strong><code>NULL</code> vs <code>NA</code> en un vector:</strong> <code>c(1, NULL, 3)</code> tiene longitud 2 —el <code>NULL</code> se esfuma— mientras que <code>c(1, NA, 3)</code> tiene longitud 3: el <code>NA</code> reserva el puesto del dato ausente.</li>
+        <li><strong><code>0/0</code>, <code>1/0</code>, <code>log(0)</code>:</strong> producen <code>NaN</code>, <code>Inf</code> y <code>-Inf</code>: matemática indefinida o desbordada, no datos faltantes. <code>is.finite()</code> es el único filtro que descarta las cuatro anomalías de una vez.</li>
+      </ul>
 
       <div class="callout danger"><span class="cic"><svg class="ci"><use href="#i-stop"/></svg></span><p><strong>Error frecuente:</strong> comparar con <code>NA</code> usando <code>==</code>. <code>x == NA</code> siempre devuelve <code>NA</code>, nunca <code>TRUE</code> o <code>FALSE</code>, porque R razona: "si no sé cuánto vale, tampoco sé si es igual". Usa siempre <code>is.na(x)</code>. Detalle sutil: <code>is.na(NaN)</code> es <code>TRUE</code> (todo <code>NaN</code> cuenta como faltante), pero <code>is.nan(NA)</code> es <code>FALSE</code>.</p></div>
 
@@ -1092,7 +1128,9 @@ mean(tasas[is.finite(tasas)])  # 0.05833333</code></pre>
 [1] 0.05833333</div></div>
 <p>Nota que <code>na.rm = TRUE</code> no habría bastado: elimina <code>NA</code> y <code>NaN</code>, pero deja pasar <code>Inf</code> y el promedio daría <code>Inf</code>. <code>is.finite()</code> es el filtro completo.</p></div></details>
 
-      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>En resumen:</strong> cada valor tiene un tipo que decide qué operaciones son válidas, y R promueve tipos siguiendo la jerarquía <code>logical → integer → double → character</code>. Nunca compares decimales con <code>==</code> (usa <code>all.equal()</code> o <code>near()</code>) ni <code>NA</code> con <code>==</code> (usa <code>is.na()</code>). <code>typeof()</code> dice cómo se guarda un objeto y <code>class()</code> cómo se comporta.</p></div>
+      <div class="challenge"><div class="xhead"><svg class="ci"><use href="#i-trophy"/></svg>Reto</div><p>Te llega la nómina de una pyme exportada desde un sistema viejo, y la columna de salarios viene como texto: <code>salario_txt &lt;- c("2450000", "N/D", "3100000", "", "1800000")</code>. Tu tarea: (1) conviértela con <code>as.numeric()</code> y explica el warning: ¿qué valores se volvieron <code>NA</code> y por qué?; (2) calcula el salario promedio de los valores disponibles; (3) entrega un mini informe de dos frases: cuántos registros quedaron utilizables y qué decisión tomaste sobre los no numéricos (¿son ceros, son faltantes, hay que pedir el dato de nuevo?). Esa frase final —la decisión sobre los <code>NA</code>— es la parte más importante del reto: es la que un analista real tiene que defender.</p></div>
+
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>En resumen:</strong> cada valor tiene un tipo que decide qué operaciones son válidas, y R promueve tipos siguiendo la jerarquía <code>logical → integer → double → character</code>. Nunca compares decimales con <code>==</code> (usa <code>all.equal()</code> o <code>near()</code>) ni <code>NA</code> con <code>==</code> (usa <code>is.na()</code>). <code>typeof()</code> dice cómo se guarda un objeto y <code>class()</code> cómo se comporta. En el siguiente capítulo verás dónde viven estos valores: los objetos, sus nombres y las reglas para no perderlos.</p></div>
 
       <div class="pager"><a data-go="interfaz"><small>Anterior</small><b>← Interfaz</b></a><a class="next" data-go="variables"><small>Siguiente</small><b>Variables y objetos →</b></a></div>
     </section>
@@ -1102,10 +1140,13 @@ mean(tasas[is.finite(tasas)])  # 0.05833333</code></pre>
       <div class="breadcrumbs"><a data-nav="inicio">Inicio</a><span class="sep">/</span><span>Nivel Básico</span><span class="sep">/</span><span>Variables</span></div>
       <h1 class="page-title">Variables y objetos</h1>
       <p class="lead">Una variable no es una caja que contiene un valor: es una <strong>etiqueta pegada sobre un objeto</strong>. En R todo lo que creas (un número, una tabla, un modelo de regresión) es un objeto, y los nombres son la forma de encontrarlo después.</p>
+      <p>El capítulo anterior respondió qué clase de valores existen en R; este responde dónde viven y cómo se llaman. Puede sonar elemental —"asignar un valor a un nombre"— pero es la operación que ejecutarás más veces en tu vida con R: cada dataset importado, cada tabla filtrada, cada modelo ajustado necesita un nombre para que el paso siguiente pueda usarlo. Un análisis es, visto de cerca, una cadena de objetos nombrados donde cada eslabón alimenta al próximo.</p>
+      <p>Y hay una razón más profunda para dedicarle un capítulo. La mayoría de los lenguajes te dejan pensar en las variables como cajas; R funciona con otro modelo —etiquetas pegadas sobre objetos— y esa diferencia explica comportamientos que de otro modo parecen magia: por qué copiar una tabla gigante es instantáneo, por qué modificar la copia no toca el original y por qué una función no daña los datos que le pasas. Entender el modelo ahora te ahorra confusiones cuando los objetos pesen gigabytes.</p>
 
       <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>Al terminar sabrás:</strong> asignar objetos con <code>&lt;-</code> (y por qué no con <code>=</code>), entender que las variables son etiquetas sobre objetos con copia al modificar, nombrar en <code>snake_case</code> evitando trampas como <code>T</code>/<code>F</code>, e inspeccionar cualquier objeto con <code>str()</code>, <code>class()</code> y <code>ls()</code>.</p></div>
 
       <h2>Asignación: cuatro formas, una convención</h2>
+      <p>R ofrece cuatro maneras de asignar, pero la comunidad usa una. El siguiente bloque las muestra todas para que las reconozcas cuando las veas en código ajeno; observa que solo las dos últimas líneas imprimen algo, porque asignar es silencioso: el resultado va al objeto, no a la pantalla.</p>
       <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R</span><button class="copy">Copiar</button></div>
 <pre><code class="language-r">salario <- 2500000          # el operador idiomático de R
 ipc = 5.2                   # válido, pero se reserva para otro uso
@@ -1116,6 +1157,7 @@ salario
 tasa_interes</code></pre>
 <div class="out">[1] 2500000
 [1] 0.0925</div></div>
+      <p>Las cuatro formas funcionan: <code>&lt;-</code> es la idiomática; <code>=</code> asigna pero se reserva para argumentos; <code>-&gt;</code> apunta hacia la derecha y solo se ve en código muy viejo o al final de una cadena de pipes; y <code>assign()</code> recibe el nombre como texto, útil cuando el nombre se construye con código (lo verás en programación avanzada). Al consultar <code>salario</code> y <code>tasa_interes</code>, la consola imprime sus valores con el prefijo <code>[1]</code>: primera posición del vector, un adelanto de lo que verás en el capítulo de vectores.</p>
 
       <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>¿Por qué <code>&lt;-</code> y no <code>=</code>?</strong> Ambos asignan, pero la comunidad reserva <code>=</code> para pasar argumentos a funciones: en <code>mean(x, na.rm = TRUE)</code>, ese <code>=</code> no crea ninguna variable <code>na.rm</code>. Usar <code>&lt;-</code> para variables y <code>=</code> para argumentos hace el código legible de un vistazo: sabes qué es una asignación y qué es un argumento. Atajo en RStudio: <kbd>Alt</kbd>+<kbd>-</kbd>.</p></div>
 
@@ -1130,6 +1172,7 @@ salario        # el original queda intacto
 salario_nuevo  # solo cambió la etiqueta que modificaste</code></pre>
 <div class="out">[1] 2500000
 [1] 2800000</div></div>
+      <p>El resultado lo confirma: <code>salario</code> sigue en 2 500 000 y <code>salario_nuevo</code> pasó a 2 800 000 (el aumento del 12 % se aplicó solo a la etiqueta modificada). En un proyecto real este patrón es tu red de seguridad para experimentar: <code>datos_prueba &lt;- datos</code>, ensayas la limpieza agresiva sobre <code>datos_prueba</code>, y si el resultado no convence, <code>datos</code> sigue intacto. La copia además no costó memoria hasta el momento de modificar: con tablas de millones de filas, eso importa.</p>
 
       <div class="callout tip"><span class="cic"><svg class="ci"><use href="#i-bulb"/></svg></span><p><strong>Modelo mental:</strong> las variables son etiquetas sobre objetos, no cajas con cosas dentro. Un mismo objeto puede tener varias etiquetas, y arrancar una etiqueta (<code>rm()</code>) no destruye las demás. Este modelo te salvará cuando trabajes con data frames grandes: pasar una tabla a una función no la copia hasta que la función intente modificarla.</p></div>
 
@@ -1140,6 +1183,7 @@ salario_nuevo  # solo cambió la etiqueta que modificaste</code></pre>
         <li>Las palabras reservadas no se pueden usar como nombre: <code>if</code>, <code>else</code>, <code>for</code>, <code>while</code>, <code>function</code>, <code>TRUE</code>, <code>FALSE</code>, <code>NULL</code>, <code>NA</code>, <code>Inf</code>, <code>NaN</code>… Intentar <code>TRUE &lt;- 1</code> produce un error inmediato.</li>
         <li>Con comillas invertidas puedes crear nombres "ilegales" como <code>`tasa de interés`</code>, pero tendrás que escribir las comillas cada vez. Evítalo.</li>
       </ul>
+      <p>El siguiente experimento muestra la diferencia entre una palabra reservada de verdad y un atajo desprotegido. La primera línea falla de inmediato; la segunda, que debería asustar más, se ejecuta sin queja:</p>
       <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R</span><button class="copy">Copiar</button></div>
 <pre><code class="language-r">TRUE <- 1     # las palabras reservadas están blindadas
 T <- 0        # ...pero sus atajos T y F ¡NO lo están!</code></pre>
@@ -1157,6 +1201,7 @@ T <- 0        # ...pero sus atajos T y F ¡NO lo están!</code></pre>
         <tr><td><code>mean</code>, <code>data</code>, <code>c</code>, <code>df</code></td><td>Pisan nombres de funciones de R base y siembran confusión.</td><td><code>ingreso_promedio</code>, <code>datos_ipc</code></td></tr>
         <tr><td><code>SalarioEnPesosColombianosDelAnio2024</code></td><td>Descriptivo, pero inescribible.</td><td><code>salario_cop_2024</code></td></tr>
       </table></div>
+      <p>Un matiz final sobre estilo: más importante que la convención elegida es la <strong>consistencia</strong>. Un script que mezcla <code>ingresoMensual</code>, <code>ingreso.mensual</code> e <code>ingreso_mensual</code> obliga al lector (y a ti en dos semanas) a recordar tres grafías para la misma idea. Elige <code>snake_case</code>, aplícalo a todo —variables, columnas, nombres de archivo— y tu código empezará a leerse como un documento y no como un acertijo.</p>
 
       <h2>El entorno global: tu mesa de trabajo</h2>
       <p>Cada variable que creas en la consola vive en el <em>entorno global</em> (lo que RStudio muestra en el panel Environment). Puedes listarlo, consultarlo y limpiarlo:</p>
@@ -1168,6 +1213,7 @@ rm(list = ls())         # borra TODO el entorno (irreversible)</code></pre>
 <div class="out">[1] "anio_base"     "ipc"           "salario"       "salario_nuevo"
 [4] "tasa_interes"
 [1] TRUE</div></div>
+      <p>Nota tres cosas de la salida: <code>ls()</code> lista los nombres en orden alfabético, no en orden de creación; <code>exists("salario")</code> responde <code>TRUE</code> sin imprimir el valor —pregunta por la etiqueta, no por el contenido—; y ni <code>rm(anio_base)</code> ni <code>rm(list = ls())</code> imprimen nada: eliminan en silencio. Ese último merece respeto: borra todos tus objetos sin pedir confirmación. Con la configuración del capítulo de interfaz (sin <code>.RData</code>), perder el entorno nunca es tragedia —tu script lo reconstruye—, pero el hábito correcto es reiniciar la sesión (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>F10</kbd>) en lugar de limpiar a mano.</p>
 
       <div class="callout danger"><span class="cic"><svg class="ci"><use href="#i-stop"/></svg></span><p><strong>Sobrescritura silenciosa:</strong> R jamás avisa cuando reutilizas un nombre. Si calculas <code>total &lt;- sum(ventas_2023)</code> y doscientas líneas después escribes <code>total &lt;- sum(ventas_2024)</code>, la primera cifra desaparece sin ruido y cualquier código posterior que asuma el valor viejo produce resultados incorrectos <em>sin ningún error</em>. Es de los bugs más difíciles de cazar: usa nombres específicos (<code>total_2023</code>, <code>total_2024</code>) y ejecuta tus scripts de arriba abajo en un entorno limpio.</p></div>
 
@@ -1188,6 +1234,7 @@ attributes(salarios)  # metadatos adjuntos (aquí, los nombres)</code></pre>
 [1] 3
 $names
 [1] "gerencia"  "analista"  "asistente"</div></div>
+      <p>La radiografía completa de <code>salarios</code>: <code>str()</code> lo resume en dos líneas (vector numérico con nombres, tres valores); <code>class()</code> y <code>typeof()</code> repiten la pareja del capítulo anterior (<code>numeric</code>/<code>double</code>); <code>length()</code> cuenta 3 elementos; y <code>attributes()</code> revela los metadatos: un atributo <code>names</code> con las etiquetas de cada cargo. Los atributos son información adjunta al objeto —nombres, dimensiones, clase— y explican cómo un mismo vector puede "saber" cosas sobre sí mismo. Los volverás a encontrar en matrices (dimensiones) y factores (niveles).</p>
 
       <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>Hábito de oro:</strong> <code>str()</code> es la primera función que deberías aplicar a cualquier dato recién importado. En una sola línea por columna te muestra tipos, dimensiones y una muestra de valores: detecta al instante la columna de salarios que llegó como texto o el año que llegó como decimal.</p></div>
 
@@ -1208,7 +1255,9 @@ typeof(salario_real)</code></pre>
       <div class="exercise"><div class="xhead"><svg class="ci"><use href="#i-pencil"/></svg>Ejercicio propuesto</div><p>Predice qué imprime este código y explica por qué, usando el modelo de etiquetas: <code>a &lt;- 100; b &lt;- a; a &lt;- 50; b</code></p></div>
       <details class="acc"><summary>Ver solución</summary><div class="accbody"><p>Imprime <code>100</code>. Cuando ejecutas <code>b &lt;- a</code>, la etiqueta <code>b</code> queda apuntando al valor que <code>a</code> tenía <em>en ese momento</em> (100). Reasignar <code>a &lt;- 50</code> solo mueve la etiqueta <code>a</code> hacia un objeto nuevo; no toca el objeto al que apunta <code>b</code>. Las variables no quedan "conectadas" entre sí: la asignación copia la referencia al valor actual, no crea un vínculo permanente.</p></div></details>
 
-      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>En resumen:</strong> una variable es una etiqueta pegada a un objeto, no una caja; usa <code>&lt;-</code> para asignar y reserva <code>=</code> para los argumentos de funciones. Nombra en <code>snake_case</code> con nombres que se expliquen solos y cuídate de la sobrescritura silenciosa. <code>str()</code> es la primera función que deberías aplicar a cualquier dato nuevo.</p></div>
+      <div class="challenge"><div class="xhead"><svg class="ci"><use href="#i-trophy"/></svg>Reto</div><p>Heredas este fragmento de un script de un colega que ya no está en la empresa: <code>x &lt;- c(2500000, 3100000, 1750000); T &lt;- 0; datos2 &lt;- x * 1.12; mean &lt;- sum(datos2) / length(datos2)</code>. Funciona, pero es una bomba de tiempo. Tu tarea: (1) identifica los dos nombres peligrosos y explica qué puede romper cada uno; (2) reescribe el fragmento con nombres <code>snake_case</code> descriptivos (los valores son salarios mensuales y el 1.12 es un aumento del 12 %); (3) verifica en un entorno limpio que tu versión produce el mismo promedio. Entregable: el script corregido con un comentario por línea explicando cada cambio de nombre.</p></div>
+
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>En resumen:</strong> una variable es una etiqueta pegada a un objeto, no una caja; usa <code>&lt;-</code> para asignar y reserva <code>=</code> para los argumentos de funciones. Nombra en <code>snake_case</code> con nombres que se expliquen solos y cuídate de la sobrescritura silenciosa. <code>str()</code> es la primera función que deberías aplicar a cualquier dato nuevo. En el siguiente capítulo pondrás estos objetos a trabajar: los operadores aritméticos, relacionales y lógicos con los que R calcula y compara.</p></div>
 
       <div class="pager"><a data-go="tipos-datos"><small>Anterior</small><b>← Tipos de datos</b></a><a class="next" data-go="operadores"><small>Siguiente</small><b>Operadores →</b></a></div>
     </section>
@@ -3987,11 +4036,11 @@ clientes |> select(where(is.numeric))          # por tipo de columna</code></pre
       <div class="out">region  monto con_iva segmento grado    canal
 Norte     120   142.8 bajo     C        web
 Norte     340   404.6 alto     A        tienda
-Sur        NA      NA bajo     sin dato web
+Sur        NA      NA NA       sin dato web
 Sur        80    95.2 bajo     C        web
 Centro    260   309.4 alto     B        tienda</div>
 
-      <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong><code>if_else()</code> vs <code>ifelse()</code>:</strong> el <code>if_else()</code> de dplyr exige que ambas ramas sean del mismo tipo y maneja <code>NA</code> de forma predecible (por eso el "bajo" en la fila con <code>NA</code>: la condición <code>NA &gt;= 200</code> da <code>NA</code>, y sin argumento <code>missing</code> el resultado sería <code>NA</code>; aquí se ve el matiz de propagar faltantes). El <code>ifelse()</code> de R base es más laxo y puede convertir tipos silenciosamente. En dplyr, prefiere <code>if_else()</code>.</p></div>
+      <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong><code>if_else()</code> vs <code>ifelse()</code>:</strong> el <code>if_else()</code> de dplyr exige que ambas ramas sean del mismo tipo y propaga los <code>NA</code> de forma predecible: como la condición <code>NA &gt;= 200</code> da <code>NA</code>, la fila con monto desconocido queda con <code>segmento = NA</code>. Si quieres etiquetar los faltantes en vez de propagarlos, usa el cuarto argumento: <code>if_else(monto &gt;= 200, "alto", "bajo", missing = "sin dato")</code>. El <code>ifelse()</code> de R base es más laxo y puede convertir tipos silenciosamente. En dplyr, prefiere <code>if_else()</code>.</p></div>
 
       <h2>arrange(): ordenar filas</h2>
       <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R · dplyr</span><button class="copy">Copiar</button></div>
