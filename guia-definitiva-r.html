@@ -1681,6 +1681,8 @@ names(notas)[order(notas, decreasing = TRUE)]
       <div class="breadcrumbs"><a data-nav="inicio">Inicio</a><span class="sep">/</span><span>Nivel Básico</span><span class="sep">/</span><span>Matrices</span></div>
       <h1 class="page-title">Matrices</h1>
       <p class="lead">Una matriz no es una estructura nueva: es <strong>un vector al que se le añade el atributo <code>dim</code></strong> (filas × columnas). Sigue siendo una sola secuencia de valores del mismo tipo, solo que R la muestra y la indexa en dos dimensiones. Es la base del álgebra lineal en R.</p>
+      <p>Vienes de dominar el vector, y la matriz es su primer truco: los mismos datos, en dos dimensiones. Nada nuevo entra en juego —ni tipos, ni reglas de indexación—, solo un atributo que le dice a R "muestra esto como filas y columnas". Por eso este capítulo se siente familiar: no aprenderás una estructura desde cero, sino una forma nueva de mirar la que ya conoces.</p>
+      <p>¿Y para qué la querrás? Dos escenarios. El primero, tablas de una sola magnitud: unidades por producto y mes, retornos por activo y periodo, miles de escenarios simulados. El segundo, menos visible pero más profundo: el álgebra lineal que sostiene la estadística — detrás de cada regresión que ajustes en el Nivel Intermedio hay productos matriciales e inversas como los de este capítulo. En el día a día usarás más data frames que matrices, y está bien: la matriz es la maquinaria del sótano, y conocerla te permitirá entender qué hace R cuando modela.</p>
 
       <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>Al terminar sabrás:</strong> crear matrices con <code>matrix()</code> (y por qué se llenan por columnas), nombrar filas y columnas, indexar con <code>[fila, columna]</code> evitando la trampa de <code>drop</code>, y distinguir el producto elemento a elemento (<code>*</code>) del producto matricial (<code>%*%</code>).</p></div>
 
@@ -1693,6 +1695,7 @@ is.matrix(v)        # TRUE</code></pre>
 <div class="out">     [,1] [,2] [,3]
 [1,]    1    3    5
 [2,]    2    4    6</div></div>
+      <p>Esa es toda la magia: seis valores en memoria, y el atributo <code>dim</code> —de la misma familia de metadatos que conociste con <code>attributes()</code> en el capítulo de variables— le indica a R que los presente como 2 filas × 3 columnas. Nota que el vector se repartió <em>bajando por columnas</em>: 1 y 2 en la primera, 3 y 4 en la segunda. Ese orden no es casual, y lo retomamos ya mismo.</p>
 
       <h2>Crear: por columnas (defecto) o por filas</h2>
       <p>La forma habitual es <code>matrix()</code>. El detalle que causa más sorpresas: R llena la matriz <strong>por columnas</strong> (baja por la primera columna, luego la segunda...). Si tus datos vienen "leídos por filas", usa <code>byrow = TRUE</code>:</p>
@@ -1722,6 +1725,21 @@ ventas["cacao", "feb"]   # acceso por nombre: legible y a prueba de reordenamien
 cafe  120  90 150
 cacao 135 110 160
 [1] 110</div></div>
+      <p>La tabla ahora se explica sola: café y cacao en las filas, meses en las columnas, y el acceso <code>ventas["cacao", "feb"]</code> devuelve 110 sin que tengas que recordar posiciones. En un proyecto real, los nombres también protegen el análisis: si alguien inserta un mes o reordena productos, el acceso por nombre sigue apuntando al dato correcto, mientras que el acceso por posición apuntaría a otro sin avisar.</p>
+
+      <h2>Operar con la matriz: ingresos = unidades × precio</h2>
+      <p>Como la matriz sigue siendo un vector, toda la vectorización del capítulo anterior aplica. Un caso típico: convertir unidades vendidas en ingresos, cuando cada producto tiene su precio (café a 500, cacao a 800 pesos por unidad, digamos). Multiplicar la matriz por el vector de precios funciona… por una razón que conviene entender:</p>
+      <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R</span><button class="copy">Copiar</button></div>
+<pre><code class="language-r">precios <- c(cafe = 500, cacao = 800)
+ingresos <- ventas * precios     # el vector se recicla ¡bajando por columnas!
+ingresos
+rowSums(ingresos)                # ingreso del trimestre por producto</code></pre>
+<div class="out">         ene    feb    mar
+cafe   60000  45000  75000
+cacao 108000  88000 128000
+  cafe  cacao
+180000 324000</div></div>
+      <p>¿Por qué funciona? El reciclaje del capítulo de vectores, aplicado al orden interno de la matriz: R recorre <code>ventas</code> columna por columna (120, 135, 90, 110…) y recicla <code>precios</code> (500, 800, 500, 800…), de modo que cada fila queda emparejada con su precio. Funciona <em>porque el vector tiene un valor por fila</em>. Si quisieras aplicar un valor por <em>columna</em> (un descuento por mes, por ejemplo), este mismo gesto produciría números incorrectos sin error alguno — tendrías que transponer o usar <code>sweep(ventas, 2, descuentos, "*")</code>. Es el peligro del reciclaje silencioso, ahora en dos dimensiones.</p>
 
       <h2>Indexar con [fila, columna] y la trampa de drop</h2>
       <p>La sintaxis es <code>m[fila, columna]</code>; dejar una posición vacía significa "todas". Aplican las mismas cinco formas de indexar que aprendiste con vectores (posiciones, negativos, lógicos, nombres, <code>which()</code>).</p>
@@ -1735,6 +1753,7 @@ ventas[1, , drop = FALSE]   # fila 1 CONSERVANDO la estructura de matriz</code><
   150   160
      ene feb mar
 cafe 120  90 150</div></div>
+      <p>Mira los tres resultados: la fila de café llega como vector con nombres de mes, la columna de marzo como vector con nombres de producto, y solo la tercera forma —con <code>drop = FALSE</code>— conserva la tabla de 1×3 con su estructura intacta.</p>
 
       <div class="callout warn"><span class="cic"><svg class="ci"><use href="#i-alert"/></svg></span><p><strong>La trampa de la dimensión perdida:</strong> al extraer una sola fila o columna, R "simplifica" el resultado a vector y la matriz pierde sus dimensiones. En un análisis interactivo no molesta, pero dentro de una función o bucle rompe código que espera una matriz (por ejemplo, algo que luego llama a <code>nrow()</code> o <code>%*%</code>). El seguro es <code>drop = FALSE</code>. Guárdate este detalle: reaparece con data frames.</p></div>
 
@@ -1754,6 +1773,7 @@ t(A)        # transpuesta</code></pre>
      [,1] [,2]
 [1,]    1    2
 [2,]    3    4</div></div>
+      <p>Comprueba una casilla del producto matricial a mano: la posición [1,1] es la fila (1, 3) por la columna (1, 2), es decir, 1×1 + 3×2 = 7. El resto sigue la misma receta de "fila por columna". Compárala con la casilla [1,1] de <code>A * A</code>, que es simplemente 1×1 = 1: dos operaciones distintas que comparten símbolo en el papel, pero no en R.</p>
 
       <p>Y <code>solve(A)</code> calcula la inversa. Verifícalo con la definición: una matriz por su inversa da la identidad.</p>
       <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R</span><button class="copy">Copiar</button></div>
@@ -1766,6 +1786,7 @@ A %*% solve(A)      # debe dar la identidad</code></pre>
      [,1] [,2]
 [1,]    1    0
 [2,]    0    1</div></div>
+      <p>La salida confirma la definición: <code>A %*% solve(A)</code> devuelve la identidad (unos en la diagonal, ceros fuera). Esta pareja producto-inversa es el corazón del estimador de mínimos cuadrados que usarás en econometría; aquí la ves en miniatura.</p>
 
       <div class="callout danger"><span class="cic"><svg class="ci"><use href="#i-stop"/></svg></span><p><strong>Cuidado:</strong> confundir <code>*</code> con <code>%*%</code> no siempre da error: si las dimensiones son compatibles, obtienes una matriz de números incorrectos sin ninguna advertencia. En econometría (piensa en <code>solve(t(X) %*% X) %*% t(X) %*% y</code>, la fórmula de MCO) ese silencio destruye el resultado. Ante la duda, verifica una casilla a mano.</p></div>
 
@@ -1778,6 +1799,18 @@ colMeans(ventas)   # venta promedio de cada mes</code></pre>
   360   405
   ene   feb   mar
 127.5 100.0 155.0</div></div>
+      <p>Dos líneas, seis totales: el cacao acumuló más unidades en el trimestre (405 contra 360) y marzo fue el mejor mes en promedio (155). Con una matriz de miles de escenarios simulados, estas mismas funciones resumen columnas enteras en milisegundos.</p>
+
+      <h2>Crecer por bloques: cbind() y rbind()</h2>
+      <p>Para añadir columnas o filas completas están <code>cbind()</code> (<em>column bind</em>) y <code>rbind()</code> (<em>row bind</em>). Llega abril y la matriz crece sin reconstruirse:</p>
+      <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R</span><button class="copy">Copiar</button></div>
+<pre><code class="language-r">abr <- c(140, 170)
+ventas <- cbind(ventas, abr)   # nueva columna; rbind() añadiría una fila
+ventas</code></pre>
+<div class="out">      ene feb mar abr
+cafe  120  90 150 140
+cacao 135 110 160 170</div></div>
+      <p>Fíjate en el detalle amable: <code>cbind()</code> tomó el nombre del objeto (<code>abr</code>) como nombre de la columna nueva. La condición para que esto funcione es dimensional: la columna nueva debe tener tantos valores como filas tiene la matriz (y la fila nueva, tantos como columnas). Si no coinciden, R recicla o falla — verifica con <code>dim()</code> tras cada unión.</p>
 
       <h2>¿Cuándo usar una matriz... y cuándo no?</h2>
       <div class="tablewrap"><table class="data"><tr><th>Usa MATRIZ cuando...</th><th>Usa DATA FRAME cuando...</th></tr><tr><td>Todo es numérico y homogéneo: álgebra lineal, MCO manual, sistemas de ecuaciones</td><td>Tus columnas mezclan tipos: ciudad (texto), ventas (número), activo (lógico)</td></tr><tr><td>Simulaciones: miles de escenarios × periodos, cada celda un número</td><td>Datos "reales" leídos de Excel/CSV con variables heterogéneas</td></tr><tr><td>Matrices de correlaciones o de distancias (<code>cor()</code> devuelve matriz)</td><td>Vas a usar el tidyverse (dplyr/ggplot2 trabajan con data frames)</td></tr></table></div>
@@ -1797,7 +1830,7 @@ retornos["A", , drop = FALSE]   # sigue siendo matriz 1x3</code></pre></div></di
 
       <div class="challenge"><div class="xhead"><svg class="ci"><use href="#i-trophy"/></svg>Reto</div><p>Crea una matriz 3×3 con los números 1 al 9 por filas, calcula la suma de cada columna, y luego verifica con <code>t()</code> que <code>colSums(m)</code> es igual a <code>rowSums(t(m))</code>. ¿Por qué tiene que ser así?</p></div>
 
-      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>En resumen:</strong> una matriz es un vector con el atributo <code>dim</code>; R la llena por columnas salvo que uses <code>byrow = TRUE</code>. Extraer una sola fila o columna la reduce a vector (usa <code>drop = FALSE</code>), y <code>*</code> multiplica casilla por casilla mientras <code>%*%</code> es el producto matricial. Ponle siempre nombres de fila y columna.</p></div>
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>En resumen:</strong> una matriz es un vector con el atributo <code>dim</code>; R la llena por columnas salvo que uses <code>byrow = TRUE</code>. Extraer una sola fila o columna la reduce a vector (usa <code>drop = FALSE</code>), y <code>*</code> multiplica casilla por casilla mientras <code>%*%</code> es el producto matricial. Ponle siempre nombres de fila y columna. En el siguiente capítulo cambiamos de lo cuantitativo a lo cualitativo: los factores, la estructura de R para las categorías.</p></div>
 
       <div class="pager"><a data-go="vectores"><small>Anterior</small><b>← Vectores</b></a><a class="next" data-go="factores"><small>Siguiente</small><b>Factores →</b></a></div>
     </section>
@@ -1807,6 +1840,8 @@ retornos["A", , drop = FALSE]   # sigue siendo matriz 1x3</code></pre></div></di
       <div class="breadcrumbs"><a data-nav="inicio">Inicio</a><span class="sep">/</span><span>Nivel Básico</span><span class="sep">/</span><span>Factores</span></div>
       <h1 class="page-title">Factores</h1>
       <p class="lead">Los factores representan <strong>variables categóricas</strong>: datos cualitativos con un conjunto finito y conocido de categorías (niveles), como región, nivel educativo o estrato. Son la respuesta de R a una pregunta que todo analista enfrenta: ¿cómo le digo al software que "primaria, secundaria, universitaria" no son simples textos, sino categorías con significado?</p>
+      <p>Hasta aquí, todo lo que has guardado son números, textos y lógicos "crudos". Pero abre cualquier dataset real —una encuesta de hogares, una base de clientes— y la mitad de las columnas no son cantidades sino categorías: región, sexo, estrato, nivel educativo, estado del contrato. Este capítulo presenta la estructura que R diseñó específicamente para ellas.</p>
+      <p>La tentación del principiante es dejar las categorías como texto, y funciona… hasta que deja de hacerlo: el gráfico ordena "alto, bajo, medio" alfabéticamente, la regresión necesita saber cuál es la categoría base, y un "Secundria" mal tecleado se convierte en una categoría nueva sin que nadie lo note. El factor resuelve las tres cosas a la vez, porque convierte la categoría en un contrato: estos son los valores válidos, y este es su orden.</p>
 
       <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>Al terminar sabrás:</strong> representar variables categóricas con factores, controlar orden y etiquetas con <code>levels</code> y <code>labels</code>, crear factores ordenados para comparar niveles, construir tablas de frecuencia y evitar la trampa de <code>as.numeric()</code> sobre un factor.</p></div>
 
@@ -1830,6 +1865,7 @@ Levels: L M S
 attr(,"levels")
 [1] "L" "M" "S"</div></div>
       <p>Observa dos cosas: los niveles se ordenaron <strong>alfabéticamente</strong> por defecto (L, M, S — no el orden lógico S, M, L), y cada valor del vector es en realidad el número de su nivel. Por eso "M" se guarda como 2. Casi todos los problemas con factores nacen de olvidar esta doble naturaleza.</p>
+      <p>¿Cuándo la notarás? Cada vez que un factor "se comporte raro": un gráfico que ordena las categorías donde no quieres, una exportación que muestra números en vez de etiquetas, una unión de tablas que no encuentra coincidencias. La pregunta de diagnóstico siempre es la misma: ¿qué dicen <code>levels(f)</code> y los códigos de <code>unclass(f)</code>?</p>
 
       <h2>levels y labels en factor(): controla orden y etiquetas</h2>
       <p><code>levels</code> declara qué valores existen en los <em>datos de entrada</em> y en qué orden; <code>labels</code> define cómo quieres <em>mostrarlos</em>. Son distintos y combinables — muy útil cuando los datos vienen codificados como números, típico en encuestas:</p>
@@ -1846,6 +1882,7 @@ levels(tallas)</code></pre>
 <div class="out">[1] bajo  alto  medio bajo  medio medio
 Levels: bajo medio alto
 [1] "S" "M" "L"</div></div>
+      <p>El resultado se lee mejor de lo que se escribió: los códigos 1, 2, 3 de la encuesta ahora se muestran como "bajo", "medio" y "alto", en ese orden y no en el alfabético (donde "alto" habría quedado primero). Este patrón —números de un libro de códigos convertidos en etiquetas legibles— es rutina con encuestas oficiales, donde cada categórica llega codificada como entero y el diccionario de la encuesta te dice qué significa cada código.</p>
 
       <div class="callout tip"><span class="cic"><svg class="ci"><use href="#i-bulb"/></svg></span><p><strong>Reordenar la referencia para regresión:</strong> en un modelo, la primera categoría del factor es la base de comparación. <code>relevel(region, ref = "Caribe")</code> mueve "Caribe" al primer lugar sin tocar nada más — así los coeficientes de <code>lm()</code> se interpretan "respecto al Caribe". Para reordenar todo, vuelve a llamar <code>factor(x, levels = ...)</code>.</p></div>
 
@@ -1862,6 +1899,23 @@ educ[educ >= "secundaria"] # filtrar por nivel mínimo</code></pre>
 [1] secundaria    universitaria secundaria    secundaria    universitaria
 Levels: primaria < secundaria < universitaria</div></div>
       <p>Fíjate en cómo se imprime: <code>primaria &lt; secundaria &lt; universitaria</code>. Con un factor sin ordenar, esas comparaciones devuelven <code>NA</code> con advertencia, porque no tiene sentido preguntar si "Caribe" es menor que "Andina".</p>
+      <p>El filtro <code>educ[educ &gt;= "secundaria"]</code> es más potente de lo que parece: en análisis del mercado laboral, "personas con al menos secundaria" es exactamente esta línea. Sin factor ordenado tendrías que enumerar las categorías válidas con <code>%in%</code> y mantener esa lista a mano cada vez que la clasificación cambie.</p>
+
+      <h2>De número a categoría: cut()</h2>
+      <p>Muchas categóricas no nacen categóricas: nacen numéricas y tú las agrupas. La edad se vuelve grupo etario, el ingreso se vuelve quintil, el puntaje se vuelve nivel de riesgo. La función <code>cut()</code> hace ese corte y devuelve —no por casualidad— un factor:</p>
+      <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R</span><button class="copy">Copiar</button></div>
+<pre><code class="language-r">edades <- c(23, 35, 67, 15, 42, 58)
+grupo <- cut(edades,
+             breaks = c(0, 17, 39, 59, Inf),
+             labels = c("menor", "joven", "adulto", "mayor"))
+grupo
+table(grupo)</code></pre>
+<div class="out">[1] joven  joven  mayor  menor  adulto adulto
+Levels: menor joven adulto mayor
+grupo
+ menor  joven adulto  mayor
+     1      2      2      1</div></div>
+      <p>Cada corte <code>breaks</code> define intervalos de la forma <code>(a, b]</code> —abiertos a la izquierda, cerrados a la derecha—: la persona de 39 años caería en "joven" y la de 40 en "adulto". Si necesitas que el límite pertenezca al intervalo de la derecha, usa <code>right = FALSE</code>. Nota que los niveles quedaron en el orden de los cortes, no alfabético: <code>cut()</code> ya te entrega el factor bien ordenado para tablas y gráficos.</p>
 
       <h2>Tablas de frecuencia y proporciones</h2>
       <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R</span><button class="copy">Copiar</button></div>
@@ -1873,6 +1927,7 @@ round(prop.table(table(educ)), 3)  # proporciones (suman 1)</code></pre>
 educ
      primaria    secundaria universitaria
         0.167         0.500         0.333</div></div>
+      <p>La lectura: de las seis personas, la mitad tiene secundaria (50 %), un tercio universitaria y una sexta parte primaria. <code>prop.table()</code> convierte cualquier tabla de conteos en proporciones — y como recibe la tabla (no el factor), más adelante podrás aplicarla también a cruces de dos variables.</p>
       <p>Nota valiosa: <code>table()</code> sobre un factor muestra <em>todos</em> los niveles, incluso los de frecuencia cero. Con un vector de texto, una categoría sin casos simplemente desaparece de la tabla — con factores, ves el cero, que muchas veces es el dato interesante.</p>
 
       <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>Niveles fantasma y droplevels():</strong> al filtrar datos, los niveles no usados <em>persisten</em> (con frecuencia 0 en tablas y espacios vacíos en gráficos). <code>droplevels(f)</code> elimina los niveles sin observaciones. Es rutina después de cualquier subconjunto: <code>sub <- droplevels(educ[educ != "primaria"])</code>.</p></div>
@@ -1890,6 +1945,19 @@ as.numeric(levels(f))[f]       # equivalente idiomático (y más eficiente)</cod
 
       <div class="callout danger"><span class="cic"><svg class="ci"><use href="#i-stop"/></svg></span><p><strong>Por qué es tan peligrosa:</strong> <code>as.numeric(f)</code> no da error ni advertencia, y devuelve números perfectamente plausibles. Si tu columna de ingresos llegó como factor (pasaba muchísimo al importar CSV con R antiguo) y la conviertes mal, todo el análisis posterior queda corrupto en silencio. Regla de oro: <strong>factor → character → numeric</strong>, nunca el salto directo.</p></div>
 
+      <h2>El control de dominio en acción</h2>
+      <p>La tercera razón de existir de los factores —conocer sus categorías válidas— merece verse funcionando. Crea un factor declarando los niveles y pásale un valor que no pertenece:</p>
+      <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R</span><button class="copy">Copiar</button></div>
+<pre><code class="language-r">sexo <- factor(c("F", "M", "f", "M"), levels = c("F", "M"))
+sexo                            # la "f" minúscula no es un nivel válido
+table(sexo, useNA = "ifany")    # y el conteo lo delata</code></pre>
+<div class="out">[1] F    M    &lt;NA> M
+Levels: F M
+sexo
+   F    M &lt;NA>
+   1    2    1</div></div>
+      <p>La <code>"f"</code> minúscula quedó como <code>NA</code> al crearse el factor — sin drama, pero visible. En la creación con <code>factor()</code> la conversión es silenciosa (por eso conviene revisar con <code>table(..., useNA = "ifany")</code>); en cambio, al <em>asignar</em> un valor inválido a un factor existente, R sí advierte con <code>invalid factor level</code>. En ambos casos el resultado es el mismo: el dato sucio no se cuela como categoría nueva, se convierte en faltante que puedes contar y corregir. Ese es el chequeo de calidad gratis.</p>
+
       <h2>Adelanto honesto: forcats en el tidyverse</h2>
       <p>Cuando llegues al tidyverse, el paquete <strong>forcats</strong> (de <em>for categorical variables</em>) te dará versiones más cómodas de todo lo anterior. Las dos que más usarás:</p>
       <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R</span><button class="copy">Copiar</button></div>
@@ -1897,6 +1965,8 @@ as.numeric(levels(f))[f]       # equivalente idiomático (y más eficiente)</cod
 fct_infreq(educ)                    # reordena niveles por frecuencia (ideal para barras)
 fct_reorder(region, ingreso_medio)  # reordena una categórica según otra variable</code></pre></div>
       <p>La lógica no cambia: siguen siendo factores con códigos y niveles. forcats solo hace ergonómico lo que aquí aprendiste a hacer a mano — por eso vale la pena entender primero la mecánica de base.</p>
+
+      <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>Nota de historia — <code>stringsAsFactors</code>:</strong> si lees código de R anterior a 2020 verás por todas partes <code>stringsAsFactors = FALSE</code>. Durante décadas, R convertía <em>automáticamente</em> todo texto a factor al importar datos o crear data frames, y esa sobreactuación causaba las trampas que ya conoces. Desde R 4.0 el default cambió: el texto se queda como texto, y el factor se crea solo cuando tú lo pides — que es exactamente lo que esta guía te enseña a hacer, con los <code>levels</code> declarados.</p></div>
 
       <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>Buena práctica:</strong> define los <code>levels</code> explícitamente al crear cualquier factor importante, aunque el orden alfabético coincida con el que quieres. Documenta tu intención, hace reproducible el orden en tablas y gráficos, y detecta valores mal escritos (un "Secundria" con typo se convertirá en <code>NA</code> y lo verás de inmediato).</p></div>
 
@@ -1913,7 +1983,7 @@ unclass(sat)                  # 3 1 3 2 3 1 + levels</code></pre></div></div></d
 
       <div class="challenge"><div class="xhead"><svg class="ci"><use href="#i-trophy"/></svg>Reto</div><p>Simula 200 respuestas con <code>muestra <- sample(c("malo","regular","bueno"), 200, replace = TRUE, prob = c(0.2, 0.3, 0.5))</code>, conviértelas en factor ordenado y construye la tabla de proporciones. Luego filtra solo los "bueno", aplica <code>droplevels()</code> y compara <code>levels()</code> antes y después.</p></div>
 
-      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>En resumen:</strong> un factor es un vector de enteros más un atributo <code>levels</code> con las etiquetas; define siempre los <code>levels</code> de forma explícita para fijar el orden y detectar valores mal escritos. Usa <code>ordered = TRUE</code> cuando las categorías tengan jerarquía, y para números guardados como factor convierte con <code>as.character()</code> antes de <code>as.numeric()</code>, nunca directo.</p></div>
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>En resumen:</strong> un factor es un vector de enteros más un atributo <code>levels</code> con las etiquetas; define siempre los <code>levels</code> de forma explícita para fijar el orden y detectar valores mal escritos. Usa <code>ordered = TRUE</code> cuando las categorías tengan jerarquía, y para números guardados como factor convierte con <code>as.character()</code> antes de <code>as.numeric()</code>, nunca directo. En el siguiente capítulo conocerás el contenedor que admite todo lo anterior a la vez: la lista.</p></div>
 
       <div class="pager"><a data-go="matrices"><small>Anterior</small><b>← Matrices</b></a><a class="next" data-go="listas"><small>Siguiente</small><b>Listas →</b></a></div>
     </section>
@@ -1926,6 +1996,7 @@ unclass(sat)                  # 3 1 3 2 3 1 + levels</code></pre></div></div></d
 
       <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>Al terminar sabrás:</strong> construir listas que combinan tipos y longitudes, distinguir <code>[ ]</code>, <code>[[ ]]</code> y <code>$</code> para acceder a sus elementos, navegar estructuras anidadas (un modelo, un JSON) y usar <code>str()</code> para mapear cualquier objeto desconocido.</p></div>
 
+      <p>Con este capítulo cierras la secuencia de estructuras homogéneas: vector, matriz y factor exigen que todo sea del mismo tipo. Pero un análisis real junta cosas heterogéneas —el nombre del cliente, su edad, su historial de compras, su información de contacto— y para eso R tiene un contenedor sin restricciones: la lista. Con ella completas el juego de piezas que desemboca, en el próximo capítulo, en el data frame.</p>
       <p>¿Por qué dedicarle una sección entera a algo tan simple? Porque <strong>casi todo lo complejo en R es una lista disfrazada</strong>: el resultado de una regresión (<code>lm</code>), la salida de un test estadístico (<code>t.test</code>), un JSON leído de una API, e incluso el data frame que verás en la próxima sección (que es una lista de columnas de igual longitud). Saber navegar listas es saber extraer resultados de cualquier análisis.</p>
 
       <h2>Crear una lista</h2>
@@ -1941,6 +2012,7 @@ length(cliente)   # 5 elementos, sin importar el tamaño de cada uno
 names(cliente)</code></pre>
 <div class="out">[1] 5
 [1] "nombre"   "edad"     "activo"   "compras"  "contacto"</div></div>
+      <p>Fíjate en <code>length(cliente)</code>: devuelve 5, la cantidad de "compartimentos", sin importar que uno lleve un solo texto y otro un vector de tres compras o una lista entera. La longitud de una lista cuenta elementos, no contenido — primera diferencia práctica con el vector.</p>
 
       <h2>[ vs [[ vs $: la analogía del tren</h2>
       <p>Imagina la lista como un <strong>tren de carga</strong>: cada elemento es un vagón con algo adentro.</p>
@@ -1959,6 +2031,8 @@ class(cliente["compras"]); class(cliente$compras)</code></pre>
 [1]  45000 120000  89000
 [1] "list"
 [1] "numeric"</div></div>
+      <p>La propia impresión te dice qué tienes en las manos: <code>cliente["compras"]</code> se muestra con su encabezado <code>$compras</code> —el formato de las listas—, mientras que las otras dos formas imprimen el vector desnudo. Y <code>class()</code> lo confirma: <code>"list"</code> contra <code>"numeric"</code>. Cuando dudes de qué devolvió un acceso, imprímelo y busca el <code>$</code>.</p>
+      <p>Un matiz más de <code>$</code>: hace coincidencia parcial. <code>cliente$comp</code> encuentra <code>compras</code> en silencio, y si dos elementos empezaran por "comp", devolvería <code>NULL</code> también en silencio. Cómodo en la consola, arriesgado en scripts: para código serio, <code>[["compras"]]</code> con el nombre completo es la forma a prueba de sustos.</p>
 
       <div class="callout warn"><span class="cic"><svg class="ci"><use href="#i-alert"/></svg></span><p><strong>La confusión #1 con listas:</strong> intentar operar sobre <code>lista[1]</code>. <code>mean(cliente["compras"])</code> falla ("argument is not numeric") porque le estás pasando un vagón cerrado — una lista — y no los números. Si el objetivo es <em>usar el contenido</em>, siempre <code>[[ ]]</code> o <code>$</code>. Si el objetivo es <em>quedarte con una sub-lista</em>, <code>[ ]</code>.</p></div>
 
@@ -1975,6 +2049,30 @@ names(cliente)</code></pre>
 <div class="out">[1] "Santa Marta"
 [1] 120000
 [1] "nombre"   "edad"     "compras"  "contacto" "segmento"</div></div>
+      <p>Las dos primeras líneas navegan y las tres siguientes editan: <code>edad</code> se actualiza, <code>segmento</code> nace con solo asignarlo y <code>activo</code> desaparece al recibir <code>NULL</code> — fíjate en el <code>names()</code> final, donde ya no está. Es el mismo trío crear/modificar/eliminar que usarás con las columnas de un data frame, porque un data frame es una lista.</p>
+
+      <h2>Aplanar con unlist(): de lista a vector</h2>
+      <p>A veces necesitas lo contrario de una lista: juntar todo su contenido en un único vector para calcular de una vez. <code>unlist()</code> aplana la estructura, conservando nombres compuestos:</p>
+      <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R</span><button class="copy">Copiar</button></div>
+<pre><code class="language-r">notas <- list(mate = c(4, 5), fisica = c(3, 4.5))
+unlist(notas)          # aplana a un vector con nombres compuestos
+mean(unlist(notas))    # promedio global de todas las notas</code></pre>
+<div class="out">  mate1   mate2 fisica1 fisica2
+    4.0     5.0     3.0     4.5
+[1] 4.125</div></div>
+      <p>Una advertencia coherente con todo lo que sabes: el resultado de <code>unlist()</code> es un vector, y un vector tiene UN solo tipo. Si la lista mezcla números y texto, el aplanado dispara la coerción del capítulo de tipos y todo termina como <code>character</code>. Aplana solo cuando el contenido sea homogéneo. Última pieza del kit: <code>c()</code> también une listas —<code>c(lista1, lista2)</code> produce una con los elementos de ambas— y <code>vector("list", 12)</code> crea una lista vacía de doce compartimentos <code>NULL</code>, lista para llenarse en un bucle.</p>
+
+      <h2>Listas para organizar tu propio trabajo</h2>
+      <p>Las listas no son solo algo que otros objetos "son por dentro": también son la mejor herramienta para empaquetar resultados propios. Imagina que tu análisis produce un promedio, un tamaño de muestra y una nota metodológica; en lugar de tres objetos sueltos en el entorno, devuélvelos juntos:</p>
+      <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R</span><button class="copy">Copiar</button></div>
+<pre><code class="language-r">resultado <- list(
+  promedio = mean(c(45000, 120000, 89000)),
+  n        = 3,
+  nota     = "Cifras en pesos; sin ajuste por inflación"
+)
+resultado$promedio</code></pre>
+<div class="out">[1] 84666.67</div></div>
+      <p>Este patrón —una lista con el resultado, su tamaño de muestra y sus supuestos— es el embrión de lo que hacen todas las funciones estadísticas de R: por eso <code>lm()</code> y <code>t.test()</code> devuelven listas. Cuando en el nivel de funciones escribas las tuyas, devolver una lista bien nombrada será la diferencia entre una función que entrega un número suelto y una que entrega un resultado completo.</p>
 
       <div class="callout tip"><span class="cic"><svg class="ci"><use href="#i-bulb"/></svg></span><p><strong>Adelanto de una línea:</strong> <code>lapply(lista, f)</code> aplica la función <code>f</code> a cada elemento y devuelve otra lista: <code>lapply(list(a = 1:3, b = 4:6), mean)</code> devuelve <code>$a</code> = 2 y <code>$b</code> = 5. Es el puente entre listas e iteración, y lo estudiarás a fondo en el nivel de funciones.</p></div>
 
@@ -1996,6 +2094,7 @@ head(modelo$residuals, 3)      # primeros residuos</code></pre>
         1         2         3
  3.849460 11.849460 -5.947766</div></div>
       <p>Todo lo que el modelo sabe está ahí, accesible con las mismas herramientas que acabas de aprender: <code>$</code>, <code>[[</code>, indexación por nombre. Cuando un tutorial te diga "extrae los residuos del modelo", ya sabes que es simplemente abrir un vagón de la lista. (En la práctica también existen funciones-extractoras como <code>coef(modelo)</code> y <code>residuals(modelo)</code>, que son la vía recomendada — pero funcionan precisamente porque debajo hay una lista.)</p>
+      <p>Y los números también se dejan leer: la pendiente 3.93 dice que, en este dataset clásico, cada milla por hora adicional de velocidad añade unos 3.9 pies de distancia de frenado. No importa si todavía no sabes regresión —llegará en el Nivel Intermedio—; lo que importa hoy es que ya sabes <em>llegar</em> a cualquier número que un modelo produzca.</p>
 
       <h2>El mismo patrón: datos tipo API/JSON</h2>
       <p>Cuando leas datos de una API (con <code>jsonlite</code>, por ejemplo), el JSON se convierte en... una lista anidada. La estructura es idéntica a la que ya sabes navegar:</p>
@@ -2013,6 +2112,7 @@ respuesta[["data"]][["usuario"]][["id"]]   # equivalente con [[ ]]</code></pre>
 <div class="out">[1] "Santa Marta"
 [1] 254000
 [1] 501</div></div>
+      <p>Nota cómo la ruta <code>respuesta$data$usuario$ciudad</code> se lee igual que una dirección: caja grande, caja mediana, caja pequeña, dato. Las APIs reales anidan más profundo, pero el gesto nunca cambia.</p>
 
       <h2>str(): tu linterna para listas desconocidas</h2>
       <p>Ante una lista ajena (un modelo, un JSON, el objeto que devuelve un paquete), no adivines: <code>str()</code> (<em>structure</em>) te muestra el mapa completo — nombres, tipos, tamaños y anidamiento. Con <code>max.level</code> controlas cuántos niveles de profundidad ver:</p>
@@ -2023,6 +2123,7 @@ respuesta[["data"]][["usuario"]][["id"]]   # equivalente con [[ ]]</code></pre>
  $ data  :List of 2
   ..$ usuario:List of 3
   ..$ compras: num [1:3] 45000 120000 89000</div></div>
+      <p>En el mapa se lee todo de un vistazo: dos elementos en el nivel superior, <code>data</code> es a su vez una lista de dos, y <code>compras</code> es un vector numérico de tres posiciones. Con <code>max.level = 1</code> habrías visto solo el primer nivel — ideal para objetos gigantes.</p>
 
       <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>Buena práctica:</strong> el flujo profesional ante cualquier objeto desconocido es siempre el mismo: <code>str(x, max.level = 1)</code> para ver el mapa, <code>names(x)</code> para conocer los vagones, y luego <code>$</code> o <code>[[ ]]</code> para extraer justo lo que necesitas. Funciona igual para un <code>lm</code>, un <code>t.test</code> o la respuesta de una API.</p></div>
 
@@ -2041,7 +2142,7 @@ class(curso[["notas"]])    # "numeric": la carga
 
       <div class="challenge"><div class="xhead"><svg class="ci"><use href="#i-trophy"/></svg>Reto</div><p>Ajusta <code>modelo <- lm(dist ~ speed, data = cars)</code> y, usando solo acceso a la lista (sin <code>summary()</code>), responde: ¿cuántos grados de libertad residuales tiene el modelo (<code>df.residual</code>)? ¿Cuál es el residuo más grande en valor absoluto? Pista: <code>which.max(abs(...))</code>.</p></div>
 
-      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>En resumen:</strong> la lista es el contenedor universal de R, y casi todo lo complejo (un <code>lm</code>, un <code>t.test</code>, un JSON, un data frame) es una lista por dentro. <code>[ ]</code> devuelve una sub-lista; <code>[[ ]]</code> y <code>$</code> devuelven el contenido. Ante un objeto desconocido: <code>str()</code>, <code>names()</code> y luego extraer con <code>$</code> o <code>[[ ]]</code>.</p></div>
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>En resumen:</strong> la lista es el contenedor universal de R, y casi todo lo complejo (un <code>lm</code>, un <code>t.test</code>, un JSON, un data frame) es una lista por dentro. <code>[ ]</code> devuelve una sub-lista; <code>[[ ]]</code> y <code>$</code> devuelven el contenido. Ante un objeto desconocido: <code>str()</code>, <code>names()</code> y luego extraer con <code>$</code> o <code>[[ ]]</code>. En el siguiente capítulo estas piezas se ensamblan: el data frame, una lista de vectores de igual longitud y la estructura reina del análisis de datos.</p></div>
 
       <div class="pager"><a data-go="factores"><small>Anterior</small><b>← Factores</b></a><a class="next" data-go="dataframes"><small>Siguiente</small><b>Data Frames →</b></a></div>
     </section>
