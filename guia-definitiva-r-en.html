@@ -354,6 +354,17 @@ table.data tr:hover td{background:var(--surface-2)}
 .fig img{display:block;width:100%;height:auto}
 .fig figcaption{padding:10px 16px;font-size:.8rem;color:var(--text-mut);border-top:1px solid var(--border)}
 
+/* Conceptual diagrams (inline SVG, theme-aware) */
+.diagram{margin:22px 0;border:1px solid var(--border);border-radius:var(--radius);
+  background:var(--surface);box-shadow:var(--shadow-sm);overflow:hidden}
+.diagram svg{display:block;width:100%;height:auto;font-family:var(--font)}
+.diagram .dg-txt{fill:var(--text-title)}
+.diagram .dg-mut{fill:var(--text-mut)}
+.diagram .dg-soft{fill:var(--text-soft)}
+.diagram .dg-mono{font-family:var(--mono)}
+.diagram .dg-box{fill:var(--surface-2);stroke:var(--border-strong)}
+.diagram figcaption{padding:10px 16px;font-size:.8rem;color:var(--text-mut);border-top:1px solid var(--border)}
+
 /* Real-world case / showcase */
 .showcase{margin:24px 0;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:var(--surface);box-shadow:var(--shadow)}
 .showcase img{display:block;width:100%;height:auto;border-bottom:1px solid var(--border)}
@@ -589,16 +600,22 @@ table.data tr:hover td{background:var(--surface-2)}
       <div class="breadcrumbs"><a data-nav="inicio">Home</a><span class="sep">/</span><span>Basic Level</span><span class="sep">/</span><span>What is R?</span></div>
       <h1 class="page-title">What is R and what is it for?</h1>
       <p class="lead">R is a programming language and a free, open-source environment designed specifically for statistical analysis, data science, and visualization. It is not "just another stats program": it is a full programming language whose raw material is data.</p>
+      <p>Before installing anything or writing functions, it helps to understand what problem R solves. In a spreadsheet you can run calculations, filter tables, and build charts; R lets you do the same, but with one decisive advantage: every step is written down as a reproducible recipe. If the data changes tomorrow, you don't redo the work by hand — you run the code again and get the updated analysis.</p>
+      <p>This first chapter works as your entry map. You'll see where R comes from, why its design is so tightly linked to data analysis, where it tends to shine, and how to read your first lines of code without feeling like you're staring at a foreign language. What matters here is not memorizing names but building a mental model: R works with objects, functions, and vectors.</p>
+      <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>By the end you'll know how to:</strong> explain what R is and where it came from, why its "statistics-first" design makes it unique (vectorization, built-in statistics, and the thousands of CRAN packages), how it differs from Python, and how its ecosystem fits together (R, CRAN, Posit, and the tidyverse).</p></div>
       <div class="tag-row"><span class="t">Concept</span><span class="t">History</span><span class="t">Ecosystem</span><span class="t">R vs Python</span></div>
 
       <h2>A little history (just the essentials)</h2>
+      <p>A tool's history is not a decorative detail: it helps you understand why the tool works the way it does. R was not born to build web apps or video games; it was born so researchers and analysts could converse with their data interactively. That original decision explains many things we will see later: why vectors matter so much, why so many statistical functions come built in, and why the language favors step-by-step exploration.</p>
       <p>The story of R begins before R. In the 1970s, John Chambers and his team at Bell Laboratories created <strong>S</strong>, a language designed so statisticians could <em>explore</em> data interactively instead of writing rigid Fortran programs. S was revolutionary, but its commercial version (S-PLUS) was expensive and closed-source.</p>
       <p>In 1993, <strong>Ross Ihaka and Robert Gentleman</strong>, professors at the University of Auckland (New Zealand), released a free implementation inspired by S. They named it <strong>R</strong>: after their own initials and as a nod to its predecessor. In 1995 they released it under the GPL license (free software), and since 1997 it has been maintained by the <strong>R Core Team</strong>, a group of some twenty elite statisticians and developers, alongside an enormous worldwide community. That same year saw the birth of <strong>CRAN</strong>, the official package repository.</p>
-      <p>The most recent stable release is <strong>R 4.6.0</strong> ("Because it was There", April 2026). R ships one major version per year plus interim patches, with remarkable stability: well-written code from ten years ago usually runs today without changes.</p>
+      <p>The most recent stable release is <strong>R 4.6.1</strong> ("Happy Hop", June 2026). R ships one major version per year plus interim patches, with remarkable stability: well-written code from ten years ago usually runs today without changes. That stability is one of the reasons R remains so widely used in research, healthcare, economics, and regulatory analysis.</p>
 
       <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>Why the history matters:</strong> R was designed <em>by statisticians, for analyzing data</em>. That heritage explains its design decisions: the interactivity, vectors as the basic unit, and statistics built in from the start. Python was born as a general-purpose language and "learned" data later; R was born for it.</p></div>
 
       <h2>What makes R unique</h2>
+      <p>Now that we know where R comes from, its strengths are easier to understand. R is especially valuable when you need to explore data, test hypotheses, build charts, document an analysis, and share results with other people. It is not just about "doing the math": it is about turning a question into a workflow that can be reviewed, repeated, and improved.</p>
+      <p>These are the ideas you will reuse most throughout the guide:</p>
       <ul>
         <li><strong>Native vectorization.</strong> In R you operate on entire columns of data in one stroke, without writing loops. It is the same mental model as Excel ("apply the formula to the whole column"), but programmable and auditable.</li>
         <li><strong>Statistics out of the box.</strong> Regressions (<code>lm()</code>), hypothesis tests (<code>t.test()</code>), distributions, and frequency tables come included without installing anything. In other languages that requires external libraries.</li>
@@ -606,14 +623,17 @@ table.data tr:hover td{background:var(--surface-2)}
         <li><strong>CRAN: more than 21,000 reviewed packages.</strong> Every CRAN package goes through daily automated checks on several platforms. If a statistical technique has been published, there is almost certainly a package that implements it.</li>
         <li><strong>Reproducible reports.</strong> With Quarto and R Markdown, the report and the analysis live in the same document: when the data changes, the entire PDF/Word/HTML regenerates.</li>
       </ul>
-      <p>See vectorization in action with a classic economics case: adjusting a series of salaries for a negotiated raise.</p>
+      <p>The word <em>vectorization</em> will come up many times, so it is worth seeing it right away with a small example. Suppose you have three salaries expressed in millions of pesos and need to apply a negotiated 9% raise. In a spreadsheet you would drag a formula down; in R you write a single operation over the whole vector.</p>
+      <p>The next block creates the salary vector and then multiplies every value by <code>1.09</code>. You will learn two ideas at once: how to store several values together and how R applies an operation to each element without you writing a loop.</p>
       <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R</span><button class="copy">Copy</button></div>
 <pre><code class="language-r">salaries <- c(2.4, 3.1, 1.8)   # salaries in millions of pesos
 salaries * 1.09                # a 9% raise for EVERYONE at once</code></pre>
 <div class="out">[1] 2.616 3.379 1.962</div></div>
-      <p>No loop, no cell to drag: R applied the operation to every element. Whether you have 3 salaries or 3 million, the code is identical.</p>
+      <p>The expected result is a new set of three values: <code>2.616</code>, <code>3.379</code>, and <code>1.962</code>. Each number is the original salary increased by 9%. No loop, no cell to drag: R applied the operation to every element. Whether you have 3 salaries or 3 million, the code is identical.</p>
+      <p>In a real project, this pattern is used to update prices, convert units, adjust amounts for inflation, compute rates, or transform entire columns of a dataset. Later on, when we work with data frames, this same idea will apply to whole variables inside a table.</p>
 
       <h2>Who uses R in the real world</h2>
+      <p>With that concept in hand, we can place R outside the classroom. A tool becomes important when it solves real problems reliably, and R is used precisely in contexts where analysis must be traceable: scientific research, banking, healthcare, data journalism, consulting, and public institutions. In those settings it is not enough to get a result; you also have to be able to explain how you got it.</p>
       <div class="tablewrap"><table class="data">
         <tr><th>Sector</th><th>What they use it for</th><th>Examples</th></tr>
         <tr><td>Pharma and healthcare</td><td>Clinical trials, biostatistics; the FDA now accepts regulatory submissions built in R</td><td>Roche, Novartis, R Consortium pilots with the FDA</td></tr>
@@ -624,7 +644,8 @@ salaries * 1.09                # a 9% raise for EVERYONE at once</code></pre>
       </table></div>
 
       <h2>R or Python? An honest take</h2>
-      <p>It is not a war, and anyone who frames it that way is selling you smoke. They are tools with different centers of gravity:</p>
+      <p>After seeing where R is used, a natural question appears: why learn R and not Python? The honest answer is that they are not enemies. They are tools with different centers of gravity, and a good analyst may end up using both depending on the problem. What matters when starting out is choosing a path that lets you learn data analysis without carrying too much software-engineering baggage too soon.</p>
+      <p>It is not a war, and anyone who frames it that way is selling you smoke. The useful comparison is this:</p>
       <div class="tablewrap"><table class="data">
         <tr><th>Criterion</th><th>R</th><th>Python</th></tr>
         <tr><td>Statistics and econometrics</td><td>Built in, with packages at the academic frontier</td><td>Via libraries (statsmodels, scipy), sometimes lagging behind</td></tr>
@@ -633,9 +654,10 @@ salaries * 1.09                # a 9% raise for EVERYONE at once</code></pre>
         <tr><td>Deep learning and software production</td><td>Possible, but not its strong suit</td><td>Clearly superior (PyTorch, web ecosystem)</td></tr>
         <tr><td>Initial learning curve for analysts</td><td>From data to chart in minutes</td><td>Requires more general-programming "scaffolding"</td></tr>
       </table></div>
-      <p>Many professionals use both, and they actually coexist well (Quarto runs both). The practical takeaway: if your focus is <strong>data analysis, statistics, and applied economics</strong>, R is one of the best learning investments you can make; and the data-logic skills you build will serve you just as well if you add Python someday.</p>
+      <p>Many professionals use both, and they actually coexist well (Quarto runs both). The practical takeaway: if your focus is <strong>data analysis, statistics, and applied economics</strong>, R is one of the best learning investments you can make. Besides, what you learn here — thinking in variables, cleaning data, checking assumptions, communicating results — will serve you just as well if you add Python someday.</p>
 
       <h2>The ecosystem: the map in four names</h2>
+      <p>So far we have talked about R as a language, but in practice you will work inside an ecosystem. Think of it as a city: R is the language, CRAN is the public library of tools, RStudio/Posit is your workspace, and the tidyverse is a family of packages that share style and vocabulary. You don't need to master the whole map on day one; just know what role each piece plays.</p>
       <ul>
         <li><strong>CRAN</strong> — the official package repository. Installing from it is as simple as <code>install.packages("name")</code>.</li>
         <li><strong>Posit</strong> (formerly RStudio, PBC) — the company that develops RStudio and Quarto and funds much of the tidyverse. RStudio is free and open source; Posit makes its living from enterprise products.</li>
@@ -646,6 +668,8 @@ salaries * 1.09                # a 9% raise for EVERYONE at once</code></pre>
       <div class="callout tip"><span class="cic"><svg class="ci"><use href="#i-bulb"/></svg></span><p><strong>Don't try to memorize the ecosystem:</strong> for now it is enough to distinguish R (the language), CRAN (where packages come from), and RStudio/Posit (where you work). The rest will fall into place on its own as you move forward.</p></div>
 
       <h2>Your first code, line by line</h2>
+      <p>Now that you know what R is, why it exists, and where it is used, we can read a first block of code. The goal is not to memorize syntax yet. The goal is to recognize the basic pieces that will repeat throughout the guide: comments, functions, operations, object assignment, and computing over vectors.</p>
+      <p>Read the block as if it were a recipe. Each line performs one small, visible action. Some lines display a result in the console; others store information for later use. That difference — showing versus storing — is one of the first important intuitions when learning R.</p>
       <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R</span><button class="copy">Copy</button></div>
 <pre><code class="language-r"># Everything after # is a comment: R ignores it completely
 print("Hello, R")                # prints text to the console
@@ -655,7 +679,7 @@ mean(sales)                      # computes the average of the vector</code></pr
 <div class="out">[1] "Hello, R"
 [1] 4
 [1] 120</div></div>
-      <p>Let's break down what just happened:</p>
+      <p>The expected result has three outputs. First comes the text <code>"Hello, R"</code>; then the result of <code>2 + 2</code>; finally, the average of the sales. The line that creates <code>sales</code> prints nothing because it only stores the object. Let's break down what just happened:</p>
       <ul>
         <li><strong>Line 1:</strong> the <code>#</code> marks a comment. R does not execute it; it is a note for humans.</li>
         <li><strong>Line 2:</strong> <code>print()</code> is a <em>function</em>: it takes something inside parentheses (its argument) and does something with it. The <code>[1]</code> in the output means that line starts at element 1 of the result.</li>
@@ -663,6 +687,7 @@ mean(sales)                      # computes the average of the vector</code></pr
         <li><strong>Line 4:</strong> two key ideas here. <code>c()</code> <em>combines</em> values into a vector, and <code>&lt;-</code> (the assignment operator) saves the result under the name <code>sales</code>. Notice that this line <strong>prints nothing</strong>: assignment is silent. The object is now in memory, ready to use.</li>
         <li><strong>Line 5:</strong> <code>mean()</code> takes the whole vector and returns its average: (120 + 150 + 90) / 3 = 120.</li>
       </ul>
+      <p>In a real project this pattern repeats constantly: you create an object with data, apply a function to summarize it, and then interpret the result. A sales table becomes an object, an income column is summarized with <code>mean()</code> or <code>sum()</code>, and the result feeds a report. We are not working with full tables yet, but you have already seen the skeleton of the professional workflow.</p>
 
       <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>Key idea:</strong> in R, almost everything is a <em>vector</em> and almost everything is done with <em>functions</em>. Internalize those two ideas and the rest of the language falls into place naturally: a data frame is a set of vectors, a model is fitted with a function, a chart is built with functions applied to vectors.</p></div>
 
@@ -671,7 +696,9 @@ mean(sales)                      # computes the average of the vector</code></pr
       <div class="exercise"><div class="xhead"><svg class="ci"><use href="#i-pencil"/></svg>Practice exercise</div><p>Without running anything yet, predict on paper what each line returns: <code>3 * 4</code>, <code>sqrt(16)</code>, <code>c(1, 2, 3) * 2</code>, and <code>prices &lt;- c(100, 250)</code>. Pay special attention to the last two.</p></div>
       <details class="acc"><summary>View solution</summary><div class="accbody"><p><code>3 * 4</code> → <code>12</code>. <code>sqrt(16)</code> → <code>4</code> (square root). <code>c(1, 2, 3) * 2</code> → <code>2 4 6</code>: R multiplies <em>each</em> element of the vector; that is <strong>vectorization</strong>. <code>prices &lt;- c(100, 250)</code> → <strong>prints nothing</strong>: it is an assignment, and the vector is stored in memory under the name <code>prices</code>. If you then type <code>prices</code> on its own, you will see <code>[1] 100 250</code>.</p></div></details>
 
-      <div class="challenge"><div class="xhead"><svg class="ci"><use href="#i-trophy"/></svg>Challenge</div><p>Think of a repetitive task you currently do in Excel (updating a monthly sales report, recalculating an index, cleaning the same dataset every week). Write it down: by the end of the basic level you should be able to sketch how to automate it in R, and it will become your personal practice project.</p></div>
+      <div class="challenge"><div class="xhead"><svg class="ci"><use href="#i-trophy"/></svg>Challenge</div><p>Think of a repetitive task you currently do in Excel (updating a monthly sales report, recalculating an index, cleaning the same dataset every week). Write it down as one concrete sentence: what data comes in, what transformation you apply, and what result you expect. By the end of the basic level you should be able to sketch how to automate it in R, and it will become your personal practice project.</p></div>
+
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>In short:</strong> R is a free language created by and for statisticians; its strength lies in vectorization, built-in statistics, <code>ggplot2</code>, and the more than 21,000 CRAN packages. Almost everything in R is a vector and almost everything is done with functions: those two ideas hold up the rest of the language. In the next chapter we move from the conceptual map to preparing your environment: installing R, opening RStudio, and checking that your machine is ready to practice.</p></div>
 
       <div class="pager"><a data-go="inicio"><small>Previous</small><b>← Home</b></a><a class="next" data-go="instalacion"><small>Next</small><b>Installing R and RStudio →</b></a></div>
     </section>
@@ -681,8 +708,13 @@ mean(sales)                      # computes the average of the vector</code></pr
       <div class="breadcrumbs"><a data-nav="inicio">Home</a><span class="sep">/</span><span>Basic Level</span><span class="sep">/</span><span>Installation</span></div>
       <h1 class="page-title">Installing R and RStudio</h1>
       <p class="lead">You need two pieces: <strong>R</strong> (the language's engine) and <strong>RStudio</strong> (the cockpit you pilot it from). Both are free, they install in that order, and in about 10 minutes you are ready to go.</p>
+      <p>In the previous chapter we saw that R is the language that runs your instructions, and that its strength lies in turning analyses into reproducible recipes. To practice for real, we need to prepare the environment: the place where you will write code, see results, save scripts, and look up help. A correct installation prevents many problems that, to a beginner, look like programming errors when they are really configuration issues.</p>
+      <p>This chapter answers four practical questions: what to install, where to download it from, in what order, and how to check that everything works. The goal is not to turn you into a system administrator; it is to leave your machine ready to learn without friction.</p>
+
+      <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>By the end you'll know how to:</strong> install R from CRAN and RStudio Desktop in the correct order, verify that everything went well with <code>R.version.string</code> and <code>sessionInfo()</code>, keep Posit Cloud at hand as a browser-based alternative, and solve the most frequent installation problems.</p></div>
 
       <p>The engine-and-cockpit analogy is not just decoration: <strong>R</strong> is the interpreter that actually runs your code —you could use it from a bare terminal— while <strong>RStudio</strong> is a development environment (IDE) that gives you an editor, a console, a plot viewer, and built-in help. If tomorrow you preferred a different cockpit (VS Code, for instance), the engine would still be the same R. For learning, RStudio is the standard choice and the one this guide uses.</p>
+      <p>Look at the two screenshots below before downloading anything. The first one shows CRAN, the official site of the R language. The second shows Posit, where RStudio Desktop is downloaded from. Keeping these two sources separate helps you avoid fake installers, outdated tutorials, or unofficial downloads.</p>
 
       <figure class="fig">
         <img src="img/cran-descarga.png" alt="Página de descarga de R en CRAN" loading="lazy">
@@ -693,19 +725,20 @@ mean(sales)                      # computes the average of the vector</code></pr
         <figcaption>RStudio Desktop download from Posit. It's free and detects your R installation.</figcaption>
       </figure>
       <h2>Step 1 — Install R (from CRAN)</h2>
-      <p>Download R only from <a href="https://cran.r-project.org" target="_blank" rel="noopener">cran.r-project.org</a>, the official repository. Choose your operating system and follow the instructions in its tab:</p>
+      <p>R must be installed first because it is the piece that runs the code. Download it only from <a href="https://cran.r-project.org" target="_blank" rel="noopener">cran.r-project.org</a>, the official repository. There you will find different installers depending on your operating system. The interface changes a little between Windows, macOS, and Linux, but the idea is the same: install the base language and make the R console available.</p>
+      <p>Choose your operating system and follow the instructions in its tab:</p>
 
       <div class="tabs"><div class="tabbtns"><button class="active">Windows</button><button>macOS</button><button>Linux</button></div>
       <div class="tabpane active">
-        <p>Path: <em>Download R for Windows → base → Download R 4.6.x for Windows</em>. Run the <code>.exe</code> and accept the default options, with one important exception:</p>
+        <p>On Windows, the installer is an <code>.exe</code> file. The usual path inside CRAN is: <em>Download R for Windows → base → Download R 4.6.x for Windows</em>. Run the file and accept the default options, with one important exception: pay attention to the path where R will be installed.</p>
         <ul>
-          <li><strong>Install to a path with no accents, ñ characters, or odd spaces</strong>, for example <code>C:\R\R-4.6.0</code>. Paths like <code>C:\Users\José María\...</code> or OneDrive-synced folders cause cryptic errors when installing packages.</li>
+          <li><strong>Install to a path with no accents, ñ characters, or odd spaces</strong>, for example <code>C:\R\R-4.6.1</code>. Paths like <code>C:\Users\José María\...</code> or OneDrive-synced folders cause cryptic errors when installing packages.</li>
           <li>Since R 4.2 only the <strong>64-bit</strong> version exists; if a tutorial mentions 32-bit, it is outdated material.</li>
         </ul>
         <p><strong>What about RTools?</strong> It is a set of compilers for Windows. <em>You don't need it today.</em> It is only required when a package must be compiled from source (R will ask "Do you want to install from sources...?" — answer <em>No</em> and it will use the precompiled binary). Install it later only if a package demands it.</p>
       </div>
       <div class="tabpane">
-        <p>First identify your chip: Apple menu → <em>About This Mac</em>. Then download the correct <code>.pkg</code> from CRAN:</p>
+        <p>On macOS, the key point is downloading the installer that matches your processor. First identify your chip: Apple menu → <em>About This Mac</em>. Then download the correct <code>.pkg</code> from CRAN:</p>
         <ul>
           <li><strong>Apple Silicon (M1, M2, M3, M4…):</strong> the <code>arm64</code> package.</li>
           <li><strong>Intel:</strong> the <code>x86_64</code> package. If you install the arm64 build on an Intel Mac, it won't start.</li>
@@ -713,21 +746,22 @@ mean(sales)                      # computes the average of the vector</code></pr
         <p>CRAN also recommends <strong>XQuartz</strong> (<a href="https://www.xquartz.org" target="_blank" rel="noopener">xquartz.org</a>): some graphics packages use it for certain windows and devices. Install it once and forget about it.</p>
       </div>
       <div class="tabpane">
-        <p>The <code>r-base</code> in your distribution's repos usually runs <strong>several versions behind</strong>. To get R 4.6 on Ubuntu/Debian, add the official CRAN repository:</p>
+        <p>On Linux, many distributions include R in their repositories, but that package often runs <strong>several versions behind</strong>. To get R 4.6 on Ubuntu/Debian, it is worth adding the official CRAN repository. The following block updates the package list, installs basic tools, adds CRAN's key, and then installs R.</p>
         <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">bash</span><button class="copy">Copy</button></div>
-<pre><code class="language-r"># Ubuntu: add the CRAN repository and its key, then install
+<pre><code class="language-bash"># Ubuntu: add the CRAN repository and its key, then install
 sudo apt update
 sudo apt install --no-install-recommends software-properties-common dirmngr
 wget -qO- https://cloud.r-project.org/bin/linux/ubuntu/marutter_pubkey.asc | \
   sudo tee -a /etc/apt/trusted.gpg.d/cran_ubuntu_key.asc
 sudo add-apt-repository "deb https://cloud.r-project.org/bin/linux/ubuntu $(lsb_release -cs)-cran40/"
 sudo apt install r-base r-base-dev</code></pre></div>
-        <p>For Fedora, openSUSE, or other distributions, follow the specific instructions on CRAN's Linux page. Also install <code>r-base-dev</code> (or its equivalent): on Linux many packages are compiled from source.</p>
+        <p>If everything goes well, you will end up with the <code>R</code> command available in the terminal and the development tools needed to compile packages when required. For Fedora, openSUSE, or other distributions, follow the specific instructions on CRAN's Linux page. Also install <code>r-base-dev</code> (or its equivalent): on Linux many packages are compiled from source.</p>
       </div>
       </div>
 
       <h2>Step 2 — Install RStudio Desktop (Posit)</h2>
-      <p>Download <strong>RStudio Desktop</strong> (free) from <a href="https://posit.co/download/rstudio-desktop/" target="_blank" rel="noopener">posit.co</a> and install it with the default options. On startup, RStudio automatically finds and detects your R installation; there is nothing to configure.</p>
+      <p>Now that the engine is installed, you can install the cockpit. Download <strong>RStudio Desktop</strong> (free) from <a href="https://posit.co/download/rstudio-desktop/" target="_blank" rel="noopener">posit.co</a> and install it with the default options. On startup, RStudio automatically finds and detects your R installation; there is nothing to configure.</p>
+      <p>RStudio does not replace R: it organizes it. It lets you write scripts, run lines with keyboard shortcuts, see the objects in memory, look up help, and review charts without jumping between windows. That is why we will use it throughout the guide.</p>
 
       <div class="callout warn"><span class="cic"><svg class="ci"><use href="#i-alert"/></svg></span><p><strong>Correct order:</strong> install R first and RStudio <em>afterwards</em>. RStudio is only the interface; it does not include the language. If you do it the other way around, RStudio will open with an "R not found" error.</p></div>
 
@@ -739,23 +773,26 @@ sudo apt install r-base r-base-dev</code></pre></div>
       </table></div>
 
       <h2>Step 3 — Verify the installation</h2>
-      <p>Open RStudio and type into the console (the pane with the <code>&gt;</code> symbol):</p>
+      <p>Installing is not enough: you have to verify. This check saves time later, when a package won't install or an example won't run. Open RStudio and type two diagnostic commands into the console (the pane with the <code>&gt;</code> symbol).</p>
+      <p>The first one shows the exact version of R installed. The second prints a full report of your environment: operating system, platform, locale, and loaded packages. You will learn to use this output later when asking for help or reporting an error.</p>
       <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R · Console</span><button class="copy">Copy</button></div>
 <pre><code class="language-r">R.version.string   # installed R version
 sessionInfo()      # full detail: platform, locale, loaded packages</code></pre>
-<div class="out">[1] "R version 4.6.0 (2026-04-24)"
-R version 4.6.0 (2026-04-24)
+<div class="out">[1] "R version 4.6.1 (2026-06-24)"
+R version 4.6.1 (2026-06-24)
 Platform: x86_64-w64-mingw32/x64
 Running under: Windows 11 x64 (build 26200)
 ...</div></div>
-      <p>If you see version 4.6.x, everything is in order. <code>sessionInfo()</code> will also be your best ally when asking for help: pasting its output into a forum tells anyone exactly what environment you are running.</p>
+      <p>The expected result should show version 4.6.x or later. If you see a much older version, you probably downloaded an old installer or your system pulled R from another repository. <code>sessionInfo()</code> will also be your best ally when asking for help: pasting its output into a forum tells anyone exactly what environment you are running.</p>
 
       <h2>Plan B: Posit Cloud (R in the browser)</h2>
       <p>If you work on a locked-down corporate machine, a borrowed computer, or you simply want to start right now, use <a href="https://posit.cloud" target="_blank" rel="noopener">Posit Cloud</a>: it is the full RStudio running in the browser, with a free plan that covers the entire basic level. You create an account, open a "New Project", and get exactly the same interface you will see in the next section.</p>
+      <p>This option does not replace learning to manage a local installation, but it is useful for getting started without fighting permissions, antivirus software, or network configurations. It also helps when you want everyone in a class to work in the same environment.</p>
 
       <div class="callout tip"><span class="cic"><svg class="ci"><use href="#i-bulb"/></svg></span><p><strong>Tip for teams and classrooms:</strong> Posit Cloud is also great for standardizing: everyone works with the same R version and the same packages, without fighting heterogeneous local installations.</p></div>
 
       <h2>Common installation problems</h2>
+      <p>Most early errors do not come from R as a language, but from the operating system: permissions, paths, antivirus software, proxies, or outdated tutorials. The table below summarizes the most common symptoms and the practical way to solve them. If something fails, start here before reinstalling everything.</p>
       <div class="tablewrap"><table class="data">
         <tr><th>Symptom</th><th>Likely cause</th><th>Solution</th></tr>
         <tr><td>Antivirus blocks the installer or deletes R files</td><td>False positives, common on corporate machines</td><td>Verify you downloaded from CRAN/Posit, add an exclusion for the R folder, or ask IT to whitelist it</td></tr>
@@ -768,7 +805,9 @@ Running under: Windows 11 x64 (build 26200)
       <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>When you upgrade R in the future:</strong> installing a new major version (e.g. moving from 4.6 to 4.7) does not automatically migrate your packages: you will have to reinstall them. That is normal, it happens once a year, and it takes a few minutes with <code>install.packages()</code>.</p></div>
 
       <div class="exercise"><div class="xhead"><svg class="ci"><use href="#i-pencil"/></svg>Practice exercise</div><p>Install R and RStudio (or open Posit Cloud) and run these three checks in the console: (1) <code>R.version.string</code> to confirm version 4.6 or later; (2) <code>2 + 2</code> to confirm the engine responds; (3) <code>.libPaths()</code> to discover which folder your packages will be stored in.</p></div>
-      <details class="acc"><summary>View solution</summary><div class="accbody"><p>You should see something like <code>[1] "R version 4.6.0 (2026-04-24)"</code>, then <code>[1] 4</code>, and in <code>.libPaths()</code> one or two paths: the system library (inside the R installation) and, sometimes, a personal library in your user folder. If the version is below 4.6, download again from CRAN; if <code>2 + 2</code> does not respond, review the common-problems table.</p></div></details>
+      <details class="acc"><summary>View solution</summary><div class="accbody"><p>You should see something like <code>[1] "R version 4.6.1 (2026-06-24)"</code>, then <code>[1] 4</code>, and in <code>.libPaths()</code> one or two paths: the system library (inside the R installation) and, sometimes, a personal library in your user folder. If the version is below 4.6, download again from CRAN; if <code>2 + 2</code> does not respond, review the common-problems table.</p></div></details>
+
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>In short:</strong> R (the engine) is installed first and RStudio (the cockpit) second, always from CRAN and Posit. Verify with <code>R.version.string</code>; if your machine is locked down, Posit Cloud gives you the full RStudio in the browser. Avoid paths with accents, ñ characters, or spaces, which cause cryptic errors when installing packages. Now that the environment is ready, the next step is learning to find your way around RStudio.</p></div>
 
       <div class="pager"><a data-go="que-es-r"><small>Previous</small><b>← What is R?</b></a><a class="next" data-go="interfaz"><small>Next</small><b>The RStudio interface →</b></a></div>
     </section>
@@ -778,6 +817,7 @@ Running under: Windows 11 x64 (build 26200)
       <div class="breadcrumbs"><a data-nav="inicio">Home</a><span class="sep">/</span><span>Basic Level</span><span class="sep">/</span><span>Interface</span></div>
       <h1 class="page-title">The RStudio interface</h1>
       <p class="lead">RStudio organizes your work into four panes. Understanding what each one does —and how code flows between them— will save you hours and give you professional analyst habits from day one.</p>
+      <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>By the end you'll know how to:</strong> identify what each of RStudio's four panes does, follow the Source → Console → Environment workflow with <kbd>Ctrl</kbd>+<kbd>Enter</kbd>, work from scripts and Projects instead of the console, and configure the reproducibility settings (no <code>.RData</code> restore) plus the shortcuts that speed you up.</p></div>
 
       <figure class="fig">
         <img src="img/rstudio-script.png" alt="RStudio con un script en el editor y la consola" loading="lazy">
@@ -859,6 +899,8 @@ sum(monthly_cpi)                           # approximate cumulative inflation</c
 
       <div class="challenge"><div class="xhead"><svg class="ci"><use href="#i-trophy"/></svg>Challenge</div><p>Get your RStudio ready for serious work: turn off <code>.RData</code> saving, choose a theme and font size, and check with <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>K</kbd> that you can locate the shortcuts for run, assign, and insert pipe. Close RStudio, reopen it from the <code>r-practice.Rproj</code> file, and confirm that Environment starts empty: that clean screen is your new normal.</p></div>
 
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>In short:</strong> RStudio has four panes and your code flows through them — write in Source, run with <kbd>Ctrl</kbd>+<kbd>Enter</kbd>, read results in Console, and watch objects appear in Environment. Keep your work in scripts, not the console, and use one RStudio Project per analysis with relative paths. Turn off <code>.RData</code> restore so every session starts clean and reproducible.</p></div>
+
       <div class="pager"><a data-go="instalacion"><small>Previous</small><b>← Installing R and RStudio</b></a><a class="next" data-go="tipos-datos"><small>Next</small><b>Data types →</b></a></div>
     </section>
     <section class="topic" id="tipos-datos">
@@ -866,7 +908,29 @@ sum(monthly_cpi)                           # approximate cumulative inflation</c
       <div class="breadcrumbs"><a data-nav="inicio">Home</a><span class="sep">/</span><span>Basic Level</span><span class="sep">/</span><span>Data types</span></div>
       <h1 class="page-title">Data types</h1>
       <p class="lead">Every value in R belongs to a type, and the type decides which operations are valid: you can add two numbers, but not a number and a piece of text. Mastering the type system is your vaccine against half the errors you will see in real-world data analysis.</p>
+      <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>By the end you'll know how to:</strong> tell R's basic types apart (double, integer, character, logical), predict implicit coercion up the hierarchy and convert types on purpose with the <code>as.*()</code> family, distinguish <code>NA</code>, <code>NULL</code>, <code>NaN</code> and <code>Inf</code>, and avoid the classic traps of comparing decimals or <code>NA</code> with <code>==</code>.</p></div>
 
+      <figure class="diagram">
+        <svg viewBox="0 0 680 240" role="img" aria-label="Jerarquia de coercion de tipos">
+        <g font-size="15" text-anchor="middle">
+        <rect class="dg-box" x="20" y="40" width="140" height="46" rx="10"/>
+        <text class="dg-txt dg-mono" x="90" y="62">logical</text><text class="dg-mut" x="90" y="78" font-size="11">TRUE / FALSE</text>
+        <rect class="dg-box" x="180" y="40" width="140" height="46" rx="10"/>
+        <text class="dg-txt dg-mono" x="250" y="62">integer</text><text class="dg-mut" x="250" y="78" font-size="11">5L</text>
+        <rect class="dg-box" x="340" y="40" width="140" height="46" rx="10"/>
+        <text class="dg-txt dg-mono" x="410" y="62">double</text><text class="dg-mut" x="410" y="78" font-size="11">3.14</text>
+        <rect x="500" y="40" width="160" height="46" rx="10" fill="var(--brand)" opacity="0.14" stroke="var(--brand)"/>
+        <text class="dg-txt dg-mono" x="580" y="62">character</text><text class="dg-mut" x="580" y="78" font-size="11">"texto"</text>
+        <path d="M160 63 h20 M320 63 h20 M480 63 h20" stroke="var(--text-mut)" stroke-width="2" marker-end="url(#ar)"/>
+        <text class="dg-soft" x="340" y="118" font-size="13">menos general &#8594; m&#225;s general (R promueve hacia la derecha)</text>
+        <rect class="dg-box" x="140" y="150" width="400" height="60" rx="10"/>
+        <text class="dg-mono dg-txt" x="340" y="176" font-size="13">c(TRUE, 1L, 2.5, "a")</text>
+        <text class="dg-soft" x="340" y="196" font-size="12">&#8594; todo se convierte a <tspan class="dg-mono" fill="var(--brand)">character</tspan></text>
+        </g>
+        <defs><marker id="ar" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 z" fill="var(--text-mut)"/></marker></defs>
+        </svg>
+        <figcaption>Figure: the coercion hierarchy. When you mix types, R promotes them toward the most general one.</figcaption>
+      </figure>
       <h2>The mental model: the type sets the rules of the game</h2>
       <p>Think of the type as each value's "ID card": it tells R what can be done with it. A salary stored as a number (<code>2450000</code>) can be averaged; the same salary stored as text (<code>"2,450,000"</code>, typical of a badly exported Excel file) cannot. When a calculation fails or returns something absurd, the first question is always: <em>what type are my data?</em></p>
       <div class="tablewrap"><table class="data">
@@ -1025,6 +1089,8 @@ mean(rates[is.finite(rates)])  # 0.05833333</code></pre>
 [1] 0.05833333</div></div>
 <p>Note that <code>na.rm = TRUE</code> would not have been enough: it removes <code>NA</code> and <code>NaN</code>, but lets <code>Inf</code> through and the average would be <code>Inf</code>. <code>is.finite()</code> is the complete filter.</p></div></details>
 
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>In short:</strong> every value has a type, and a vector holds one type only, so mixing types triggers coercion up the hierarchy logical → integer → double → character. Never compare decimals with <code>==</code> (floating-point error) and never compare against <code>NA</code> with <code>==</code> (use <code>is.na()</code>). Keep <code>NA</code>, <code>NULL</code>, <code>NaN</code> and <code>Inf</code> straight — they mean different things and are detected with different functions.</p></div>
+
       <div class="pager"><a data-go="interfaz"><small>Previous</small><b>← The RStudio interface</b></a><a class="next" data-go="variables"><small>Next</small><b>Variables and objects →</b></a></div>
     </section>
 
@@ -1033,6 +1099,7 @@ mean(rates[is.finite(rates)])  # 0.05833333</code></pre>
       <div class="breadcrumbs"><a data-nav="inicio">Home</a><span class="sep">/</span><span>Basic Level</span><span class="sep">/</span><span>Variables</span></div>
       <h1 class="page-title">Variables and objects</h1>
       <p class="lead">A variable is not a box containing a value: it is a <strong>label attached to an object</strong>. In R everything you create (a number, a table, a regression model) is an object, and names are how you find it later.</p>
+      <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>By the end you'll know how to:</strong> assign objects with <code>&lt;-</code> and understand the label-and-object (copy-on-modify) model, apply the naming rules and <code>snake_case</code> style, guard against silent overwriting, and X-ray any object with <code>str()</code>, <code>class()</code>, <code>typeof()</code>, <code>length()</code> and <code>attributes()</code>.</p></div>
 
       <h2>Assignment: four forms, one convention</h2>
       <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R</span><button class="copy">Copy</button></div>
@@ -1137,6 +1204,8 @@ typeof(real_salary)</code></pre>
       <div class="exercise"><div class="xhead"><svg class="ci"><use href="#i-pencil"/></svg>Practice exercise</div><p>Predict what this code prints and explain why, using the label model: <code>a &lt;- 100; b &lt;- a; a &lt;- 50; b</code></p></div>
       <details class="acc"><summary>View solution</summary><div class="accbody"><p>It prints <code>100</code>. When you run <code>b &lt;- a</code>, the label <code>b</code> ends up pointing to the value <code>a</code> had <em>at that moment</em> (100). Reassigning <code>a &lt;- 50</code> only moves the label <code>a</code> to a new object; it does not touch the object <code>b</code> points to. Variables do not stay "connected" to each other: assignment copies the reference to the current value, it does not create a permanent link.</p></div></details>
 
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>In short:</strong> a variable is a label attached to an object, not a box — assignment copies the reference and R only duplicates on modify. Use <code>&lt;-</code> and self-explanatory <code>snake_case</code> names, avoiding reserved words and the overwritable <code>T</code>/<code>F</code>. R reuses names silently, so pick specific names and inspect any new object with <code>str()</code>.</p></div>
+
       <div class="pager"><a data-go="tipos-datos"><small>Previous</small><b>← Data types</b></a><a class="next" data-go="operadores"><small>Next</small><b>Operators →</b></a></div>
     </section>
 
@@ -1145,6 +1214,7 @@ typeof(real_salary)</code></pre>
       <div class="breadcrumbs"><a data-nav="inicio">Home</a><span class="sep">/</span><span>Basic Level</span><span class="sep">/</span><span>Operators</span></div>
       <h1 class="page-title">Operators</h1>
       <p class="lead">Operators are the verbs of the language: they calculate, compare and combine conditions. Here they all are, including the two almost nobody explains well (<code>%%</code> and <code>%in%</code>) and the three traps that sooner or later bite every analyst.</p>
+      <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>By the end you'll know how to:</strong> use the arithmetic, comparison, logical and membership operators, put <code>%%</code>, <code>%/%</code> and <code>%in%</code> to real work, choose between vectorized <code>&amp;</code>/<code>|</code> and scalar <code>&amp;&amp;</code>/<code>||</code>, and apply operator precedence (and parentheses) to avoid surprises like <code>-2^2</code>.</p></div>
 
       <div class="tabs">
         <div class="tabbtns"><button class="active">Arithmetic</button><button>Comparison</button><button>Logical</button><button>Membership</button></div>
@@ -1313,6 +1383,8 @@ months %in% c(1, 6, 7, 12)       # (c) high season</code></pre>
 
       <div class="challenge"><div class="xhead"><svg class="ci"><use href="#i-trophy"/></svg>Challenge</div><p>Without running it, predict the result of <code>-1:3^2 %% 2 == 0 | FALSE</code>. Break it down operator by operator using the precedence table and then verify it in the console. Hint: <code>^</code> goes first, then <code>:</code>... and the unary <code>-</code> applies before <code>:</code>, so the sequence is <code>(-1):9</code>.</p></div>
 
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>In short:</strong> beyond basic arithmetic, <code>%%</code> (modulo) and <code>%/%</code> (integer division) drive cycles and grouping, and <code>%in%</code> cleanly tests membership. Use <code>&amp;</code> and <code>|</code> for vectors (filtering) and <code>&amp;&amp;</code> and <code>||</code> for single conditions (<code>if</code>). Precedence is fixed, not left-to-right, so add parentheses whenever three or more operators mix.</p></div>
+
       <div class="pager"><a data-go="variables"><small>Previous</small><b>← Variables and objects</b></a><a class="next" data-go="vectores"><small>Next</small><b>Vectors →</b></a></div>
     </section>
     <section class="topic" id="vectores">
@@ -1320,9 +1392,29 @@ months %in% c(1, 6, 7, 12)       # (c) high season</code></pre>
       <div class="breadcrumbs"><a data-nav="inicio">Home</a><span class="sep">/</span><span>Basic Level</span><span class="sep">/</span><span>Vectors</span></div>
       <h1 class="page-title">Vectors</h1>
       <p class="lead">The vector is THE central structure of R: an ordered sequence of values <strong>of the same type</strong>. It is not just one structure among many: in R, <em>everything</em> else (matrices, factors, data frames) is built on top of vectors. Understanding vectors is, quite literally, understanding R.</p>
+      <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>By the end you'll know how to:</strong> create vectors with <code>c()</code>, <code>seq()</code> and <code>rep()</code>, index them five ways (position, negative, logical, name and <code>which()</code>), use vectorization to operate on every element at once, and recognize how recycling and 1-based indexing can bite you.</p></div>
 
       <p>Here is the key mental model: in R <strong>there are no scalars</strong>. When you type <code>5</code>, R treats it as a numeric vector of length 1. That is why printing it shows <code>[1] 5</code>: that <code>[1]</code> tells you "this is the element in position 1". Every R function is designed with vectors in mind, and that explains why the language feels so natural for data analysis: a column of sales, a series of prices, or the answers to a survey <em>are</em> vectors.</p>
 
+      <figure class="diagram">
+        <svg viewBox="0 0 680 220" role="img" aria-label="Vectorizacion">
+        <g font-size="14" text-anchor="middle" class="dg-mono">
+        <text class="dg-soft" x="60" y="46" font-size="12" text-anchor="start">precios</text>
+        <rect class="dg-box" x="150" y="30" width="80" height="34" rx="7"/><text class="dg-txt" x="190" y="52">100</text>
+        <rect class="dg-box" x="245" y="30" width="80" height="34" rx="7"/><text class="dg-txt" x="285" y="52">200</text>
+        <rect class="dg-box" x="340" y="30" width="80" height="34" rx="7"/><text class="dg-txt" x="380" y="52">300</text>
+        <text class="dg-soft" x="490" y="52" font-size="15">&#215; 1.19</text>
+        <path d="M190 68 v34 M285 68 v34 M380 68 v34" stroke="var(--lvl2)" stroke-width="2" marker-end="url(#ar2)"/>
+        <text class="dg-soft" x="60" y="130" font-size="12" text-anchor="start">resultado</text>
+        <rect x="150" y="112" width="80" height="34" rx="7" fill="var(--lvl2)" opacity="0.16" stroke="var(--lvl2)"/><text class="dg-txt" x="190" y="134">119</text>
+        <rect x="245" y="112" width="80" height="34" rx="7" fill="var(--lvl2)" opacity="0.16" stroke="var(--lvl2)"/><text class="dg-txt" x="285" y="134">238</text>
+        <rect x="340" y="112" width="80" height="34" rx="7" fill="var(--lvl2)" opacity="0.16" stroke="var(--lvl2)"/><text class="dg-txt" x="380" y="134">357</text>
+        <text class="dg-soft" x="340" y="184" font-size="13" font-family="var(--font)">Una sola operaci&#243;n se aplica a cada elemento a la vez &#8212; sin bucle.</text>
+        </g>
+        <defs><marker id="ar2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 z" fill="var(--lvl2)"/></marker></defs>
+        </svg>
+        <figcaption>Figure: vectorization. One operation applies to every element at once.</figcaption>
+      </figure>
       <h2>Creating vectors: c(), sequences, and repetitions</h2>
       <p>The <code>c()</code> function (for <em>combine</em>) is the most used in all of R. But for regular sequences there are more expressive tools:</p>
       <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R</span><button class="copy">Copy</button></div>
@@ -1460,6 +1552,8 @@ names(grades)[order(grades, decreasing = TRUE)]
 
       <div class="challenge"><div class="xhead"><svg class="ci"><use href="#i-trophy"/></svg>Challenge</div><p>Using the <code>sales</code> vector from the integrated example, compute in a single line the average monthly percentage growth for the half-year. Hint: combine <code>mean()</code>, <code>diff()</code>, and the negative indexing <code>sales[-6]</code>.</p></div>
 
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>In short:</strong> the vector is R's core structure — an ordered sequence of one type, with no true scalars. Build vectors with <code>c()</code>, <code>seq()</code> and <code>rep()</code>, subset them five ways, and lean on vectorization instead of loops. Stay alert to 1-based indexing and to recycling, which can produce wrong-but-plausible numbers without a warning when lengths align.</p></div>
+
       <div class="pager"><a data-go="operadores"><small>Previous</small><b>← Operators</b></a><a class="next" data-go="matrices"><small>Next</small><b>Matrices →</b></a></div>
     </section>
 
@@ -1468,6 +1562,7 @@ names(grades)[order(grades, decreasing = TRUE)]
       <div class="breadcrumbs"><a data-nav="inicio">Home</a><span class="sep">/</span><span>Basic Level</span><span class="sep">/</span><span>Matrices</span></div>
       <h1 class="page-title">Matrices</h1>
       <p class="lead">A matrix is not a new structure: it is <strong>a vector with a <code>dim</code> attribute added</strong> (rows × columns). It is still a single sequence of values of the same type, only R displays and indexes it in two dimensions. It is the foundation of linear algebra in R.</p>
+      <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>By the end you'll know how to:</strong> build matrices with <code>matrix()</code> (and the <code>byrow</code> option), index them with <code>[row, column]</code> while avoiding the drop-to-vector trap, tell element-wise <code>*</code> from the matrix product <code>%*%</code> (plus <code>t()</code> and <code>solve()</code>), and decide when a matrix beats a data frame.</p></div>
 
       <p>You can verify that "matrix = vector + dimensions" yourself: take a vector of 6 numbers and assign it dimensions.</p>
       <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R</span><button class="copy">Copy</button></div>
@@ -1582,6 +1677,8 @@ returns["A", , drop = FALSE]   # still a 1x3 matrix</code></pre></div></div></de
 
       <div class="challenge"><div class="xhead"><svg class="ci"><use href="#i-trophy"/></svg>Challenge</div><p>Create a 3×3 matrix with the numbers 1 through 9 filled by rows, compute the sum of each column, and then verify with <code>t()</code> that <code>colSums(m)</code> equals <code>rowSums(t(m))</code>. Why must that be the case?</p></div>
 
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>In short:</strong> a matrix is just a vector with a <code>dim</code> attribute, filled by columns unless you pass <code>byrow = TRUE</code>. Index with <code>[row, column]</code>, name your rows and columns, and use <code>drop = FALSE</code> to keep the structure when extracting a single row or column. Don't confuse element-wise <code>*</code> with the matrix product <code>%*%</code>, and reserve matrices for numeric, homogeneous data.</p></div>
+
       <div class="pager"><a data-go="vectores"><small>Previous</small><b>← Vectors</b></a><a class="next" data-go="factores"><small>Next</small><b>Factors →</b></a></div>
     </section>
 
@@ -1590,6 +1687,7 @@ returns["A", , drop = FALSE]   # still a 1x3 matrix</code></pre></div></div></de
       <div class="breadcrumbs"><a data-nav="inicio">Home</a><span class="sep">/</span><span>Basic Level</span><span class="sep">/</span><span>Factors</span></div>
       <h1 class="page-title">Factors</h1>
       <p class="lead">Factors represent <strong>categorical variables</strong>: qualitative data with a finite, known set of categories (levels), such as region, education level, or socioeconomic stratum. They are R's answer to a question every analyst faces: how do I tell the software that "primary, secondary, university" are not mere strings, but categories with meaning?</p>
+      <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>By the end you'll know how to:</strong> create factors and understand that they are integer codes plus a <code>levels</code> attribute, control category order (and the regression baseline) with <code>levels</code>/<code>labels</code> and <code>relevel()</code>, use <code>ordered = TRUE</code> for hierarchies, and avoid the <code>as.numeric()</code>-on-a-factor trap.</p></div>
 
       <h2>Why do factors exist?</h2>
       <p>Three concrete reasons:</p>
@@ -1694,6 +1792,8 @@ unclass(sat)                  # 3 1 3 2 3 1 + levels</code></pre></div></div></d
 
       <div class="challenge"><div class="xhead"><svg class="ci"><use href="#i-trophy"/></svg>Challenge</div><p>Simulate 200 responses with <code>responses <- sample(c("bad","fair","good"), 200, replace = TRUE, prob = c(0.2, 0.3, 0.5))</code>, turn them into an ordered factor, and build the table of proportions. Then filter only the "good" responses, apply <code>droplevels()</code>, and compare <code>levels()</code> before and after.</p></div>
 
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>In short:</strong> a factor is a categorical variable stored as integer codes plus a <code>levels</code> attribute. Control category order (and the regression baseline) with the <code>levels</code> argument or <code>relevel()</code>, and use <code>ordered = TRUE</code> when categories have a hierarchy. Never convert a factor straight to numeric — go factor → character → numeric, or you get the internal codes.</p></div>
+
       <div class="pager"><a data-go="matrices"><small>Previous</small><b>← Matrices</b></a><a class="next" data-go="listas"><small>Next</small><b>Lists →</b></a></div>
     </section>
 
@@ -1702,6 +1802,7 @@ unclass(sat)                  # 3 1 3 2 3 1 + levels</code></pre></div></div></d
       <div class="breadcrumbs"><a data-nav="inicio">Home</a><span class="sep">/</span><span>Basic Level</span><span class="sep">/</span><span>Lists</span></div>
       <h1 class="page-title">Lists</h1>
       <p class="lead">The list is R's <strong>universal container</strong>: it can hold elements of different types and lengths — vectors, matrices, factors, functions, and even other lists. If the vector is R's building brick, the list is the box that fits any combination of bricks.</p>
+      <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>By the end you'll know how to:</strong> create and modify lists that hold mixed types and nesting, tell <code>[ ]</code> (keeps a sub-list) from <code>[[ ]]</code> and <code>$</code> (extract the content), navigate nested structures, and apply all of this to real objects like an <code>lm</code> model or a JSON response using <code>str()</code> and <code>names()</code>.</p></div>
 
       <p>Why devote an entire section to something so simple? Because <strong>almost everything complex in R is a list in disguise</strong>: the result of a regression (<code>lm</code>), the output of a statistical test (<code>t.test</code>), a JSON read from an API, and even the data frame you will see in the next section (which is a list of equal-length columns). Knowing how to navigate lists means knowing how to extract results from any analysis.</p>
 
@@ -1818,6 +1919,8 @@ class(course[["grades"]])    # "numeric": the cargo
 
       <div class="challenge"><div class="xhead"><svg class="ci"><use href="#i-trophy"/></svg>Challenge</div><p>Fit <code>model <- lm(dist ~ speed, data = cars)</code> and, using only list access (no <code>summary()</code>), answer: how many residual degrees of freedom does the model have (<code>df.residual</code>)? Which is the largest residual in absolute value? Hint: <code>which.max(abs(...))</code>.</p></div>
 
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>In short:</strong> a list is R's universal container — it holds elements of different types and lengths, including other lists. Use <code>[ ]</code> to keep a sub-list and <code>[[ ]]</code> or <code>$</code> to pull out the actual content. It matters because regression models, test results and JSON are all lists, and you navigate any of them with <code>str()</code>, <code>names()</code> and <code>$</code>.</p></div>
+
       <div class="pager"><a data-go="factores"><small>Previous</small><b>← Factors</b></a><a class="next" data-go="dataframes"><small>Next</small><b>Data frames →</b></a></div>
     </section>
     <section class="topic" id="dataframes">
@@ -1825,18 +1928,64 @@ class(course[["grades"]])    # "numeric": the cargo
       <div class="breadcrumbs"><a data-nav="inicio">Home</a><span class="sep">/</span><span>Basic Level</span><span class="sep">/</span><span>Data Frames</span></div>
       <h1 class="page-title">Data Frames</h1>
       <p class="lead">The data frame is the star structure of data analysis: a table where each column is a variable and each row is an observation. It looks like a spreadsheet, but with one key difference: understanding what it is <em>on the inside</em> will save you half of the mistakes of your first year with R.</p>
+      <p>So far you have learned separate pieces: vectors to store values of the same type, factors to represent categories, lists to bundle different objects, and operators to ask questions about your data. The data frame brings those ideas together in a familiar shape: a table. That is why it is the bridge between learning R as a language and using R as an analysis tool.</p>
+      <p>A student coming from Excel tends to think of a table as a grid of independent cells. In R it pays to think differently: a table is a collection of columns, and each column has rules of its own. The salary column is numeric, the name column is text, the "active" column may be logical, and all of them must have the same length because each position represents the same observation. Organizing data this way lets you compute, filter, sort and summarize with precision.</p>
+      <p>What problem does a data frame solve? It solves the central problem of applied analysis: working with rectangular data. A survey, a customer database, a sales log, a CSV file, an exported SQL table, a health dataset or a monthly panel of indicators almost always arrives as rows and columns. R designed the data frame so those tables could live inside the language without losing the power of vectors.</p>
+      <p>The essential idea is this: <strong>each column is a vector</strong> and <strong>the whole data frame is a list of those vectors</strong>. This design decision has enormous advantages. You can apply vectorized functions to entire columns, inspect types, select variables by name, and combine text, numeric and logical columns in a single table. It also has limits: if a column mixes numbers with text, R must settle on a single type; if there are missing values, filters and averages can behave unexpectedly; and if you confuse a column-vector with a sub-table, some functions will fail.</p>
+      <p>In real projects you will use data frames for almost everything: importing data, cleaning it, creating new variables, filtering observations, summarizing by group, detecting missing values, preparing plots and feeding models. Later on you will meet the <em>tibble</em>, a modern version used by the tidyverse, but first you need to master the base data frame. If you understand this structure, you will better understand <code>dplyr</code>, <code>ggplot2</code>, models with <code>lm()</code> and almost every professional workflow in R.</p>
+
+      <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>By the end you'll know how to:</strong> understand the data frame as a list of vectors (its columns), run the standard reconnaissance with <code>str()</code> and <code>summary()</code>, access columns and rows with <code>$</code>, <code>[[ ]]</code> and <code>[ , ]</code>, filter rows while avoiding the ghost rows caused by <code>NA</code>, and create, sort and summarize by group.</p></div>
 
       <figure class="fig">
         <img src="img/rstudio-environment.png" alt="Panel Environment de RStudio" loading="lazy">
         <figcaption>The Environment pane shows your loaded objects; click a data frame to view it as a table.</figcaption>
       </figure>
+      <figure class="diagram">
+        <svg viewBox="0 0 680 250" role="img" aria-label="A data frame is a list of column vectors">
+        <g font-size="13" text-anchor="middle">
+        <text class="dg-soft" x="340" y="24" font-size="13" font-family="var(--font)">A data frame = several columns, and each column is a vector of ONE type</text>
+        <g class="dg-mono">
+        <text class="dg-mut" x="130" y="58">name &#60;chr&#62;</text>
+        <rect class="dg-box" x="60" y="66" width="140" height="30"/><text class="dg-txt" x="130" y="86">"Ana"</text>
+        <rect class="dg-box" x="60" y="96" width="140" height="30"/><text class="dg-txt" x="130" y="116">"Beto"</text>
+        <rect class="dg-box" x="60" y="126" width="140" height="30"/><text class="dg-txt" x="130" y="146">"Caro"</text>
+        <text class="dg-mut" x="340" y="58">age &#60;dbl&#62;</text>
+        <rect class="dg-box" x="270" y="66" width="140" height="30"/><text class="dg-txt" x="340" y="86">25</text>
+        <rect class="dg-box" x="270" y="96" width="140" height="30"/><text class="dg-txt" x="340" y="116">31</text>
+        <rect class="dg-box" x="270" y="126" width="140" height="30"/><text class="dg-txt" x="340" y="146">28</text>
+        <text class="dg-mut" x="550" y="58">active &#60;lgl&#62;</text>
+        <rect class="dg-box" x="480" y="66" width="140" height="30"/><text class="dg-txt" x="550" y="86">TRUE</text>
+        <rect class="dg-box" x="480" y="96" width="140" height="30"/><text class="dg-txt" x="550" y="116">FALSE</text>
+        <rect class="dg-box" x="480" y="126" width="140" height="30"/><text class="dg-txt" x="550" y="146">TRUE</text>
+        </g>
+        <rect x="52" y="60" width="156" height="102" rx="8" fill="none" stroke="var(--lvl1)" stroke-dasharray="4 3"/>
+        <rect x="262" y="60" width="156" height="102" rx="8" fill="none" stroke="var(--lvl2)" stroke-dasharray="4 3"/>
+        <rect x="472" y="60" width="156" height="102" rx="8" fill="none" stroke="var(--lvl3)" stroke-dasharray="4 3"/>
+        <text class="dg-soft" x="340" y="196" font-size="12" font-family="var(--font)">&#8593; One row = one observation &#183; one column = one variable</text>
+        </g>
+        </svg>
+        <figcaption>Figure: a data frame is a list of columns, and each column is a single-type vector.</figcaption>
+      </figure>
       <h2>The mental model: a list of vectors</h2>
-      <p>A data frame <strong>is a list</strong> whose elements are vectors of the same length. Each column is a vector; each vector is a column. This sentence sounds trivial, but it explains almost everything about how a data frame behaves:</p>
+      <p>Before writing any code, let's pause on the mental model. A data frame <strong>is a list</strong> whose elements are vectors of the same length. Each column is a vector; each vector is a column. This sentence sounds trivial, but it explains almost everything about how a data frame behaves.</p>
+      <p>Imagine a registration form. Every person fills in the same fields: name, age and city. In a spreadsheet you see rows, but R stores the information by columns: one vector with all the names, another vector with all the ages and another vector with all the cities. The first position of each vector belongs to the first person; the second position belongs to the second; and so on. That is why all columns must have the same length: if one column has three values and another has two, R cannot know for certain which piece of data belongs to which observation.</p>
+      <p>This design connects directly with what you have already learned:</p>
       <ul>
         <li><strong>Each column has exactly ONE type</strong> (numeric, character, logical…), because a vector is homogeneous. That is why, if the text <code>"N/A"</code> sneaks into a salary column, the entire column turns into text.</li>
         <li>Rows, on the other hand, can mix types: a row is not a vector — it is a "cross-section" of several vectors.</li>
         <li>Everything you learned about vectors (vectorized operations, comparisons, <code>NA</code>) applies directly to columns.</li>
       </ul>
+      <div class="tablewrap"><table class="data">
+        <tr><th>Prior concept</th><th>How it shows up inside a data frame</th></tr>
+        <tr><td>Vector</td><td>Each column is a vector and keeps its rules: a single type, element-wise operations, missing values.</td></tr>
+        <tr><td>List</td><td>The whole data frame is a special list: each element of the list is a column.</td></tr>
+        <tr><td>Factor</td><td>Categorical columns can be represented as factors when order or levels matter.</td></tr>
+        <tr><td>Logical operators</td><td>They build the conditions that filter rows: high salary, a specific region, sales greater than zero.</td></tr>
+      </table></div>
+      <div class="callout tip"><span class="cic"><svg class="ci"><use href="#i-bulb"/></svg></span><p><strong>Tip:</strong> when something goes wrong with a data frame, ask yourself first: am I working with a column vector, with a row, or with a sub-table? That distinction explains many beginner mistakes.</p></div>
+
+      <h2>Example 1 — Creating and reading a minimal data frame</h2>
+      <p>Let's start with a deliberately small example. The goal is not to analyze anything yet, but to see how a table is built from columns and how R interprets it internally. We will use three people, their age and their city. This example teaches the basic principle: each argument of <code>data.frame()</code> creates a column.</p>
       <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R</span><button class="copy">Copy</button></div>
 <pre><code class="language-r">df <- data.frame(
   name = c("Ana", "Beto", "Caro"),
@@ -1854,11 +2003,25 @@ length(df)   # 3! the "length" of a data frame is its COLUMNS</code></pre>
 [1] "list"
 [1] "data.frame"
 [1] 3</div></div>
+      <p>Let's read the block line by line:</p>
+      <ul>
+        <li><strong><code>df <- data.frame(...)</code>:</strong> creates the object and stores it under the name <code>df</code>. The name goes on the left; the table being built goes on the right.</li>
+        <li><strong><code>name = c("Ana", "Beto", "Caro")</code>:</strong> creates a text column. Since it is a character vector, all of its elements are names.</li>
+        <li><strong><code>age = c(25, 31, 28)</code>:</strong> creates a numeric column. R will be able to compute averages, maximums or comparisons on it.</li>
+        <li><strong><code>city = c(...)</code>:</strong> creates another text column. It has three values, just like the other columns.</li>
+        <li><strong><code>df</code>:</strong> prints the table so you can look at it. R adds row numbers on the left; they are not a real column, they are the row names.</li>
+        <li><strong><code>typeof(df)</code>:</strong> reveals the internal structure: to R, the data frame is a list.</li>
+        <li><strong><code>class(df)</code>:</strong> shows how the object behaves: although it is a list on the inside, on the outside it presents itself as <code>"data.frame"</code>.</li>
+        <li><strong><code>length(df)</code>:</strong> returns <code>3</code> because it counts columns, not rows. This surprise is useful: it confirms that the data frame is organized by columns.</li>
+      </ul>
+      <p>The important takeaway is that the printed table is not a homogeneous matrix. It is an ordered collection of columns with different types. In a real project, this same pattern appears when you import a CSV of students, customers or municipalities: R receives columns of different types and organizes them as a data frame.</p>
 
       <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>Mental model:</strong> think of the data frame as a filing cabinet with vertical folders (the columns). Each folder holds a single type of document, and all of them contain the same number of sheets (the rows). <code>typeof(df)</code> returns <code>"list"</code> because that is literally what it is.</p></div>
 
-      <h2>Scouting the terrain: the first 5 commands</h2>
-      <p>Whenever you receive a data frame (yours or someone else's), do the standard reconnaissance <em>before</em> computing anything. It is the equivalent of walking the lot before building on it. Let's use a small employee register from a consulting firm:</p>
+      <h2>Example 2 — Sizing up a table before you analyze it</h2>
+      <p>The second step is learning a professional habit: never compute on a table you have not inspected. When you receive a data frame, even one you built yourself, you first need to answer basic questions: how many rows does it have? which columns does it bring? what type is each column? are there missing values? are the names clear?</p>
+      <p>This reconnaissance matters because the most dangerous errors do not always produce error messages. A salary column imported as text can block calculations; an <code>NA</code> can contaminate an average; a badly named column can make you filter the wrong variable. Inspecting first lets you catch those problems before drawing conclusions.</p>
+      <p>Let's use a mini employee register from a consulting firm. The case is small, but it mirrors a real workflow: one row per employee and columns for name, area, salary and tenure.</p>
       <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R</span><button class="copy">Copy</button></div>
 <pre><code class="language-r">employees <- data.frame(
   name   = c("Ana", "Beto", "Caro", "David", "Elena", "Fabio"),
@@ -1876,6 +2039,15 @@ names(employees)     # what are the columns called?</code></pre>
 3  Caro Sales   2900      2
 [1] 6 4
 [1] "name"   "area"   "salary" "tenure"</div></div>
+      <p>This first block does two things: it builds the table and checks its overall shape.</p>
+      <ul>
+        <li><strong><code>employees <- data.frame(...)</code>:</strong> creates the table from four columns. All of them have six values, one per employee.</li>
+        <li><strong><code>salary = c(..., NA)</code>:</strong> includes a missing value. We do this on purpose because real data almost never arrives complete.</li>
+        <li><strong><code>head(employees, 3)</code>:</strong> shows the first three rows. It lets you see what the table looks like without printing all of it.</li>
+        <li><strong><code>dim(employees)</code>:</strong> returns two numbers: rows first, then columns. Here there are 6 observations and 4 variables.</li>
+        <li><strong><code>names(employees)</code>:</strong> lists the column names. These are the names you will use to access, filter and compute.</li>
+      </ul>
+      <p>The expected reading is simple: we have six employees and four variables. Before talking about high salaries or tenure, we already know the dataset's size and the names available. In a real database with thousands of records, this step keeps you from working blind.</p>
 
       <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R</span><button class="copy">Copy</button></div>
 <pre><code class="language-r">str(employees)      # structure: every column's type at a glance
@@ -1894,10 +2066,18 @@ summary(employees)  # statistical summary per column (and it counts the NAs!)</c
                                        3rd Qu.:4800   3rd Qu.: 6.50
                                        Max.   :5100   Max.   :10.00
                                        NA's   :1</div></div>
-      <p>Notice two findings that the reconnaissance revealed effortlessly: <code>salary</code> has an <code>NA</code> (<code>summary()</code> says so) and every column has the expected type (<code>str()</code>). If <code>salary</code> showed up as <code>chr</code>, you would know something broke during import — more on that in the next section.</p>
+      <p>Now let's look more closely:</p>
+      <ul>
+        <li><strong><code>str(employees)</code>:</strong> shows the object's compact structure. It states that this is a <code>data.frame</code>, that it has 6 observations and 4 variables, and then shows the type of each column.</li>
+        <li><strong><code>summary(employees)</code>:</strong> computes per-column summaries. For numeric columns it shows minimum, quartiles, median, mean and maximum; for text columns it reports length, class and mode.</li>
+        <li><strong><code>NA's :1</code>:</strong> confirms there is a missing value in <code>salary</code>. It is a small line, but analytically important.</li>
+      </ul>
+      <p>Notice two findings that the reconnaissance revealed effortlessly: <code>salary</code> has an <code>NA</code> and every column has the expected type. If <code>salary</code> showed up as <code>chr</code>, you would know something broke during import, perhaps because it came with currency symbols, thousands separators or strings like <code>"N/A"</code>. We will talk about that in the next section, when we import data from files.</p>
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>Best practice:</strong> before computing anything, always run a mini audit: <code>head()</code>, <code>dim()</code>, <code>names()</code>, <code>str()</code> and <code>summary()</code>. It is a simple habit that prevents costly mistakes.</p></div>
 
       <h2>Accessing columns: <code>$</code>, <code>[[</code> and <code>[</code></h2>
-      <p>There are three ways to pull out a column, and <strong>they do not return the same thing</strong>. The difference matters when you pass the result to another function:</p>
+      <p>Now that we know the table, we need to learn how to take pieces of it. In R, "pulling out a column" can mean two different things: extracting the vector that holds the values, or keeping a one-column sub-table. The difference matters because many functions expect vectors, while others need to keep receiving data frames.</p>
+      <p>This is one of the first sources of confusion for beginners. Visually, a column always looks the same; technically, it can be a vector or a one-column data frame. That is why it pays to learn the access forms right from the start:</p>
       <div class="tablewrap"><table class="data">
         <tr><th>Syntax</th><th>Returns</th><th>When to use it</th></tr>
         <tr><td><code>df$salary</code></td><td>Vector</td><td>Everyday interactive use; RStudio autocompletes the name</td></tr>
@@ -1906,6 +2086,7 @@ summary(employees)  # statistical summary per column (and it counts the NAs!)</c
         <tr><td><code>df[, c("a", "b")]</code></td><td>Data frame (several columns)</td><td>Selecting a subset of columns</td></tr>
         <tr><td><code>df[1:3, ]</code></td><td>Data frame (rows)</td><td>Selecting rows; the "empty" comma means "all columns"</td></tr>
       </table></div>
+      <p>The next block shows those differences with the employees table. Pay special attention to the comma inside <code>[rows, columns]</code>: rows go before the comma; columns go after it.</p>
       <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R</span><button class="copy">Copy</button></div>
 <pre><code class="language-r">employees$salary                     # vector: ready for mean(), sum()...
 employees[["area"]]                  # vector, with the name in quotes
@@ -1919,11 +2100,20 @@ employees[1:3, c("name", "salary")]  # rows 1-3, two columns</code></pre>
 1  Ana   3200
 2 Beto   4500
 3 Caro   2900</div></div>
+      <p>Line-by-line interpretation:</p>
+      <ul>
+        <li><strong><code>employees$salary</code>:</strong> extracts the column as a numeric vector. That is why you can pass it to functions like <code>mean()</code>, <code>sum()</code> or <code>is.na()</code>.</li>
+        <li><strong><code>employees[["area"]]</code>:</strong> also extracts a vector, but using the name in quotes. This form is handy when the column name is stored in another variable.</li>
+        <li><strong><code>employees[2, ]</code>:</strong> takes the second row and all the columns. The comma separates rows from columns; leaving the space after the comma empty means "all columns".</li>
+        <li><strong><code>employees[1:3, c("name", "salary")]</code>:</strong> takes rows 1 through 3 and only two columns. The result is still a table.</li>
+      </ul>
+      <p>In real projects you will use these forms to prepare data before analyzing it: selecting relevant columns, reviewing specific cases, extracting a numeric variable to compute indicators, or building small tables for a report.</p>
 
       <div class="callout warn"><span class="cic"><svg class="ci"><use href="#i-alert"/></svg></span><p><strong>Treacherous detail:</strong> <code>df[, "salary"]</code> (with a comma) returns a <em>vector</em>, but <code>df["salary"]</code> (without a comma) returns a <em>data frame</em>. On top of that, <code>$</code> does silent partial matching: <code>employees$sal</code> finds <code>salary</code> without a word of warning — convenient until the day it matches the wrong column.</p></div>
 
       <h2>Filtering rows: simple and combined conditions</h2>
-      <p>The base-R recipe is <code>df[condition, columns]</code>. The condition is a logical vector built from the columns, and you can combine conditions with <code>&amp;</code> (and) and <code>|</code> (or):</p>
+      <p>Filtering means keeping only the observations that meet a condition. It is a core operation of analysis: keeping active customers, municipalities in a certain region, sales greater than zero, passing students or records after a given date. In base R, the recipe is <code>df[condition, columns]</code>.</p>
+      <p>The condition is built by comparing columns. For example, <code>employees$tenure >= 5</code> produces a logical vector of <code>TRUE</code> and <code>FALSE</code> values. R keeps the rows where the condition is <code>TRUE</code>. You can combine conditions with <code>&amp;</code> (and) and <code>|</code> (or):</p>
       <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R</span><button class="copy">Copy</button></div>
 <pre><code class="language-r"># Employees with 5+ years of tenure, name and area only
 employees[employees$tenure >= 5, c("name", "area")]
@@ -1944,32 +2134,44 @@ employees[employees$area == "Finance" | employees$tenure > 6, ]</code></pre>
    name    area salary tenure
 2  Beto      IT   4500      7
 4 David Finance   5100     10</div></div>
-      <p>The readable base-R alternative is <code>subset()</code>: it takes the data frame, the condition (without repeating <code>employees$</code>) and, optionally, the columns:</p>
+      <p>Let's read the three filters:</p>
+      <ul>
+        <li><strong>First filter:</strong> keeps employees with a tenure of 5 or more and shows only <code>name</code> and <code>area</code>. It is useful when you want a reduced table for reviewing cases.</li>
+        <li><strong>Second filter:</strong> demands two conditions at once: being in IT and earning more than 4600. The <code>&amp;</code> operator means "both conditions must hold".</li>
+        <li><strong>Third filter:</strong> keeps employees in Finance or employees with more than 6 years. The <code>|</code> operator means "meeting either condition is enough".</li>
+      </ul>
+      <p>The readable base-R alternative is <code>subset()</code>: it takes the data frame, the condition (without repeating <code>employees$</code>) and, optionally, the columns. It is convenient for interactive reading, although later on you will see that the tidyverse offers an even clearer grammar with <code>filter()</code> and <code>select()</code>.</p>
       <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R</span><button class="copy">Copy</button></div>
 <pre><code class="language-r">subset(employees, salary > 4000, select = c(name, salary))</code></pre>
 <div class="out">   name salary
 2  Beto   4500
 4 David   5100
 5 Elena   4800</div></div>
+      <p>The result contains only employees earning more than 4000 and only two columns. In a real project you would use this pattern to build subsets: high-value customers, suspicious transactions, prioritized municipalities or complete observations for a model.</p>
 
       <h3>The NA trap: ghost rows</h3>
-      <p>Here comes a classic that will happen to you sooner or later. Fabio's salary is <code>NA</code>. What does <code>NA &gt; 3000</code> return? Neither <code>TRUE</code> nor <code>FALSE</code>: it returns <code>NA</code> ("I don't know"). And when you index a data frame with an <code>NA</code>, R does not drop the row — it hands you a <strong>ghost row</strong> filled with <code>NA</code>:</p>
+      <p>Here comes a classic that will happen to you sooner or later. Fabio's salary is <code>NA</code>. What does <code>NA &gt; 3000</code> return? Neither <code>TRUE</code> nor <code>FALSE</code>: it returns <code>NA</code>, because R cannot claim that an unknown value is greater than 3000. That logic is correct, but it can produce a surprise when you filter.</p>
+      <p>When you index a data frame with a condition that contains <code>NA</code>, R does not automatically discard that position. In certain cases it hands you a <strong>ghost row</strong> filled with <code>NA</code>. The next block shows the problem explicitly:</p>
       <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R</span><button class="copy">Copy</button></div>
 <pre><code class="language-r">employees[employees$area == "Sales" & employees$salary > 3000, ]</code></pre>
 <div class="out">    name  area salary tenure
 1    Ana Sales    3200      4
 NA  &lt;NA>  &lt;NA>      NA     NA</div></div>
-      <p>Two clean fixes: wrap the condition in <code>which()</code> (which ignores <code>NA</code>s and returns only the positions that are truly <code>TRUE</code>) or exclude them explicitly with <code>!is.na()</code>. <code>subset()</code> also drops them on its own:</p>
+      <p>The first row is correct: Ana works in Sales and her salary is above 3000. The second one is not a real employee; it shows up because Fabio belongs to Sales but his salary is unknown, so the full condition cannot be resolved as true or false. In large databases, this detail can inflate counts, contaminate manual reviews or produce confusing tables.</p>
+      <p>Two clean fixes: wrap the condition in <code>which()</code>, which ignores the <code>NA</code>s and returns only the positions that are truly <code>TRUE</code>, or exclude them explicitly with <code>!is.na()</code>. <code>subset()</code> also drops them on its own:</p>
       <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R</span><button class="copy">Copy</button></div>
 <pre><code class="language-r">employees[which(employees$area == "Sales" & employees$salary > 3000), ]
 employees[!is.na(employees$salary) & employees$salary > 3000, ]  # explicit</code></pre>
 <div class="out">  name  area salary tenure
 1  Ana Sales   3200      4</div></div>
+      <p>The first fix asks for the positions that are truly <code>TRUE</code>; the second states explicitly: "first keep the known salaries, then evaluate whether they exceed 3000". In survey, health or finance analysis, this decision must be a conscious one: a missing value does not always mean zero, and dropping it without thinking can change the interpretation.</p>
 
       <div class="callout danger"><span class="cic"><svg class="ci"><use href="#i-stop"/></svg></span><p><strong>Ghost rows:</strong> if rows full of <code>NA</code> show up when you filter, it is not an R bug: there are <code>NA</code>s in the column you filtered by. Use <code>which()</code> or <code>!is.na()</code>. In a survey database with thousands of missing values, this detail changes your counts and your averages.</p></div>
 
       <h2>Creating, modifying and deleting columns</h2>
-      <p>Since every column is a vector, creating a column is simply assigning a vector (or a vectorized operation on other columns). Deleting one is assigning <code>NULL</code>:</p>
+      <p>Once you know how to inspect and filter, the next step is transforming the table. In data analysis you almost never work only with the original columns: you create indicators, change names, correct values, convert units or flag observations that meet a rule. In a data frame, creating a column is simply assigning a new vector.</p>
+      <p>The reason this works is the column model: if <code>employees$salary</code> is a vector and <code>employees$tenure</code> is another vector, you can operate on them to create new variables. The only requirement is that the new column's length be compatible with the number of rows. Deleting a column also follows a simple rule: assign it <code>NULL</code>.</p>
+      <p>The next block shows four frequent operations: creating calculated columns, modifying one cell, renaming a column and deleting a temporary variable.</p>
       <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R</span><button class="copy">Copy</button></div>
 <pre><code class="language-r">employees$annual_salary <- employees$salary * 12         # new, calculated
 employees$senior        <- employees$tenure >= 5         # new, logical
@@ -1981,9 +2183,20 @@ head(employees, 3)</code></pre>
 1      Ana Sales   3200      4  FALSE
 2     Beto    IT   4500      7   TRUE
 3     Caro Sales   3100      2  FALSE</div></div>
+      <p>Line-by-line explanation:</p>
+      <ul>
+        <li><strong><code>annual_salary <- salary * 12</code>:</strong> creates a calculated column by multiplying each monthly salary by 12. It is a vectorized operation.</li>
+        <li><strong><code>senior <- tenure >= 5</code>:</strong> creates a logical column. Each employee is marked <code>TRUE</code> if they have five years or more, and <code>FALSE</code> otherwise.</li>
+        <li><strong><code>salary[3] <- 3100</code>:</strong> corrects a single value: the third position of the salary column.</li>
+        <li><strong><code>names(employees)[1] <- "employee"</code>:</strong> renames the first column from <code>name</code> to <code>employee</code>.</li>
+        <li><strong><code>annual_salary <- NULL</code>:</strong> deletes the column we no longer want to keep.</li>
+      </ul>
+      <p>The expected output shows the first three rows with a new <code>senior</code> column and Caro's corrected salary. In real projects, this pattern is used to create derived variables: age in years from a birth date, margin as sales minus costs, risk classification, compliance indicators or quality flags.</p>
+      <div class="callout warn"><span class="cic"><svg class="ci"><use href="#i-alert"/></svg></span><p><strong>Common mistake:</strong> modifying original data without leaving a trace. When a correction matters, comment on why you are making it, or create a new column instead of overwriting the old one. Reproducibility also means explaining your decisions.</p></div>
 
       <h2>Sorting with <code>order()</code></h2>
-      <p>Mind the distinction: <code>sort()</code> sorts the <em>values</em> of a vector, but to sort a data frame you need <code>order()</code>, which returns the <em>positions</em> in the right order. Those positions are then used as the row index:</p>
+      <p>Sorting a table looks like a visual operation, but in R it is an operation on rows. Mind the distinction: <code>sort()</code> sorts the <em>values</em> of a vector, while sorting a data frame requires <code>order()</code>, which returns the <em>positions</em> in the right order. Those positions are then used as the row index.</p>
+      <p>The following code answers two typical questions: who earns the highest salaries? and how can I sort by area first and then by salary within each area?</p>
       <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R</span><button class="copy">Copy</button></div>
 <pre><code class="language-r"># From highest to lowest salary (NAs end up last)
 employees[order(employees$salary, decreasing = TRUE), ]
@@ -1997,11 +2210,19 @@ employees[order(employees$area, -employees$salary), ]</code></pre>
 1      Ana   Sales   3200      4  FALSE
 3     Caro   Sales   3100      2  FALSE
 6    Fabio   Sales     NA      1  FALSE</div></div>
+      <p>In the first sort, <code>order(employees$salary, decreasing = TRUE)</code> computes the positions of the salaries from highest to lowest. Those positions are then used before the comma to reorder entire rows. In the second, R sorts first by <code>area</code> and then by <code>-employees$salary</code>; the minus sign flips the numeric order so that salary ends up descending within each area.</p>
+      <p>Sorting does not change the original data frame unless you reassign the result. If you want to keep the sorted table, you need to write something like <code>employees_sorted <- employees[order(...), ]</code>. This distinction matters: printing a result is not the same as modifying an object.</p>
 
       <div class="callout tip"><span class="cic"><svg class="ci"><use href="#i-bulb"/></svg></span><p><strong>Practice without hunting for data:</strong> R ships with built-in datasets: <code>mtcars</code> (cars), <code>iris</code> (flowers), <code>airquality</code> (air quality, with real <code>NA</code>s). Type <code>data()</code> to see the full catalog. We will use them throughout this guide because they are available in every R installation.</p></div>
 
-      <h2>Putting it all together: a mini salary analysis</h2>
-      <p>Let's combine everything into the question a consultant would ask: how do salaries compare across areas?</p>
+      <h2>Example 3 — A mini applied salary analysis</h2>
+      <p>Now let's put everything together in an applied question. Imagine a small consulting firm wants a first reading of its salary structure. We are not building a full report yet; we are doing a minimal exploratory analysis to answer three questions:</p>
+      <ul>
+        <li>How many employees are there in each area?</li>
+        <li>What is the average salary per area?</li>
+        <li>What share of the team can be considered senior?</li>
+      </ul>
+      <p>This example is applied because it combines table structure, column access, <code>NA</code> handling, simple grouping and proportion calculations. They are small operations, but they form the basis of much larger analyses.</p>
       <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R</span><button class="copy">Copy</button></div>
 <pre><code class="language-r"># 1. How many employees per area?
 table(employees$area)
@@ -2018,11 +2239,18 @@ Finance      IT   Sales
    5100    4650    3150
 
 [1] 0.5</div></div>
-      <p>With four building blocks (data frame, vector, logical condition, <code>tapply</code>) you have already answered a real business question. At Level 2, <code>dplyr</code> will do this same job with a more fluent grammar — but the underlying logic is exactly this.</p>
+      <p>Let's see what each line contributes:</p>
+      <ul>
+        <li><strong><code>table(employees$area)</code>:</strong> takes the <code>area</code> column as a vector and counts how many times each category appears. The result shows 1 person in Finance, 2 in IT and 3 in Sales.</li>
+        <li><strong><code>tapply(employees$salary, employees$area, mean, na.rm = TRUE)</code>:</strong> splits the salaries by area and applies <code>mean()</code> to each group. The <code>na.rm = TRUE</code> argument keeps Fabio's missing salary from turning the Sales average into <code>NA</code>.</li>
+        <li><strong><code>mean(employees$senior)</code>:</strong> computes the proportion of <code>TRUE</code> values in the logical <code>senior</code> column. In R, <code>TRUE</code> counts as 1 and <code>FALSE</code> as 0, so the mean works out to a proportion.</li>
+      </ul>
+      <p>The reading would be: Sales concentrates the most employees, Finance has the highest average salary in this sample, and half the team is classified as senior. In a real report you would not stop here: you would check sample size, job titles, working hours, tenure and possible missing values. But the workflow is already professional: pose a question, select variables, summarize, interpret and state the limits.</p>
+      <p>With four building blocks (data frame, vector, logical condition, <code>tapply</code>) you have already answered a real business question. At Level 2, <code>dplyr</code> will do this same job with a more fluent grammar, but the underlying logic is exactly this: columns, conditions, groups and functions.</p>
 
       <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>An honest preview — the tibble:</strong> at Level 2 you will meet the <strong>tibble</strong>, the tidyverse's modernized data frame. It improves three concrete things: it prints only what fits on screen (no more 5,000 rows flying past in the console), it shows each column's type under its name (<code>&lt;chr></code>, <code>&lt;dbl></code>), and it is stricter: no partial matching with <code>$</code> and no silently turning a data frame into a vector. Everything you learn here applies just the same: a tibble is still a list of vectors.</p></div>
 
-      <div class="exercise"><div class="xhead"><svg class="ci"><use href="#i-pencil"/></svg>Practice exercise</div><p>With the built-in dataset <code>mtcars</code>: (a) how many rows and columns does it have? (b) show only the cars with more than 6 cylinders (<code>cyl</code>); (c) compute the average fuel efficiency (<code>mpg</code>); (d) show the 3 most efficient cars using <code>order()</code>; (e) filter the cars with <code>mpg > 25</code> <strong>and</strong> <code>hp &lt; 100</code>.</p></div>
+      <div class="exercise"><div class="xhead"><svg class="ci"><use href="#i-pencil"/></svg>Practice exercise</div><p>With the built-in dataset <code>mtcars</code>, practice the same workflow applied to cars. Before answering, think about what each row represents (a car model) and what each column represents (characteristics such as fuel efficiency, cylinders or horsepower). Then solve: (a) how many rows and columns does it have? (b) show only the cars with more than 6 cylinders (<code>cyl</code>); (c) compute the average fuel efficiency (<code>mpg</code>); (d) show the 3 most efficient cars using <code>order()</code>; (e) filter the cars with <code>mpg > 25</code> <strong>and</strong> <code>hp &lt; 100</code>.</p></div>
       <details class="acc"><summary>View solution</summary><div class="accbody">
 <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R</span><button class="copy">Copy</button></div>
 <pre><code class="language-r">dim(mtcars)                                   # (a) 32 rows, 11 columns
@@ -2036,8 +2264,11 @@ mtcars[mtcars$mpg > 25 & mtcars$hp &lt; 100, c("mpg", "hp")]  # (e) 5 cars</code
 Toyota Corolla 33.9   4
 Fiat 128       32.4   4
 Honda Civic    30.4   4</div></div></div></details>
+      <p>The solution follows the same pattern you just learned: inspect dimensions, filter rows with conditions, extract numeric columns to compute, and sort using positions. If the code feels long, don't worry: at the next level you will learn tidyverse verbs that express these same actions with names closer to natural language.</p>
 
-      <div class="challenge"><div class="xhead"><svg class="ci"><use href="#i-trophy"/></svg>Challenge</div><p>The <code>airquality</code> dataset has real <code>NA</code>s in the <code>Ozone</code> column. Without using <code>na.rm</code> just yet: (1) count how many <code>NA</code>s there are with <code>sum(is.na(...))</code>; (2) filter the days with <code>Ozone > 100</code> while avoiding ghost rows; (3) verify that <code>subset(airquality, Ozone > 100)</code> gives the same result.</p></div>
+      <div class="challenge"><div class="xhead"><svg class="ci"><use href="#i-trophy"/></svg>Challenge</div><p>The <code>airquality</code> dataset has real <code>NA</code>s in the <code>Ozone</code> column. This challenge exists so you can practice an authentic situation: environmental data with missing measurements. Without using <code>na.rm</code> just yet: (1) count how many <code>NA</code>s there are with <code>sum(is.na(...))</code>; (2) filter the days with <code>Ozone > 100</code> while avoiding ghost rows; (3) verify that <code>subset(airquality, Ozone > 100)</code> gives the same result. When you finish, write one interpretive sentence: how many days exceed that threshold, and under what decision you treated the missing values.</p></div>
+
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>In short:</strong> a data frame is a list of equal-length vectors: each column represents a variable, each row an observation, and each column keeps a single type. Before computing, inspect with <code>head()</code>, <code>dim()</code>, <code>names()</code>, <code>str()</code> and <code>summary()</code>. Extract columns as vectors when you need to compute, keep sub-tables when you need to preserve structure, filter carefully when there are <code>NA</code>s, use <code>order()</code> to sort and <code>tapply()</code>/<code>aggregate()</code> to summarize by group. In the next chapter you will learn to bring in data from external files; almost everything you import will end up as a data frame.</p></div>
 
       <div class="pager"><a data-go="listas"><small>Previous</small><b>← Lists</b></a><a class="next" data-go="import-export"><small>Next</small><b>Importing and exporting data →</b></a></div>
     </section>
@@ -2047,6 +2278,7 @@ Honda Civic    30.4   4</div></div></div></details>
       <div class="breadcrumbs"><a data-nav="inicio">Home</a><span class="sep">/</span><span>Basic Level</span><span class="sep">/</span><span>Import / export</span></div>
       <h1 class="page-title">Importing and exporting data</h1>
       <p class="lead">90% of real projects don't start with clean data: they start with a file somebody else put together — a CSV exported from an accounting system, an Excel file with three title rows, an official statistics download with broken accents. Importing well is your first professional R skill.</p>
+      <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>By the end you'll know how to:</strong> import CSV, Excel, SPSS/Stata and JSON (and save to CSV, xlsx and <code>.rds</code>), read the column-type report and audit with <code>str()</code>, fix the classic disasters (semicolons and decimal commas, broken accents, Excel serial dates, headers below row 1), and use projects with <code>here()</code> instead of absolute paths.</p></div>
 
       <p>The good news: R reads practically any format. The bad news: every format has its traps, and almost all of them are predictable. This section gives you the tools plus the catalog of classic disasters so that none of them catches you off guard.</p>
 
@@ -2207,6 +2439,8 @@ data$date <- as.Date(data$date, origin = "1899-12-30")
 data <- read_excel("report.xlsx", sheet = "Data", skip = 3,
                    col_types = c("text", "date", "numeric"))</code></pre></div></div></details>
 
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>In short:</strong> R reads almost any format, but each one has predictable traps. Read the column-type report on import and always audit with <code>str()</code> or <code>summary()</code> — a "successful" read is not a correct one. Fix the classic disasters (semicolons and decimal commas with <code>read_csv2()</code>, broken accents with <code>locale(encoding=)</code>, Excel serial dates, headers below row 1), and work inside a project with <code>here()</code>, keeping raw data in CSV/Excel and processed results in <code>.rds</code>.</p></div>
+
       <div class="pager"><a data-go="dataframes"><small>Previous</small><b>← Data frames</b></a><a class="next" data-go="funciones-basicas"><small>Next</small><b>Essential functions →</b></a></div>
     </section>
 
@@ -2215,6 +2449,7 @@ data <- read_excel("report.xlsx", sheet = "Data", skip = 3,
       <div class="breadcrumbs"><a data-nav="inicio">Home</a><span class="sep">/</span><span>Basic Level</span><span class="sep">/</span><span>Essential functions</span></div>
       <h1 class="page-title">Essential functions</h1>
       <p class="lead">A function takes arguments and returns a result. R ships with hundreds ready to use; this is the analyst's minimum vocabulary — the 30 functions that appear in practically every data-analysis script. Mastering them is the equivalent of knowing Excel's essential formulas, but on steroids.</p>
+      <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>By the end you'll know how to:</strong> reach for the core vocabulary of numeric summaries, ordering/counting and text/rounding helpers, handle missing values deliberately with <code>na.rm = TRUE</code> after counting them, count and compute proportions with <code>sum()</code>/<code>mean()</code> over a condition, format figures with <code>sprintf()</code> and <code>format()</code>, and anticipate banker's rounding.</p></div>
 
       <h2>The essential vocabulary, by category</h2>
       <h3>Numeric summaries</h3>
@@ -2405,6 +2640,8 @@ sprintf("The best month sold %.0f units", max(sales, na.rm = TRUE))</code></pre>
 
       <div class="challenge"><div class="xhead"><svg class="ci"><use href="#i-trophy"/></svg>Challenge</div><p>With <code>airquality</code>: report, in a single sentence built with <code>sprintf()</code>, the average ozone level (<code>Ozone</code>, with 1 decimal), the number of days measured and the percentage of missing data in that column. Hints: <code>mean(..., na.rm = TRUE)</code>, <code>sum(!is.na(...))</code> and <code>mean(is.na(...)) * 100</code>.</p></div>
 
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>In short:</strong> this is the analyst's core vocabulary — summaries (<code>sum</code>, <code>mean</code>, <code>sd</code>, <code>quantile</code>), ordering and counting (<code>sort</code>, <code>order</code>, <code>table</code>), and text/rounding helpers (<code>paste</code>, <code>sprintf</code>, <code>format</code>, <code>round</code>). Use <code>na.rm = TRUE</code> deliberately but count the <code>NA</code>s first; remember <code>sum()</code>/<code>mean()</code> over a condition count and give proportions; and expect banker's rounding when a total looks "off by a cent".</p></div>
+
       <div class="pager"><a data-go="import-export"><small>Previous</small><b>← Importing and exporting data</b></a><a class="next" data-go="ayuda"><small>Next</small><b>Help and documentation →</b></a></div>
     </section>
     <section class="topic" id="ayuda">
@@ -2412,6 +2649,7 @@ sprintf("The best month sold %.0f units", max(sales, na.rm = TRUE))</code></pre>
       <div class="breadcrumbs"><a data-nav="inicio">Home</a><span class="sep">/</span><span>Basic Level</span><span class="sep">/</span><span>Help</span></div>
       <h1 class="page-title">Help and documentation</h1>
       <p class="lead">Nobody memorizes all of R: professionals consult documentation every single day. Knowing <em>where</em> to look, <em>how</em> to read a help page, and <em>how</em> to decipher an error is a skill just as important as programming itself, and you train it like any other.</p>
+      <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>By the end you'll know how to:</strong> read a help page by its sections (starting with Examples), search with <code>?</code> vs <code>??</code> and vignettes, take an error message apart (which function failed and the key text) while distinguishing error, warning and message, search effectively online, and ask for help with a minimal reprex.</p></div>
 
       <p>Think about it: the difference between a beginner who gets stuck and one who keeps moving is rarely how much they know by heart. It's that the second one turns every error into an effective search. In this section you'll learn that entire workflow: built-in documentation, reading errors, searching online, and asking for help (from humans or an AI) in a way that gets you good answers.</p>
 
@@ -2538,6 +2776,8 @@ seq(from = 1, to = 10, length.out = 4)   # length.out spreads n equally spaced p
       <p>Recommended search: <code>invalid 'type' (character) of argument in R</code>. Note that we didn't include the <code>"10"</code>: that part is specific to your code and only gets in the way of the search. The root cause: <code>sum()</code> expects numbers and got text; the typical fix is converting with <code>as.numeric()</code>.</p>
       </div></details>
 
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>In short:</strong> professionals consult documentation daily, so make it a skill. Read help pages by section — starting with Examples — use <code>?</code> for exact names and <code>??</code> to search by topic, and take errors apart (which function failed plus the key text) while distinguishing error, warning and message. When stuck, search the generic message in English; when asking, post a minimal, self-contained reprex.</p></div>
+
       <div class="pager"><a data-go="funciones-basicas"><small>Previous</small><b>← Essential functions</b></a><a class="next" data-go="proyecto-1"><small>Next</small><b>★ Capstone project →</b></a></div>
     </section>
 
@@ -2546,6 +2786,7 @@ seq(from = 1, to = 10, length.out = 4)   # length.out spreads n equally spaced p
       <div class="breadcrumbs"><a data-nav="inicio">Home</a><span class="sep">/</span><span>Basic Level</span><span class="sep">/</span><span>Project</span></div>
       <h1 class="page-title">★ Capstone project: Exploratory Data Analysis</h1>
       <p class="lead">Apply everything you learned in Level 1 to run a complete EDA (Exploratory Data Analysis) of the <code>iris</code> dataset, with no external libraries. This isn't just running code: at every step you'll <em>interpret</em> the output and make a decision, just like a real analyst.</p>
+      <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>By the end you'll know how to:</strong> run a complete EDA with base R alone — state a guiding question, scout structure, audit quality (missing values and duplicates), describe variables with statistics and the coefficient of variation, compare groups with <code>aggregate()</code>, read a correlation matrix and a boxplot, and write up your conclusions as a reusable checklist.</p></div>
 
       <div class="method"><span><b>1</b> Concept</span><span><b>2</b> Example</span><span><b>3</b> Practice</span><span><b>4</b> Challenge</span><span><b>5</b> Project</span></div>
 
@@ -2686,6 +2927,8 @@ Petal.Width          0.82       -0.37         0.96        1.00</div></div>
 
       <div class="challenge"><div class="xhead"><svg class="ci"><use href="#i-trophy"/></svg>Challenge: take it further</div><p>Repeat the full EDA (all 8 checklist steps) with the <code>mtcars</code> dataset and document your findings in 5 lines of comments. Concrete hints: <strong>(1)</strong> in step 1 you'll notice there are no factors here: <code>cyl</code> comes in as numeric even though it's really categorical (4, 6, or 8 cylinders); convert it with <code>as.factor()</code> for grouping. <strong>(2)</strong> When comparing variability, <code>disp</code> will have the largest standard deviation (≈124), but compute the coefficient of variation before crowning it: the scales in <code>mtcars</code> differ wildly from one another. <strong>(3)</strong> Group fuel efficiency with <code>aggregate(mpg ~ cyl, data = mtcars, FUN = mean)</code>: you should see that mileage clearly worsens as cylinders increase. <strong>(4)</strong> In the correlation matrix, look up the one between <code>mpg</code> and <code>wt</code> (weight): it's strong and negative. How would you interpret it in one sentence? <strong>(5)</strong> Close with <code>hist(mtcars$mpg)</code> and a <code>boxplot(mpg ~ cyl, data = mtcars)</code>: do the cylinder groups overlap more or less than the iris species?</p></div>
 
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>In short:</strong> a solid EDA follows a reusable method — state a guiding question, then scout structure, audit quality, describe, compare groups, correlate, plot and conclude in writing. On <code>iris</code>, the petal measurements proved most informative (highest CV, r = 0.96) and cleanly separated <em>setosa</em>, while <em>versicolor</em> and <em>virginica</em> overlap slightly. Save the sequence as a template: the method, not the dataset, is what transfers to every future project.</p></div>
+
       <div class="callout tip"><span class="cic"><svg class="ci"><use href="#i-grad"/></svg></span><p><strong>Congratulations!</strong> You completed the Basic Level, and not with scattered commands: you just executed an analyst's full workflow: load, audit quality, describe, compare groups, correlate, plot, and <em>conclude in writing</em>. That method will stay with you in every project from here on. In the Intermediate Level you'll make the jump to the <strong>tidyverse</strong>, the modern, elegant way of doing exactly this with less code and more clarity.</p></div>
 
       <div class="pager"><a data-go="ayuda"><small>Previous</small><b>← Help and documentation</b></a><a class="next" data-go="prog-estructurada"><small>Next · Level 2</small><b>Structured programming →</b></a></div>
@@ -2698,6 +2941,8 @@ Petal.Width          0.82       -0.37         0.96        1.00</div></div>
       <div class="breadcrumbs"><a data-nav="inicio">Home</a><span class="sep">/</span><span>Intermediate Level</span><span class="sep">/</span><span>Structured programming</span></div>
       <h1 class="page-title">Structured programming</h1>
       <p class="lead">Up to now you typed loose commands at the console: one line, one result, another line. That works for exploring, but not for real <em>work</em>. Structured programming is the leap from "pressing buttons" to "building a machine": a file that decides, repeats, and reuses logic, one you can run again tomorrow without standing over it.</p>
+
+      <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>By the end you'll know how to:</strong> structure a reproducible script into its six blocks (header, libraries, parameters, load, transform, output), write idempotent code that returns the same result on every run, and validate it end to end with <code>source()</code>.</p></div>
 
       <h2>From the loose command to the script</h2>
       <p>A loose command lives in your head and in your working memory. You know you loaded the data first, then filtered, then averaged... but that order only exists as long as you remember it. A <strong>script</strong> makes that order explicit: it is the written recipe, not the plated dish. The practical difference is enormous.</p>
@@ -2796,6 +3041,8 @@ total &lt;- sum(data$x)   # defined from scratch every time</code></pre></div>
 
       <div class="challenge"><div class="xhead"><svg class="ci"><use href="#i-trophy"/></svg>Challenge</div><p>Take any analysis you have done at the console and turn it into a script with the six blocks (header, libraries, parameters, load, transform, output). Then restart R and run it with <code>source()</code>. If it fails, fix it until it runs clean from top to bottom. That is the minimum professional standard.</p></div>
 
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>In short:</strong> a script is a written, auditable recipe, not a pile of loose commands. Keep the parameters up top, let the data flow in one direction, and never lean on a saved workspace: if it runs clean from a fresh session with <code>source()</code>, it's reproducible.</p></div>
+
       <div class="pager"><a data-go="proyecto-1"><small>Previous</small><b>← ★ Capstone project</b></a><a class="next" data-go="condicionales"><small>Next</small><b>Conditionals →</b></a></div>
     </section>
 
@@ -2804,6 +3051,8 @@ total &lt;- sum(data$x)   # defined from scratch every time</code></pre></div>
       <div class="breadcrumbs"><a data-nav="inicio">Home</a><span class="sep">/</span><span>Intermediate Level</span><span class="sep">/</span><span>Conditionals</span></div>
       <h1 class="page-title">Conditionals</h1>
       <p class="lead">A conditional is a fork in the road: the code evaluates a yes/no question and takes one route or the other. Mastering conditionals in R means distinguishing two worlds that beginners confuse: the <em>scalar</em> world (one decision) and the <em>vectorized</em> world (one decision per element).</p>
+
+      <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>By the end you'll know how to:</strong> tell scalar decisions from vectorized ones, control program flow with <code>if / else if / else</code> and <code>switch()</code>, and classify data columns with <code>ifelse()</code> and <code>case_when()</code>.</p></div>
 
       <h2>if / else if / else: scalar decision</h2>
       <p>The <code>if</code> form evaluates <strong>a single condition</strong> (one <code>TRUE</code> or <code>FALSE</code> value) and runs the matching block. It is for control logic: deciding the program's flow, not classifying data.</p>
@@ -2911,6 +3160,8 @@ health_rate("temporary")   # 0.04
 health_rate("other")       # NA</code></pre></div>
       </div></details>
 
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>In short:</strong> use <code>if</code> to control the flow of the program (one decision) and <code>ifelse()</code>/<code>case_when()</code> to transform data (one decision per element). Since R 4.3 a length-&gt;1 condition inside <code>if</code> is an error, and <code>case_when()</code> keeps the first true arm, so order your conditions from most specific to most general.</p></div>
+
       <div class="pager"><a data-go="prog-estructurada"><small>Previous</small><b>← Structured programming</b></a><a class="next" data-go="bucles"><small>Next</small><b>Loops →</b></a></div>
     </section>
 
@@ -2919,6 +3170,8 @@ health_rate("other")       # NA</code></pre></div>
       <div class="breadcrumbs"><a data-nav="inicio">Home</a><span class="sep">/</span><span>Intermediate Level</span><span class="sep">/</span><span>Loops</span></div>
       <h1 class="page-title">Loops</h1>
       <p class="lead">A loop repeats instructions. It is the iteration pillar in action. But in R there is a healthy tension: often the loop you would write in another language is unnecessary, because R vectorizes. Learning loops includes learning <em>when not to use them</em>.</p>
+
+      <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>By the end you'll know how to:</strong> write <code>for</code>, <code>while</code> and <code>repeat</code> loops, pre-allocate instead of growing vectors, iterate safely with <code>seq_along()</code>, and decide when to vectorize or reach for the <code>apply</code> family and <code>purrr::map()</code>.</p></div>
 
       <h2>for, while, and repeat</h2>
       <p>All three repeat, but they answer different questions. <strong><code>for</code></strong>: "I know how many times." <strong><code>while</code></strong>: "I repeat as long as something holds." <strong><code>repeat</code></strong>: "I repeat and I decide when to exit."</p>
@@ -3054,6 +3307,8 @@ cumsum(sales)</code></pre>
 
       <div class="challenge"><div class="xhead"><svg class="ci"><use href="#i-trophy"/></svg>Challenge</div><p>Write two versions that build the vector of the first 50,000 squares: one growing the vector with <code>c()</code> and another pre-allocating with <code>numeric()</code>. Wrap them in <code>system.time({ ... })</code> and compare the times. Note the difference — it will convince you to pre-allocate forever.</p></div>
 
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>In short:</strong> a loop is right when each iteration depends on the previous one or produces a side effect; otherwise vectorize, it's faster and clearer. Pre-allocate the result before filling it, prefer <code>seq_along()</code> over <code>1:length()</code>, and reach for <code>vapply()</code> or <code>map_*()</code> when you want a predictable output type.</p></div>
+
       <div class="pager"><a data-go="condicionales"><small>Previous</small><b>← Conditionals</b></a><a class="next" data-go="funciones-pers"><small>Next</small><b>Writing your own functions →</b></a></div>
     </section>
 
@@ -3062,6 +3317,8 @@ cumsum(sales)</code></pre>
       <div class="breadcrumbs"><a data-nav="inicio">Home</a><span class="sep">/</span><span>Intermediate Level</span><span class="sep">/</span><span>Writing your own functions</span></div>
       <h1 class="page-title">Writing your own functions</h1>
       <p class="lead">Writing your own functions is the step that separates someone who <em>uses</em> R from someone who <em>programs</em> in R. A function encapsulates an idea: you give it a name, test it once, and reuse it without ever thinking about its guts again. It is the basic unit for not repeating yourself and for not making the same mistake twice.</p>
+
+      <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>By the end you'll know how to:</strong> write your own functions with arguments, defaults and <code>...</code>, rely on the implicit return and lexical scope, validate inputs with <code>stopifnot()</code>, and follow the design principles (verb names, data first, one responsibility).</p></div>
 
       <h2>Anatomy of a function</h2>
       <p>Every function has three parts: the <strong>arguments</strong> (what goes in), the <strong>body</strong> (what it does), and the <strong>return value</strong> (what comes out). In R, a function automatically returns the value of the <em>last expression evaluated</em>; the explicit <code>return()</code> is optional but useful for early exits.</p>
@@ -3189,6 +3446,8 @@ final_price(-50, 0.1)   # Error: Price cannot be negative</code></pre></div>
 
       <div class="challenge"><div class="xhead"><svg class="ci"><use href="#i-trophy"/></svg>Challenge</div><p>Design <code>run_payroll(salary, days = 30)</code> that returns a list with: the period's salary, the health contribution (4%), the pension contribution (4%), and the net pay. Apply one responsibility per function if you see fit, validate the inputs, and use verb names. Bonus: make it work over a vector of salaries.</p></div>
 
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>In short:</strong> a function encapsulates an idea: data comes in through the arguments, the result leaves through the return, and no hidden global state creeps in. Validate early and fail loudly, keep each function to a single responsibility, and use <code>\(x)</code> for short anonymous helpers.</p></div>
+
       <div class="pager"><a data-go="bucles"><small>Previous</small><b>← Loops</b></a><a class="next" data-go="errores"><small>Next</small><b>Error handling →</b></a></div>
     </section>
     <section class="topic" id="errores">
@@ -3196,6 +3455,8 @@ final_price(-50, 0.1)   # Error: Price cannot be negative</code></pre></div>
       <div class="breadcrumbs"><a data-nav="inicio">Home</a><span class="sep">/</span><span>Intermediate Level</span><span class="sep">/</span><span>Error handling</span></div>
       <h1 class="page-title">Error handling</h1>
       <p class="lead">Robust code anticipates what can go wrong. When you load 300 sales files and number 187 has a comma instead of a period, you don't want the whole pipeline to crash: you want R to tell you <em>what</em> failed, <em>where</em>, and keep going. R organizes the unexpected into three <em>conditions</em>: <em>errors</em> (they halt), <em>warnings</em> (they alert) and <em>messages</em> (they inform).</p>
+
+      <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>By the end you'll know how to:</strong> distinguish R's three conditions (errors, warnings, messages), intercept them with <code>tryCatch()</code>, raise clear ones with <code>stop()</code>, <code>warning()</code> and <code>stopifnot()</code>, and build resilient pipelines with purrr's <code>safely()</code> and <code>possibly()</code>.</p></div>
 
       <h2>The mental model: three conditions</h2>
       <p>R doesn't have a single "something happened" channel. It has a <strong>condition system</strong>: an object travels up the call stack looking for someone to catch it. Think of it as three alarm levels at a consulting firm:</p>
@@ -3344,6 +3605,8 @@ convert_currency("100", 4000)</code></pre>
       <p>The message says exactly what it got (<code>character</code>) and what it expected: that's actionable.</p>
       </div></details>
 
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>In short:</strong> pick the condition that matches the severity: <code>stop()</code> halts, <code>warning()</code> accumulates, <code>message()</code> informs. <code>tryCatch()</code> lets you react instead of crashing, and purrr's adverbs keep one bad case from bringing down a whole batch. A good error says what was expected, what came, and what to do.</p></div>
+
       <div class="pager"><a data-go="funciones-pers"><small>Previous</small><b>← Writing your own functions</b></a><a class="next" data-go="paquetes"><small>Next</small><b>Packages and libraries →</b></a></div>
     </section>
 
@@ -3352,6 +3615,8 @@ convert_currency("100", 4000)</code></pre>
       <div class="breadcrumbs"><a data-nav="inicio">Home</a><span class="sep">/</span><span>Intermediate Level</span><span class="sep">/</span><span>Packages</span></div>
       <h1 class="page-title">Packages and libraries</h1>
       <p class="lead">A package is code, data and documentation bundled for reuse. Base R ships the essentials; packages give it superpowers. There are more than 21,000 on CRAN, from econometrics to scraping open-data portals. Knowing how to install them, load them and <em>pin</em> them is what separates an analysis that works today from one that also works two years from now.</p>
+
+      <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>By the end you'll know how to:</strong> tell <code>install.packages()</code> apart from <code>library()</code>, resolve name conflicts with <code>::</code> and the <code>conflicted</code> package, install from CRAN, Bioconductor or GitHub, and pin exact versions for reproducibility with <code>renv</code>.</p></div>
 
       <figure class="fig">
         <img src="img/rstudio-packages.png" alt="Panel Packages de RStudio" loading="lazy">
@@ -3458,6 +3723,8 @@ conflicts_prefer(dplyr::filter)   # you settle the conflict once and for all
 # renv::snapshot()  after installing tidyverse</code></pre></div>
       </div></details>
 
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>In short:</strong> install once per machine, load every session; shared scripts should contain <code>library()</code>, never <code>install.packages()</code>. Manage masking explicitly with <code>::</code> or <code>conflicted</code>, and use <code>renv</code> to give each project its own pinned library so the analysis still runs years later.</p></div>
+
       <div class="pager"><a data-go="errores"><small>Previous</small><b>← Error handling</b></a><a class="next" data-go="tidyverse"><small>Next</small><b>tidyverse →</b></a></div>
     </section>
 
@@ -3467,6 +3734,52 @@ conflicts_prefer(dplyr::filter)   # you settle the conflict once and for all
       <h1 class="page-title">The tidyverse</h1>
       <p class="lead">The tidyverse is a collection of packages that share a common philosophy, grammar and data structure for data science. It's not "another library": it's a way of thinking about analysis. Learning one of its packages brings you closer to all the rest. Current version: <strong>tidyverse 2.0</strong>.</p>
 
+      <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>By the end you'll know how to:</strong> understand the shared philosophy of the tidyverse and its core packages, recognize and reshape data into tidy form (one variable per column, one observation per row), and chain operations readably with the native pipe <code>|&gt;</code>.</p></div>
+
+      <figure class="diagram">
+        <svg viewBox="0 0 680 150" role="img" aria-label="El pipe encadena operaciones">
+        <g font-size="13" text-anchor="middle">
+        <rect class="dg-box" x="20" y="50" width="110" height="44" rx="10"/><text class="dg-txt dg-mono" x="75" y="77">datos</text>
+        <rect class="dg-box" x="170" y="50" width="120" height="44" rx="10"/><text class="dg-txt dg-mono" x="230" y="77">filter()</text>
+        <rect class="dg-box" x="330" y="50" width="140" height="44" rx="10"/><text class="dg-txt dg-mono" x="400" y="77">group_by()</text>
+        <rect x="510" y="50" width="150" height="44" rx="10" fill="var(--brand)" opacity="0.14" stroke="var(--brand)"/><text class="dg-txt dg-mono" x="585" y="77">summarise()</text>
+        <g stroke="var(--text-mut)" stroke-width="2" marker-end="url(#ar3)">
+        <path d="M130 72 h40"/><path d="M290 72 h40"/><path d="M470 72 h40"/></g>
+        <text class="dg-mono" fill="var(--brand)" x="150" y="42" font-size="12">|&#62;</text>
+        <text class="dg-mono" fill="var(--brand)" x="310" y="42" font-size="12">|&#62;</text>
+        <text class="dg-mono" fill="var(--brand)" x="490" y="42" font-size="12">|&#62;</text>
+        <text class="dg-soft" x="340" y="128" font-size="12" font-family="var(--font)">La salida de la izquierda entra como primer argumento de la derecha.</text>
+        </g>
+        <defs><marker id="ar3" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 z" fill="var(--text-mut)"/></marker></defs>
+        </svg>
+        <figcaption>Figure: the pipe |> chains operations left to right, like a recipe.</figcaption>
+      </figure>
+      <figure class="diagram">
+        <svg viewBox="0 0 680 230" role="img" aria-label="Datos ordenados (tidy data)">
+        <g font-size="13" text-anchor="middle">
+        <text class="dg-soft" x="360" y="34" font-size="12">cada variable &#8594; una columna</text>
+        <line x1="150" y1="44" x2="570" y2="44" stroke="var(--lvl2)" stroke-width="2" marker-end="url(#ar4)"/>
+        <text class="dg-soft" x="40" y="130" font-size="12" transform="rotate(-90 40 130)">cada observaci&#243;n &#8594; una fila</text>
+        <line x1="120" y1="70" x2="120" y2="200" stroke="var(--lvl3)" stroke-width="2" marker-end="url(#ar5)"/>
+        <g class="dg-mono" font-size="12">
+        <rect class="dg-box" x="150" y="56" width="140" height="30"/><text class="dg-mut" x="220" y="76">ciudad</text>
+        <rect class="dg-box" x="290" y="56" width="140" height="30"/><text class="dg-mut" x="360" y="76">anio</text>
+        <rect class="dg-box" x="430" y="56" width="140" height="30"/><text class="dg-mut" x="500" y="76">ventas</text>
+        <rect class="dg-box" x="150" y="86" width="140" height="34"/><text class="dg-txt" x="220" y="108">Cali</text>
+        <rect class="dg-box" x="290" y="86" width="140" height="34"/><text class="dg-txt" x="360" y="108">2025</text>
+        <rect x="430" y="86" width="140" height="34" fill="var(--brand)" opacity="0.16" stroke="var(--brand)"/><text class="dg-txt" x="500" y="108">120</text>
+        <rect class="dg-box" x="150" y="120" width="140" height="34"/><text class="dg-txt" x="220" y="142">Cali</text>
+        <rect class="dg-box" x="290" y="120" width="140" height="34"/><text class="dg-txt" x="360" y="142">2026</text>
+        <rect class="dg-box" x="430" y="120" width="140" height="34"/><text class="dg-txt" x="500" y="142">150</text>
+        </g>
+        <text class="dg-soft" x="500" y="176" font-size="11" font-family="var(--font)">cada valor &#8594; una celda</text>
+        <path d="M500 158 v10" stroke="var(--brand)" stroke-width="1.5"/>
+        </g>
+        <defs><marker id="ar4" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 z" fill="var(--lvl2)"/></marker>
+        <marker id="ar5" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 z" fill="var(--lvl3)"/></marker></defs>
+        </svg>
+        <figcaption>Figure: tidy data — variable/column, observation/row, value/cell.</figcaption>
+      </figure>
       <h2>The shared philosophy</h2>
       <p>What unifies the tidyverse is three design commitments you'll see repeated in every package:</p>
       <ul>
@@ -3581,6 +3894,8 @@ model &lt;- mtcars |> lm(mpg ~ wt, data = _)</code></pre></div>
 
       <div class="challenge"><div class="xhead"><svg class="ci"><use href="#i-trophy"/></svg>Challenge</div><p>Take the wide table <code>sales_wide</code> from the tidy data section. In a single piped chain: convert it to long format with <code>pivot_longer()</code>, group by <code>quarter</code> and compute total sales by summing both regions. Which quarter sold the most?</p></div>
 
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>In short:</strong> the tidyverse is one coherent grammar built on tidy data and readable verbs, so learning one package brings you closer to the rest. The pipe turns nested, inside-out code into a top-to-bottom recipe, and tidying the data first is most of the analytical work.</p></div>
+
       <div class="pager"><a data-go="paquetes"><small>Previous</small><b>← Packages and libraries</b></a><a class="next" data-go="dplyr"><small>Next</small><b>dplyr →</b></a></div>
     </section>
 
@@ -3589,6 +3904,8 @@ model &lt;- mtcars |> lm(mpg ~ wt, data = _)</code></pre></div>
       <div class="breadcrumbs"><a data-nav="inicio">Home</a><span class="sep">/</span><span>Intermediate Level</span><span class="sep">/</span><span>dplyr</span></div>
       <h1 class="page-title">dplyr: manipulating data</h1>
       <p class="lead">dplyr is not a collection of loose functions: it is a <strong>grammar</strong>. Every verb obeys the same contract: a data frame goes in and a data frame comes out. Because the output is the same type as the input, you can chain verbs with the pipe <code>|&gt;</code> and read a complex transformation as a sentence: "take the sales, keep the ones from this quarter, group them by region, and summarise the total". If you internalize six verbs and that contract, you cover 90% of tabular data manipulation.</p>
+
+      <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>By the end you'll know how to:</strong> transform tables with the six verbs (<code>filter</code>, <code>select</code>, <code>mutate</code>, <code>arrange</code>, <code>group_by</code>, <code>summarise</code>), chain them with the pipe, scale operations across many columns with <code>across()</code>, and combine tables with joins.</p></div>
 
       <h2>The mental model: a data frame in, a data frame out</h2>
       <p>That uniformity is the key idea. In base R you jump between <code>[]</code>, <code>$</code>, <code>subset()</code>, <code>aggregate()</code>, and <code>apply()</code>, each with its own syntax. In dplyr, every verb takes the table as its first argument and returns another table, so the result of one step can always feed the next. The pipe <code>|&gt;</code> simply moves that object to the right: <code>x |&gt; f(y)</code> is <code>f(x, y)</code>.</p>
@@ -3802,6 +4119,8 @@ anti_join(sales, customers, by = "customer_id")</code></pre></div>
 <pre><code class="language-r">anti_join(orders, customers, by = join_by(customer_id))</code></pre></div>
 <p><code>anti_join</code> returns exactly the rows of <code>orders</code> with no match in <code>customers</code>. A <code>filter(!customer_id %in% customers$customer_id)</code> also works, but the join is more readable, generalizes to composite keys, and doesn't break if you change data source.</p></div></details>
 
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>In short:</strong> every dplyr verb takes a data frame and returns one, so you read a transformation as a sentence. Watch out for <code>NA</code> in filters and remember <code>na.rm</code> in summaries, <code>ungroup()</code> once you've finished aggregating, and lean on <code>anti_join</code>/<code>semi_join</code> as auditing tools.</p></div>
+
       <div class="pager"><a data-go="tidyverse"><small>Previous</small><b>← tidyverse</b></a><a class="next" data-go="tidyr"><small>Next</small><b>tidyr →</b></a></div>
     </section>
 
@@ -3810,6 +4129,8 @@ anti_join(sales, customers, by = "customer_id")</code></pre></div>
       <div class="breadcrumbs"><a data-nav="inicio">Home</a><span class="sep">/</span><span>Intermediate Level</span><span class="sep">/</span><span>tidyr</span></div>
       <h1 class="page-title">tidyr: reshaping data</h1>
       <p class="lead">dplyr transforms data that already has the right <em>shape</em>. tidyr is in charge of getting that shape. Its job is to reshape: go from wide to long and back, split and merge columns, and handle missing values. Behind it is the principle of tidy data: each variable is a column, each observation is a row, each value a cell.</p>
+
+      <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>By the end you'll know how to:</strong> reshape data between wide and long form with <code>pivot_longer()</code> and <code>pivot_wider()</code>, split and merge columns with <code>separate_wider_delim()</code> and <code>unite()</code>, and handle gaps with <code>drop_na()</code>, <code>replace_na()</code> and <code>fill()</code>.</p></div>
 
       <h2>The shape of data: wide vs. long</h2>
       <p>The same data can live in two shapes. In <strong>wide</strong> form, one unit takes up one row and its measurements spread across many columns (comfortable for a human to read). In <strong>long</strong> form, each measurement takes up its own row, with one column saying <em>what</em> was measured and another <em>how much</em> (comfortable for the machine and for ggplot2).</p>
@@ -3917,6 +4238,8 @@ long |>
   pivot_wider(names_from = quarter, values_from = sales)</code></pre></div>
 <p><code>pivot_wider</code> undoes the <code>pivot_longer</code>. You analyzed in long; you present in wide. That's the full tidyr cycle.</p></div></details>
 
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>In short:</strong> work long for analysis and present wide for humans. <code>pivot_longer()</code> is your entry point and <code>pivot_wider()</code> your exit; check column types after splitting, and use <code>fill()</code> only when a blank truly means "same as the value above".</p></div>
+
       <div class="pager"><a data-go="dplyr"><small>Previous</small><b>← dplyr</b></a><a class="next" data-go="stringr"><small>Next</small><b>stringr →</b></a></div>
     </section>
 
@@ -3925,6 +4248,8 @@ long |>
       <div class="breadcrumbs"><a data-nav="inicio">Home</a><span class="sep">/</span><span>Intermediate Level</span><span class="sep">/</span><span>stringr</span></div>
       <h1 class="page-title">stringr: manipulating text</h1>
       <p class="lead">Real-world data arrives dirty: names with inconsistent capitalization, phone numbers in varied formats, codes buried in descriptions. stringr offers a family of consistent functions (all starting with <code>str_</code>, all taking the text vector as the first argument) to clean them up. Their superpower is regular expressions.</p>
+
+      <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>By the end you'll know how to:</strong> clean text with the consistent <code>str_</code> family (detect, extract, replace, trim, pad) and describe patterns with regular expressions to pull structured pieces out of messy strings.</p></div>
 
       <h2>Why the str_ family is so convenient</h2>
       <p>In base R you have <code>nchar</code>, <code>toupper</code>, <code>grepl</code>, <code>sub</code>, <code>gsub</code>, <code>regmatches</code>... with different argument orders. stringr unifies everything: the text goes first (ideal for <code>|&gt;</code>), the pattern after, and the names are predictable (<code>str_detect</code>, <code>str_replace</code>, <code>str_extract</code>).</p>
@@ -4018,6 +4343,8 @@ str_extract(phones, "\\d{3}-\\d{3}-\\d{4}")   # "300-555-1212" "311-444-9090"</c
 str_extract(codes, "\\d{4}")   # "2026" "2025"</code></pre></div>
 <p><code>\\d{4}</code> captures the first block of exactly four digits. Since the three-digit suffix is shorter, it doesn't interfere.</p></div></details>
 
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>In short:</strong> stringr puts the text first and names functions predictably, so it pairs naturally with the pipe and <code>filter()</code>. Learn the handful of regex building blocks, remember that R doubles every regex backslash, and often it's more robust to strip what you don't want than to describe the exact format.</p></div>
+
       <div class="pager"><a data-go="tidyr"><small>Previous</small><b>← tidyr</b></a><a class="next" data-go="lubridate"><small>Next</small><b>lubridate →</b></a></div>
     </section>
 
@@ -4026,6 +4353,8 @@ str_extract(codes, "\\d{4}")   # "2026" "2025"</code></pre></div>
       <div class="breadcrumbs"><a data-nav="inicio">Home</a><span class="sep">/</span><span>Intermediate Level</span><span class="sep">/</span><span>lubridate</span></div>
       <h1 class="page-title">lubridate: dates and times</h1>
       <p class="lead">Dates are treacherous data: different formats, months of varying length, leap years, time zones. In base R, parsing a date requires remembering codes like <code>%Y-%m-%d</code> from <code>strptime</code>, and the arithmetic is awkward. lubridate replaces all of that with functions whose name <em>is</em> the order of the date.</p>
+
+      <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>By the end you'll know how to:</strong> parse dates with the <code>ymd</code>/<code>dmy</code>/<code>mdy</code> family, extract their components, do calendar arithmetic knowing periods from durations, and aggregate time series with <code>floor_date()</code>.</p></div>
 
       <h2>Why dates in base R are tedious</h2>
       <p>To read "18/06/2026" in base you need <code>as.Date("18/06/2026", format = "%d/%m/%Y")</code> and not slip up on the codes. To add a month you have to do arithmetic with seconds or manipulate components by hand. lubridate tackles both problems: parsing by name and natural arithmetic.</p>
@@ -4123,6 +4452,8 @@ issued %m+% months(1)   # "2026-02-28"  (one calendar month, with rollback)
 issued + ddays(30)      # "2026-03-02"  (30 exact days)</code></pre></div>
 <p>Mind the operator: <code>issued + months(1)</code> would return <code>NA</code> because February 31st doesn't exist. That's why we use <code>%m+%</code>, which respects that February 2026 ends on the 28th and adjusts "one month after January 31st" to the 28th. <code>ddays(30)</code> is a <em>duration</em>: it counts 30 physical days, which land in March. The difference arises from mixing calendar time with physical time.</p></div></details>
 
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>In short:</strong> the parsing function's name is the order of the date, so pick the one that matches your source (<code>03/04</code> is ambiguous). Use periods with <code>%m+%</code> for human calendar logic and durations for exact physical time, and <code>floor_date()</code> to flatten dates when aggregating by period.</p></div>
+
       <div class="pager"><a data-go="stringr"><small>Previous</small><b>← stringr</b></a><a class="next" data-go="ggplot2"><small>Next</small><b>Visualization with ggplot2 →</b></a></div>
     </section>
     <section class="topic" id="ggplot2">
@@ -4131,9 +4462,26 @@ issued + ddays(30)      # "2026-03-02"  (30 exact days)</code></pre></div>
       <h1 class="page-title">Visualization with ggplot2</h1>
       <p class="lead">ggplot2 is not "a plotting library": it is a <strong>grammar</strong>. Instead of memorizing a different function for every type of chart, you learn a handful of pieces that combine to produce virtually any figure. That is why ggplot2 remains the gold standard in R. Current version: <strong>ggplot2 4.0</strong>.</p>
 
+      <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>By the end you'll know how to:</strong> build charts layer by layer with the grammar of graphics: map variables with <code>aes()</code>, pick the right geometries, split into panels with facets, adjust scales and themes, and export at publication quality with <code>ggsave()</code>.</p></div>
+
       <figure class="fig">
         <img src="img/rstudio-plots.png" alt="Panel Plots de RStudio con un gráfico" loading="lazy">
         <figcaption>Every plot you create appears in the Plots pane, ready to export with Export.</figcaption>
+      </figure>
+      <figure class="diagram">
+        <svg viewBox="0 0 680 250" role="img" aria-label="ggplot2: capas que se suman">
+        <g font-size="13">
+        <g text-anchor="middle">
+        <rect x="200" y="30" width="280" height="30" rx="7" fill="var(--lvl3)" opacity="0.16" stroke="var(--lvl3)"/><text class="dg-mono dg-txt" x="340" y="50">+ theme_minimal()</text>
+        <rect x="185" y="66" width="310" height="30" rx="7" fill="var(--lvl2)" opacity="0.16" stroke="var(--lvl2)"/><text class="dg-mono dg-txt" x="340" y="86">+ scale_color_viridis()</text>
+        <rect x="170" y="102" width="340" height="30" rx="7" fill="var(--lvl1)" opacity="0.16" stroke="var(--lvl1)"/><text class="dg-mono dg-txt" x="340" y="122">+ geom_point()</text>
+        <rect x="155" y="138" width="370" height="30" rx="7" fill="var(--ok)" opacity="0.16" stroke="var(--ok)"/><text class="dg-mono dg-txt" x="340" y="158">aes(x, y, color)</text>
+        <rect class="dg-box" x="140" y="174" width="400" height="34"/><text class="dg-mono dg-txt" x="340" y="196">ggplot(datos)</text>
+        </g>
+        <text class="dg-soft" x="340" y="232" font-size="12" text-anchor="middle" font-family="var(--font)">Cada gr&#225;fico se construye por capas que se suman con <tspan class="dg-mono" fill="var(--brand)">+</tspan></text>
+        </g>
+        </svg>
+        <figcaption>Figure: ggplot2's layered grammar; each layer is added with +.</figcaption>
       </figure>
       <h2>The mental model: layers that add up</h2>
       <p>The underlying idea (taken from Wilkinson's book <em>The Grammar of Graphics</em>) is that every chart breaks down into independent components you can swap out:</p>
@@ -4269,6 +4617,8 @@ ggplot(diamonds, aes(cut, price)) +
 # reminder that an "obvious" variable is not always the one in charge.</div></div>
       </div></details>
 
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>In short:</strong> a chart is data plus a mapping plus layers added with <code>+</code>. Map a variable inside <code>aes()</code> and set a constant outside it, choose <code>geom_bar</code> vs <code>geom_col</code> by whether you already have the number, and prefer colorblind-safe palettes like viridis.</p></div>
+
       <div class="pager"><a data-go="lubridate"><small>Previous</small><b>← lubridate</b></a><a class="next" data-go="estadistica"><small>Next</small><b>Descriptive statistics →</b></a></div>
     </section>
 
@@ -4277,6 +4627,8 @@ ggplot(diamonds, aes(cut, price)) +
       <div class="breadcrumbs"><a data-nav="inicio">Home</a><span class="sep">/</span><span>Intermediate Level</span><span class="sep">/</span><span>Statistics</span></div>
       <h1 class="page-title">Descriptive statistics</h1>
       <p class="lead">Before modeling anything, you have to <em>look</em> at the data. R was born precisely for that: to describe, summarize and test hypotheses. This section goes from the simple average to regression, always interpreting as an analyst would.</p>
+
+      <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>By the end you'll know how to:</strong> describe variables with measures of center and spread, build frequency tables, quantify relationships with correlation, and run basic inference and linear regression while interpreting the output like an analyst.</p></div>
 
       <h2>Measures of central tendency and dispersion</h2>
       <p>Two questions summarize almost any numeric variable: <strong>where is the center?</strong> (mean, median) and <strong>how spread out is the data?</strong> (standard deviation, variance, range). The center without the dispersion lies: two countries with the same <em>average</em> income can have opposite realities.</p>
@@ -4371,6 +4723,8 @@ mean in group 1 (manual):     24.39</div></div>
       <p>Manuals average ~7 mpg more than automatics, and the p-value 0.0014 says that difference is hardly chance. <strong>Analyst's eye:</strong> in <code>mtcars</code> the manuals also weigh less, so part of the advantage could be the weight, not the transmission. Confirming it calls for a model that controls for <code>wt</code> — one more reminder that correlation ≠ causation.</p>
       </div></details>
 
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>In short:</strong> the center without the spread lies, and the median beats the mean on skewed data. Correlation is not causation, and a small p-value signals that an effect exists, not that it's large: always report the effect size alongside significance.</p></div>
+
       <div class="pager"><a data-go="ggplot2"><small>Previous</small><b>← Visualization with ggplot2</b></a><a class="next" data-go="quarto"><small>Next</small><b>Reports: R Markdown and Quarto →</b></a></div>
     </section>
 
@@ -4379,6 +4733,8 @@ mean in group 1 (manual):     24.39</div></div>
       <div class="breadcrumbs"><a data-nav="inicio">Home</a><span class="sep">/</span><span>Intermediate Level</span><span class="sep">/</span><span>Quarto</span></div>
       <h1 class="page-title">Automated reports: R Markdown and Quarto</h1>
       <p class="lead">Imagine a document where the text, the code and its results live together, and where regenerating everything with new data is a single click. That is a reproducible report. In 2026, <strong>Quarto</strong> is the recommended successor to R Markdown for achieving it.</p>
+
+      <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>By the end you'll know how to:</strong> build reproducible reports in Quarto — write a <code>.qmd</code> with YAML, Markdown and code chunks, control the output with chunk options and inline code, and render the same source to HTML, PDF, Word or slides.</p></div>
 
       <figure class="fig">
         <img src="img/quarto-render.png" alt="Documento Quarto abierto en RStudio con el botón Render" loading="lazy">
@@ -4462,6 +4818,8 @@ ggplot(mtcars, aes(wt, mpg)) + geom_point()
 # The HTML shows "The dataset has 32 cars." and the scatter, without the code.</div></div>
       </div></details>
 
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>In short:</strong> a Quarto report contains the code that produces its own numbers and figures, so there's no copy-paste to break — change the data, re-render, done. A single <code>.qmd</code> targets many formats just by editing the YAML, and Quarto is the recommended successor to R Markdown for new work.</p></div>
+
       <div class="pager"><a data-go="estadistica"><small>Previous</small><b>← Descriptive statistics</b></a><a class="next" data-go="excel"><small>Next</small><b>Working with Excel →</b></a></div>
     </section>
 
@@ -4470,6 +4828,8 @@ ggplot(mtcars, aes(wt, mpg)) + geom_point()
       <div class="breadcrumbs"><a data-nav="inicio">Home</a><span class="sep">/</span><span>Intermediate Level</span><span class="sep">/</span><span>Excel</span></div>
       <h1 class="page-title">Working with Excel</h1>
       <p class="lead">Excel is still king in companies, and that is not going to change soon. The good news: R reads, writes and formats Excel workbooks <strong>without opening the program</strong>, which turns repetitive manual tasks into scripts you run in seconds. Each package has its specialty.</p>
+
+      <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>By the end you'll know how to:</strong> read Excel workbooks with <code>readxl</code> (controlling sheet, range and column types), export tables with <code>writexl</code>, produce formatted deliverables with <code>openxlsx</code>, and automate consolidating many files at once.</p></div>
 
       <h2>Three packages, three jobs</h2>
       <div class="tabs">
@@ -4539,6 +4899,8 @@ write_xlsx(summary_tbl, "consolidated_2026.xlsx")</code></pre>
 
       <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>The real saving</strong> is not reading an Excel file: it's <em>eliminating the recurring task</em>. Consolidating 20 monthly spreadsheets, applying the same corporate format and exporting the report stops being half a day and becomes a versioned script that anyone on the team runs the same way. That is where R pays off its learning curve.</p></div>
 
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>In short:</strong> R reads, writes and formats Excel without opening the program — <code>readxl</code> to read, <code>writexl</code> for simple tables, <code>openxlsx</code> when the result must look like a report. The real payoff is turning a recurring manual task into a script anyone runs in seconds.</p></div>
+
       <div class="pager"><a data-go="quarto"><small>Previous</small><b>← Reports: R Markdown and Quarto</b></a><a class="next" data-go="sql"><small>Next</small><b>SQL databases →</b></a></div>
     </section>
     <section class="topic" id="sql">
@@ -4546,6 +4908,8 @@ write_xlsx(summary_tbl, "consolidated_2026.xlsx")</code></pre>
       <div class="breadcrumbs"><a data-nav="inicio">Home</a><span class="sep">/</span><span>Intermediate Level</span><span class="sep">/</span><span>SQL</span></div>
       <h1 class="page-title">SQL databases from R</h1>
       <p class="lead">Until now your data fit in a CSV that you opened with <code>read_csv()</code>. But in a real company the data lives on a <strong>database server</strong>: millions of rows that won't fit in your laptop's RAM, that update every second and that ten people share. R doesn't need to download all of that: it connects, asks for what it needs in the database's language (SQL) and brings back only the answer.</p>
+
+      <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>By the end you'll know how to:</strong> connect to databases through <code>DBI</code>, query them so the work happens on the server, write <code>dplyr</code> that <code>dbplyr</code> translates to SQL, and protect yourself with environment-stored credentials and parameterized queries.</p></div>
 
       <h2>The mental model: R as client, the database as server</h2>
       <p>Think of a restaurant. You (R) don't walk into the kitchen to stir the pots; you ask the waiter for a specific dish and he brings you just that dish. The database is the kitchen —it stores and processes everything—, and R is the diner placing precise orders. The "language" the orders are placed in is <strong>SQL</strong>, and the "waiter" that translates between R and any database is a package called <code>DBI</code>.</p>
@@ -4701,6 +5065,8 @@ summary |> show_query()   # inspect the generated SQL</code></pre>
       <p>CO has the highest average, and with more customers too: it's the most valuable market. Notice you didn't write a single line of SQL; dbplyr translated your <code>group_by</code> + <code>summarise</code> into a <code>GROUP BY</code> with <code>COUNT</code> and <code>AVG</code>.</p>
       </div></details>
 
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>In short:</strong> R is the client and the database the server — filter with SQL (or lazy <code>dbplyr</code>) so only the answer travels back, not millions of rows. Never hard-code credentials or paste user input into SQL: use <code>.Renviron</code> and parameterized queries, and always close the connection.</p></div>
+
       <div class="pager"><a data-go="excel"><small>Previous</small><b>← Excel</b></a><a class="next" data-go="dashboards"><small>Next</small><b>Dashboards →</b></a></div>
     </section>
 
@@ -4709,6 +5075,8 @@ summary |> show_query()   # inspect the generated SQL</code></pre>
       <div class="breadcrumbs"><a data-nav="inicio">Home</a><span class="sep">/</span><span>Intermediate Level</span><span class="sep">/</span><span>Dashboards</span></div>
       <h1 class="page-title">Dashboards</h1>
       <p class="lead">A dashboard is a single screen that answers "how is the business doing?" at a glance: a few big metrics up top, a couple of charts below. In R there are two routes depending on who will use it and how: <strong>static</strong> (Quarto Dashboard, an HTML you render and share) or <strong>interactive</strong> (Shiny, a live app where the user filters and explores, which you'll see in Level 3).</p>
+
+      <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>By the end you'll know how to:</strong> decide between a static Quarto Dashboard and an interactive Shiny app, lay out a dashboard with rows, valueboxes and charts, and add client-side interactivity with <code>plotly</code> and <code>DT</code>.</p></div>
 
       <figure class="fig">
         <img src="img/quarto-dashboard.png" alt="Quarto Dashboard renderizado con value boxes y gráficos" loading="lazy">
@@ -4794,6 +5162,8 @@ datatable(mtcars,               # table with search, sorting and pagination
       <p>The underlying logic is always the same: <em>is there user input that should recalculate live?</em> Yes → Shiny. No → Quarto.</p>
       </div></details>
 
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>In short:</strong> ask whether the user needs to interact or just look — a static Quarto Dashboard is a file you email, Shiny is a running server. Reserve valueboxes for the few metrics that matter, and don't over-engineer to Shiny when a static HTML with <code>ggplotly</code> and <code>DT</code> is enough.</p></div>
+
       <div class="pager"><a data-go="sql"><small>Previous</small><b>← SQL</b></a><a class="next" data-go="proyecto-2"><small>Next</small><b>★ Capstone project →</b></a></div>
     </section>
 
@@ -4802,6 +5172,8 @@ datatable(mtcars,               # table with search, sorting and pagination
       <div class="breadcrumbs"><a data-nav="inicio">Home</a><span class="sep">/</span><span>Intermediate Level</span><span class="sep">/</span><span>Project</span></div>
       <h1 class="page-title">★ Capstone project: Dashboard with real data</h1>
       <p class="lead">You're going to build a mini flight-analysis dashboard with <code>nycflights13</code> (every flight that departed New York in 2013, over 336,000). It's not just writing code: at each step you'll put on the analyst's hat and read what the numbers are telling you.</p>
+
+      <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>By the end you'll know how to:</strong> run a real analysis end to end — turn a business question into tidyverse data prep, answer it with charts and KPIs, read what the numbers say, and assemble everything into a shareable Quarto dashboard.</p></div>
 
       <div class="method"><span><b>1</b> Concept</span><span><b>2</b> Example</span><span><b>3</b> Practice</span><span><b>4</b> Challenge</span><span><b>5</b> Project</span></div>
 
@@ -4960,6 +5332,8 @@ list(value = "Frontier")
       <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p>Put all of this in a <strong>Quarto document with <code>format: dashboard</code></strong> and you'll have a professional dashboard renderable to HTML, ready to share. Wrap each chart with <code>ggplotly()</code> and your figures will gain tooltips with no extra work.</p></div>
 
       <div class="challenge"><div class="xhead"><svg class="ci"><use href="#i-trophy"/></svg>Challenge</div><p>Extend the dashboard and publish it. (a) <strong>The 5 most frequent destination airports</strong> — hint: <code>count(dest, sort = TRUE)</code> + <code>left_join(airports, by = c("dest" = "faa"))</code>. (b) <strong>Distance vs delay</strong> — hint: group by <code>dest</code>, summarize mean distance and delay, and use <code>geom_point(aes(size = n))</code>. (c) <strong>Value box with the on-time %</strong> — hint: <code>mean(arr_delay &lt;= 0) * 100</code>. As a bonus challenge, add a value box with <em>your most reliable airline</em> (highest on-time % and at least 5,000 flights) and publish it on Quarto Pub or GitHub Pages.</p></div>
+
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>In short:</strong> every analysis starts with a question, not with code. Watch the sample size behind an average, let each chart answer one thing (who? when?), and package the result as a rendered Quarto dashboard — a deliverable, not a loose script.</p></div>
 
       <div class="callout tip"><span class="cic"><svg class="ci"><use href="#i-grad"/></svg></span><p><strong>Intermediate Level complete!</strong> You no longer just write code: you prepare data, interrogate it like an analyst, turn it into charts that answer questions and assemble it into a dashboard someone can use to decide. You command the tidyverse, visualization, reporting, SQL and dashboards. In the Advanced Level you enter professional territory: functional programming, Machine Learning, Shiny and deployment. See you upstairs.</p></div>
 
@@ -8065,7 +8439,61 @@ collect_metrics(final)         # performance on the test set</code></pre></div>
 
       <div class="callout tip"><span class="cic"><svg class="ci"><use href="#i-grad"/></svg></span><p><strong>You made it!</strong> You've traveled the road from knowing nothing about R to building a complete, interpretable and deployable Data Science project, with the best practices of a professional. Now iterate: each new project will make you better and faster. Publish, share, ask for feedback, and keep building. Welcome to the professional level.</p></div>
 
-      <div class="pager"><a data-go="portafolio"><small>Previous</small><b>← Portfolio</b></a><a class="next" data-go="recursos"><small>Next</small><b>Resources →</b></a></div>
+      <div class="pager"><a data-go="portafolio"><small>Previous</small><b>← Portfolio</b></a><a class="next" data-go="glosario"><small>Next</small><b>Glossary →</b></a></div>
+    </section>
+
+    <section class="topic" id="glosario">
+      <span class="section-label sl4">Reference</span>
+      <div class="breadcrumbs"><a data-nav="inicio">Home</a><span class="sep">/</span><span>Glossary</span></div>
+      <h1 class="page-title">Glossary</h1>
+      <p class="lead">The terms that come up most in this guide, each in one sentence. Come back here whenever a word rings a bell but isn't fresh.</p>
+
+      <h2>Conventions used in this guide</h2>
+      <p>Before the glossary, how to read the book:</p>
+      <ul>
+        <li><code>inline code</code> (grey background) marks functions, packages and values within the text: <code>mean()</code>, <code>dplyr</code>, <code>TRUE</code>.</li>
+        <li><strong>Code blocks</strong> with the three-dot bar are runnable R; copy them with the <em>Copy</em> button. The lower strip <span class="dg-mono" style="color:var(--text-mut)">› output</span> shows what R returns.</li>
+        <li><strong>Colored callouts</strong> have fixed meanings: blue = note, cyan = tip, amber = warning, red = common mistake, green = best practice or summary.</li>
+        <li>Names of <strong>functions, packages, buttons and RStudio menus</strong> stay in English (they are their official names): <em>Source</em>, <em>Console</em>, <em>Render</em>, <code>ggplot2</code>.</li>
+      </ul>
+
+      <h2>Key terms</h2>
+      <div class="tablewrap"><table class="data">
+        <tr><th>Term</th><th>In one sentence</th></tr>
+        <tr><td><strong>Vector</strong></td><td>R's core structure: an ordered sequence of same-type values. Almost everything in R is a vector.</td></tr>
+        <tr><td><strong>Vectorization</strong></td><td>Applying an operation to every element of a vector at once, with no loop. R's superpower.</td></tr>
+        <tr><td><strong>Coercion</strong></td><td>Type conversion, automatic or explicit. When you mix types, R promotes them to the most general one (character wins).</td></tr>
+        <tr><td><strong>Type</strong></td><td>A value's data class: <code>logical</code>, <code>integer</code>, <code>double</code> (numeric), <code>character</code>.</td></tr>
+        <tr><td><code>NA</code></td><td>A missing value ("Not Available"). Detect it with <code>is.na()</code>, never with <code>== NA</code>.</td></tr>
+        <tr><td><strong>Factor</strong></td><td>A categorical variable: stored as integers with labels (levels). Ideal for modeling and ordering categories.</td></tr>
+        <tr><td><strong>List</strong></td><td>A flexible container holding elements of different type and length, even other lists. Many R results are lists.</td></tr>
+        <tr><td><strong>Data frame</strong></td><td>A table where each column is a vector (a variable) and each row an observation. The star structure of analysis.</td></tr>
+        <tr><td><strong>Tibble</strong></td><td>The modern data frame (tidyverse): cleaner printing and more predictable behavior.</td></tr>
+        <tr><td><strong>Function</strong></td><td>A reusable block that takes arguments and returns a result. Defined with <code>function()</code> or <code>\(x)</code>.</td></tr>
+        <tr><td><strong>Argument</strong></td><td>Each value you pass to a function, by position or by name (<code>round(x, digits = 2)</code>).</td></tr>
+        <tr><td><strong>Pipe</strong> (<code>|&gt;</code>)</td><td>An operator that passes the left-hand result as the first argument on the right. Chains readable steps.</td></tr>
+        <tr><td><strong>tidyverse</strong></td><td>A collection of packages sharing a common philosophy and grammar for data science (dplyr, ggplot2, tidyr…).</td></tr>
+        <tr><td><strong>Tidy data</strong></td><td>Tidy data: each variable a column, each observation a row, each value a cell.</td></tr>
+        <tr><td><strong>Verb (dplyr)</strong></td><td>Each table-transformation function: <code>filter</code>, <code>select</code>, <code>mutate</code>, <code>arrange</code>, <code>group_by</code>, <code>summarise</code>.</td></tr>
+        <tr><td><strong>Join</strong></td><td>Combining two tables on a common column (<code>left_join</code>, <code>inner_join</code>, <code>anti_join</code>).</td></tr>
+        <tr><td><code>aes()</code> / <strong>geom</strong></td><td>In ggplot2, <code>aes()</code> maps variables to visual channels (axis, color); the <code>geom_*</code> are geometric layers (points, bars).</td></tr>
+        <tr><td><strong>Regex</strong></td><td>Regular expression: a pattern to search text (<code>\\d</code> = digit). In R the backslashes are doubled.</td></tr>
+        <tr><td><strong>Script</strong> / <strong>Project</strong></td><td>A <code>.R</code> is a reproducible code file; an <code>.Rproj</code> pins the project's root folder and makes paths portable.</td></tr>
+        <tr><td><strong>Package</strong> / <strong>CRAN</strong></td><td>A package extends R; CRAN is its official repository (more than 21,000 reviewed packages).</td></tr>
+        <tr><td><strong>Lexical scope</strong></td><td>The variable-lookup rule: a function looks for variables where it was <em>written</em>, not where it was called.</td></tr>
+        <tr><td><strong>Reactivity</strong></td><td>In Shiny, the automatic recomputation of everything that depends on an input when that input changes.</td></tr>
+        <tr><td><strong>S3</strong></td><td>R's most-used object system: method dispatch by <code>class()</code> (that's why <code>summary()</code> behaves differently per object).</td></tr>
+        <tr><td><strong>recipe / workflow</strong></td><td>In tidymodels, the <em>recipe</em> encapsulates preprocessing and the <em>workflow</em> joins recipe and model into one trainable object.</td></tr>
+        <tr><td><strong>Overfitting</strong></td><td>The model memorizes training noise and fails on new data. Fought with cross-validation.</td></tr>
+        <tr><td><strong>Time series</strong></td><td>Data ordered in time; its analysis respects that each value depends on previous ones (no random CV).</td></tr>
+        <tr><td><strong>renv</strong> / <strong>Docker</strong></td><td>Reproducibility tools: <code>renv</code> pins package versions; Docker contains the whole environment.</td></tr>
+        <tr><td><strong>Commit</strong></td><td>In Git, a versioned snapshot of your changes with a message describing it.</td></tr>
+        <tr><td><strong>reprex</strong></td><td>A minimal reproducible example: just the code and data needed to reproduce a problem. It multiplies your chances of getting help.</td></tr>
+      </table></div>
+
+      <div class="callout tip"><span class="cic"><svg class="ci"><use href="#i-bulb"/></svg></span><p>Use the <strong>search box</strong> (press <kbd>/</kbd>) to jump to any term inside its module and see it in context, with examples and real output.</p></div>
+
+      <div class="pager"><a data-go="proyecto-3"><small>Previous</small><b>← Final project</b></a><a class="next" data-go="recursos"><small>Next</small><b>Resources →</b></a></div>
     </section>
 
     <!-- ============ RECURSOS ============ -->
@@ -8188,6 +8616,7 @@ const NAV=[
    {id:"proyecto-3",t:"★ Project: End-to-end Data Science"}
  ]},
  {group:"Resources",icon:"book",badge:"",cls:"",items:[
+   {id:"glosario",t:"Glossary"},
    {id:"recursos",t:"Resources"}
  ]}
 ];
