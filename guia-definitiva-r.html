@@ -1267,6 +1267,8 @@ typeof(salario_real)</code></pre>
       <div class="breadcrumbs"><a data-nav="inicio">Inicio</a><span class="sep">/</span><span>Nivel Básico</span><span class="sep">/</span><span>Operadores</span></div>
       <h1 class="page-title">Operadores</h1>
       <p class="lead">Los operadores son los verbos del lenguaje: calculan, comparan y combinan condiciones. Aquí están todos, incluidos los dos que casi nadie explica bien (<code>%%</code> y <code>%in%</code>) y las tres trampas que tarde o temprano muerden a todo analista.</p>
+      <p>Hasta aquí tienes valores con tipo y objetos con nombre. Lo que falta son los verbos: las operaciones que convierten datos quietos en respuestas. Cada pregunta de análisis que te harás —¿cuántos salarios superan el mínimo?, ¿qué meses caen en el trimestre?, ¿este año es bisiesto?— se escribe, en el fondo, con los operadores de este capítulo.</p>
+      <p>¿Por qué dedicarles un capítulo entero, si "todo el mundo sabe sumar"? Por dos razones. Primera: R trae operadores que no existen en la calculadora y que hacen trabajo pesado de analista —el módulo <code>%%</code>, la división entera <code>%/%</code>, la pertenencia <code>%in%</code>—. Segunda: detrás de los operadores hay reglas invisibles (precedencia, vectorización, propagación de <code>NA</code>) que, ignoradas, producen resultados incorrectos pero de apariencia normal: el peor tipo de error. Este capítulo es catálogo y mapa de trampas a la vez.</p>
 
       <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>Al terminar sabrás:</strong> usar los operadores aritméticos (incluidos <code>%%</code> y <code>%/%</code>), de comparación, lógicos (<code>&amp;</code> vs <code>&amp;&amp;</code>, <code>|</code> vs <code>||</code>) y de pertenencia <code>%in%</code>, y aplicar las reglas de precedencia para no caer en trampas como <code>-2^2</code> o el <code>==</code> con decimales.</p></div>
 
@@ -1298,6 +1300,7 @@ codigo %/% 10    # el número sin su último dígito</code></pre>
 [1]  1  6 12  1
 [1] 9
 [1] 458</div></div>
+<p>Lee las tres salidas: los años pares dan resto 0 al dividir entre 2 (2020 y 2022 marcan <code>TRUE</code>); el mes acumulado 13 vuelve a ser enero (1), el 18 es junio (6) y el 25 arranca otro año en enero; y del código 4589, el resto entre 10 entrega el último dígito (9) mientras el cociente entrega el resto del número (458). En proyectos reales este patrón aparece al validar dígitos de verificación, al convertir periodos acumulados en calendario y al construir ciclos.</p>
 <p>Y <code>%/%</code> brilla para agrupar: <code>(mes - 1) %/% 3 + 1</code> convierte cualquier mes en su trimestre.</p>
         </div>
         <div class="tabpane">
@@ -1317,6 +1320,7 @@ salarios > 2000000</code></pre>
 [1] FALSE
 [1] TRUE
 [1] FALSE  TRUE  TRUE FALSE</div></div>
+<p>La última línea es la que importa para el análisis: comparar un vector de cuatro salarios contra dos millones no devuelve un solo resultado, sino <em>cuatro</em> —uno por persona—. Ese vector lógico es la materia prima de todos los filtros que harás: en el capítulo de vectores lo usarás dentro de <code>[ ]</code> y en el tidyverse dentro de <code>filter()</code>. Nota también que los textos se comparan por orden alfabético, lo que permite ordenar nombres y códigos.</p>
 <p>La trampa de este grupo: <code>==</code> con decimales. Por la precisión de punto flotante que viste en tipos de datos, dos cálculos "iguales en papel" pueden diferir en la posición 16:</p>
 <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R</span><button class="copy">Copiar</button></div>
 <pre><code class="language-r">1.1 - 0.7 == 0.4                    # FALSE, aunque duela
@@ -1358,6 +1362,7 @@ c(TRUE, FALSE) && TRUE</code></pre>
 <div class="out">[1] TRUE
 [1] FALSE
 Error in c(TRUE, FALSE) && TRUE : 'length = 2' in coercion to 'logical(1)'</div></div>
+<p>El segundo ejemplo merece una segunda lectura: es el patrón <em>guardián</em>. Como <code>&amp;&amp;</code> evalúa primero <code>!is.null(x)</code> y ese lado ya es <code>FALSE</code>, el lado derecho <code>x &gt; 0</code> —que habría fallado con un <code>NULL</code>— nunca se ejecuta. Lo usarás constantemente al validar argumentos de funciones: primero comprueba que el objeto existe, después pregunta por su valor.</p>
         </div>
         <div class="tabpane">
 <p><code>%in%</code> pregunta si cada elemento de la izquierda está en el conjunto de la derecha. Es el reemplazo elegante de cadenas interminables de <code>==</code> unidas con <code>|</code>:</p>
@@ -1378,6 +1383,7 @@ ingresos_na %in% 100        # %in% responde TRUE/FALSE siempre</code></pre>
 [1]  TRUE FALSE  TRUE  TRUE FALSE
 [1]  TRUE    NA FALSE
 [1]  TRUE FALSE FALSE</div></div>
+<p>Fíjate en el contraste final: para el ingreso desconocido, <code>== 100</code> responde <code>NA</code> ("no sé si es 100"), pero <code>%in% 100</code> responde <code>FALSE</code>, porque la pregunta es otra: "¿está este valor entre los del conjunto?" y un <code>NA</code> no está en <code>{100}</code>. Esa firmeza es la que hace a <code>%in%</code> tan cómodo en filtros.</p>
 <p>Regla práctica: si vas a comparar contra dos o más valores, o si tu vector puede traer <code>NA</code>, usa <code>%in%</code>. En filtros de datos (la región Caribe, los meses del trimestre, los códigos CIIU de interés) es el operador que más usarás.</p>
         </div>
       </div>
@@ -1385,6 +1391,23 @@ ingresos_na %in% 100        # %in% responde TRUE/FALSE siempre</code></pre>
       <div class="callout warn"><span class="cic"><svg class="ci"><use href="#i-alert"/></svg></span><p><strong>Una vs. dos:</strong> <code>&amp;</code> y <code>|</code> operan elemento a elemento sobre vectores (para filtrar datos); <code>&amp;&amp;</code> y <code>||</code> devuelven un único valor y se usan en condicionales <code>if</code>. Desde R 4.3, aplicar <code>&amp;&amp;</code> o <code>||</code> a vectores de longitud mayor que 1 produce un error, lo cual es una bendición: antes tomaba el primer elemento en silencio y ocultaba bugs.</p></div>
 
       <div class="callout danger"><span class="cic"><svg class="ci"><use href="#i-stop"/></svg></span><p><strong>Error clásico:</strong> usar <code>=</code> en lugar de <code>==</code>. <code>x = 5</code> asigna; <code>x == 5</code> compara. Dentro de un <code>if</code>, el primero suele dar error de sintaxis, pero dentro de una llamada a función puede colarse como argumento y producir comportamientos desconcertantes.</p></div>
+
+      <h2>NA en operaciones lógicas: la lógica de tres valores</h2>
+      <p>En el capítulo de tipos viste que <code>NA</code> significa "valor desconocido". Los operadores lógicos lo tratan con una coherencia que sorprende la primera vez: R no responde <code>NA</code> siempre, sino <em>solo cuando el desconocido podría cambiar la respuesta</em>. Piénsalo como un testigo que no declara: a veces su silencio deja el caso abierto, y a veces las demás pruebas bastan.</p>
+      <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R</span><button class="copy">Copiar</button></div>
+<pre><code class="language-r">NA & TRUE     # NA:    el resultado depende del desconocido
+NA & FALSE    # FALSE: con un FALSE ya se hunde el "y", sea lo que sea NA
+NA | TRUE     # TRUE:  con un TRUE ya se salva el "o"
+NA | FALSE    # NA:    todo queda en manos del desconocido
+NA > 5        # NA:    comparar contra un desconocido no decide nada
+NA == NA      # NA:    dos desconocidos ni siquiera son "iguales"</code></pre>
+<div class="out">[1] NA
+[1] FALSE
+[1] TRUE
+[1] NA
+[1] NA
+[1] NA</div></div>
+      <p>La lectura: <code>NA &amp; FALSE</code> es <code>FALSE</code> porque un "y" con un lado falso es falso sin importar el otro lado; <code>NA | TRUE</code> es <code>TRUE</code> por la razón simétrica. En los cuatro casos restantes el desconocido decide, así que la respuesta es "no sé". En la práctica, esto explica por qué las condiciones con <code>NA</code> se cuelan en unos filtros y desaparecen en otros: la condición combinada puede resolverse o no, según qué lado tenga el faltante. Cuando un filtro te dé resultados extraños con datos incompletos, evalúa la condición sola en la consola y busca los <code>NA</code> con <code>sum(is.na(...))</code>.</p>
 
       <h2>Precedencia: por qué -2^2 es -4</h2>
       <p>Cuando una expresión mezcla operadores, R los aplica en un orden fijo, no de izquierda a derecha. De mayor a menor prioridad:</p>
@@ -1411,6 +1434,7 @@ ingresos_na %in% 100        # %in% responde TRUE/FALSE siempre</code></pre>
 [1] 4
 [1] 0 1 2 3 4
 [1] 1 2 3 4</div></div>
+      <p>Los dos pares de líneas resumen la lección completa: la potencia le gana al signo (por eso <code>-2^2</code> es −4) y la secuencia le gana a la resta (por eso <code>1:5 - 1</code> resta 1 <em>a cada elemento</em> de la secuencia en lugar de acortarla). En ambos casos el paréntesis convierte lo que R hace en lo que tú querías decir. Este segundo caso aparece muchísimo al construir índices: <code>1:n - 1</code> y <code>1:(n - 1)</code> son vectores distintos, y la diferencia suele descubrirse como un desfase de una posición en los resultados.</p>
 
       <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>Buena práctica:</strong> no memorices la tabla completa: cuando una expresión combine tres o más operadores, usa paréntesis aunque sean redundantes. <code>((anio %% 4) == 0) &amp; ((anio %% 100) != 0)</code> se lee sin esfuerzo y elimina toda ambigüedad, para R y para el colega que herede tu código.</p></div>
 
@@ -1437,7 +1461,7 @@ meses %in% c(1, 6, 7, 12)       # (c) temporada alta</code></pre>
 
       <div class="challenge"><div class="xhead"><svg class="ci"><use href="#i-trophy"/></svg>Reto</div><p>Sin ejecutarlo, predice el resultado de <code>-1:3^2 %% 2 == 0 | FALSE</code>. Descomponlo operador por operador usando la tabla de precedencia y luego verifícalo en la consola. Pista: <code>^</code> va primero, después <code>:</code>... y el <code>-</code> unario se aplica antes que <code>:</code>, así que la secuencia es <code>(-1):9</code>.</p></div>
 
-      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>En resumen:</strong> <code>%%</code> (resto) y <code>%/%</code> (cociente) resuelven ciclos y agrupaciones, y <code>%in%</code> reemplaza cadenas de <code>==</code> unidas con <code>|</code>. <code>&amp;</code> y <code>|</code> filtran vectores elemento a elemento; <code>&amp;&amp;</code> y <code>||</code> van en las condiciones de <code>if</code>. Ante dudas de precedencia usa paréntesis, y nunca compares dinero ni decimales con <code>==</code>.</p></div>
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>En resumen:</strong> <code>%%</code> (resto) y <code>%/%</code> (cociente) resuelven ciclos y agrupaciones, y <code>%in%</code> reemplaza cadenas de <code>==</code> unidas con <code>|</code>. <code>&amp;</code> y <code>|</code> filtran vectores elemento a elemento; <code>&amp;&amp;</code> y <code>||</code> van en las condiciones de <code>if</code>. Ante dudas de precedencia usa paréntesis, y nunca compares dinero ni decimales con <code>==</code>. En el siguiente capítulo estos operadores se despliegan a escala: el vector, la estructura donde una sola comparación filtra mil datos de una vez.</p></div>
 
       <div class="pager"><a data-go="variables"><small>Anterior</small><b>← Variables</b></a><a class="next" data-go="vectores"><small>Siguiente</small><b>Vectores →</b></a></div>
     </section>
@@ -1446,6 +1470,8 @@ meses %in% c(1, 6, 7, 12)       # (c) temporada alta</code></pre>
       <div class="breadcrumbs"><a data-nav="inicio">Inicio</a><span class="sep">/</span><span>Nivel Básico</span><span class="sep">/</span><span>Vectores</span></div>
       <h1 class="page-title">Vectores</h1>
       <p class="lead">El vector es LA estructura central de R: una secuencia ordenada de valores <strong>del mismo tipo</strong>. No es una estructura más entre varias: en R <em>todo</em> lo demás (matrices, factores, data frames) se construye sobre vectores. Entender vectores es, literalmente, entender R.</p>
+      <p>Mira hacia atrás un momento: en tipos de datos aprendiste qué es un valor; en variables, cómo se llama; en operadores, cómo se combinan dos valores. El vector es donde todo eso escala: un solo objeto que guarda cien salarios, mil precios o un millón de respuestas, con un tipo común, un nombre y la posibilidad de operarlos <em>todos a la vez</em>. Por eso este es el capítulo más importante del nivel: no es una estructura más, es el idioma nativo del lenguaje.</p>
+      <p>La recompensa por dominarlo es concreta. Cada columna de un data frame es un vector; cada filtro que escribas será una condición sobre un vector; cada función de resumen (<code>mean()</code>, <code>sum()</code>, <code>max()</code>) recibe un vector. Cuando llegues al tidyverse, descubrirás que sus verbos elegantes son, por dentro, operaciones vectorizadas como las de este capítulo. Invierte aquí el tiempo que haga falta: todo lo que sigue se apoya en esta base.</p>
 
       <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>Al terminar sabrás:</strong> crear vectores con <code>c()</code>, <code>seq()</code> y <code>rep()</code>, indexarlos de las cinco formas (posición, negativa, lógica, por nombre y <code>which()</code>) y aprovechar la vectorización y el reciclaje para operar sobre todos sus elementos a la vez.</p></div>
 
@@ -1484,6 +1510,7 @@ seq_along(ventas)                  # 1 2 3 4 (un índice por elemento)</code></p
 [1]   0  25  50  75 100
 [1] 1 2 3 4
 [1] 1 2 3 4</div></div>
+      <p>Cada creador tiene su especialidad: <code>c()</code> combina valores sueltos (y también vectores enteros: <code>c(v1, v2)</code> los concatena); <code>:</code> es el atajo para secuencias enteras de paso 1; <code>seq()</code> te deja controlar el paso (<code>by</code>) o el número de elementos (<code>length.out</code>), útil para rejillas de escenarios y ejes de gráficos; y <code>seq_len()</code>/<code>seq_along()</code> son las versiones a prueba de bordes que usarás en bucles. Observa que la primera línea no imprimió nada: fue una asignación, como aprendiste en variables.</p>
 
       <p>Para repetir valores, <code>rep()</code> tiene dos argumentos que la gente confunde: <code>times</code> repite el <em>bloque completo</em>; <code>each</code> repite <em>cada elemento</em> antes de pasar al siguiente. Compáralos lado a lado:</p>
       <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R</span><button class="copy">Copiar</button></div>
@@ -1493,6 +1520,7 @@ rep(c("A", "B"), times = c(2, 4))  # repeticiones distintas por elemento</code><
 <div class="out">[1] "T1" "T2" "T1" "T2" "T1" "T2"
 [1] "T1" "T1" "T1" "T2" "T2" "T2"
 [1] "A" "A" "B" "B" "B" "B"</div></div>
+      <p>¿Dónde se usa <code>rep()</code> en la vida real? Al construir etiquetas de periodos (cada trimestre repetido tres veces para emparejar con doce meses), al asignar grupos en un diseño de experimento y al crear columnas constantes. La forma con vector en <code>times</code> —la tercera línea— es la más flexible: cada elemento trae su propio número de repeticiones.</p>
 
       <div class="callout tip"><span class="cic"><svg class="ci"><use href="#i-bulb"/></svg></span><p><strong>seq_along() te salvará más adelante:</strong> cuando escribas bucles, usa <code>for (i in seq_along(x))</code> en lugar de <code>for (i in 1:length(x))</code>. Si <code>x</code> está vacío, <code>1:length(x)</code> produce <code>1 0</code> (¡el bucle corre dos veces con índices inválidos!), mientras que <code>seq_along(x)</code> produce un vector vacío y el bucle no corre. Es la diferencia entre un script robusto y un bug silencioso.</p></div>
 
@@ -1519,12 +1547,30 @@ mar
 168
 feb mar abr
   2   3   4</div></div>
+      <p>Recorramos las cinco formas con la salida a la vista:</p>
+      <ul>
+        <li><strong>Posición positiva:</strong> <code>ventas[1]</code> devuelve enero con su nombre y su valor (150); <code>ventas[c(2, 4)]</code> pide dos posiciones de una vez.</li>
+        <li><strong>Posición negativa:</strong> <code>ventas[-1]</code> significa "todo menos la posición 1": quedan febrero, marzo y abril. Útil para descartar el primer o el último dato de una serie.</li>
+        <li><strong>Condición lógica:</strong> <code>ventas[ventas &gt; 165]</code> conserva los meses que superan 165. Es el filtro en su forma más pura.</li>
+        <li><strong>Por nombre:</strong> <code>ventas["mar"]</code> pide marzo por su etiqueta, sin importar en qué posición esté. Más robusto que la posición cuando el orden puede cambiar.</li>
+        <li><strong><code>which()</code>:</strong> no devuelve los valores sino sus <em>posiciones</em> (2, 3 y 4). La necesitarás cuando la pregunta sea "¿dónde?" en vez de "¿cuáles?".</li>
+      </ul>
 
       <p>La indexación lógica merece que te detengas un momento: <code>ventas > 165</code> produce el vector <code>FALSE TRUE TRUE TRUE</code>, y al usarlo dentro de <code>[ ]</code> R conserva solo las posiciones con <code>TRUE</code>. Este patrón —construir una condición y filtrar con ella— es el corazón de todo filtro de datos que harás en tu vida con R, incluido el <code>filter()</code> del tidyverse.</p>
 
       <div class="callout danger"><span class="cic"><svg class="ci"><use href="#i-stop"/></svg></span><p><strong>Error muy común:</strong> en R los índices <strong>empiezan en 1</strong>, no en 0 (a diferencia de Python o C). <code>v[0]</code> no da error: devuelve un vector vacío de longitud 0, lo cual es peor porque el bug pasa desapercibido. Y pedir una posición que no existe, como <code>v[10]</code> en un vector de 4, devuelve <code>NA</code> sin quejarse.</p></div>
 
       <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>Vectores con nombres:</strong> <code>names(ventas)</code> devuelve <code>"ene" "feb" "mar" "abr"</code>, y también puedes asignar nombres después con <code>names(v) <- c(...)</code>. Un vector con nombres funciona como un mini diccionario: es la forma más simple de asociar etiqueta y valor sin necesitar todavía un data frame.</p></div>
+
+      <h2>Indexar para modificar</h2>
+      <p>Los corchetes no solo leen: también escriben. Si a una indexación le asignas un valor con <code>&lt;-</code>, R reemplaza <em>exactamente esas posiciones</em> y deja el resto intacto. Es la forma estándar de corregir datos puntuales y de marcar valores problemáticos, y funciona con cualquiera de las cinco formas de indexar:</p>
+      <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R</span><button class="copy">Copiar</button></div>
+<pre><code class="language-r">ventas["mar"] <- 170            # corregir un valor por nombre
+ventas[ventas < 160] <- NA      # marcar como faltantes los sospechosos
+ventas</code></pre>
+<div class="out">ene feb mar abr
+ NA 172 170 195</div></div>
+      <p>La primera línea corrige marzo de 168 a 170 (un error de digitación típico); la segunda usa una condición para marcar de un solo golpe todos los valores menores que 160 —aquí, enero— como faltantes. En limpieza de datos real este patrón es constante: "los ingresos negativos se vuelven <code>NA</code>", "los códigos fuera de catálogo se vuelven <code>NA</code>". Nota el orden de las operaciones: la condición se evalúa <em>antes</em> de asignar, sobre los valores actuales del vector.</p>
 
       <h2>Vectorización: el superpoder de R</h2>
       <p>En la mayoría de lenguajes, para aplicar el IVA a 4 precios escribirías un bucle. En R, las operaciones actúan sobre <em>todo el vector a la vez</em>. Compara el mismo cálculo de las dos formas:</p>
@@ -1553,6 +1599,7 @@ margen
 margen / precios * 100          # margen porcentual de cada producto</code></pre>
 <div class="out">[1] 20 60 20 25
 [1] 20.00000 24.00000 25.00000 20.83333</div></div>
+      <p>Aquí la vectorización opera entre <em>dos</em> vectores: R empareja posición con posición (precio 1 menos costo 1, precio 2 menos costo 2…) y devuelve un vector de la misma longitud. La segunda línea encadena dos operaciones vectorizadas para obtener el margen porcentual de cada producto, y las dos miradas cuentan historias distintas: el segundo producto deja el mayor margen absoluto (60), pero es el tercero el de mejor margen relativo (25 %). Este cálculo par a par es exactamente lo que harás entre columnas de un data frame: <code>ventas - costos</code>, <code>ingreso / poblacion</code>, <code>precio * (1 + tasa)</code>.</p>
 
       <h2>Reciclaje: la regla y el peligro</h2>
       <p>¿Qué pasa si operas dos vectores de distinta longitud? R <strong>recicla</strong> el más corto: lo repite hasta alcanzar la longitud del largo. Es lo que hace que <code>precios * 1.19</code> funcione (el <code>1.19</code>, vector de longitud 1, se recicla 4 veces). La regla: si la longitud mayor es múltiplo exacto de la menor, R recicla en silencio; si no lo es, recicla igual pero emite una advertencia.</p>
@@ -1569,7 +1616,16 @@ In c(1, 2, 3) + c(10, 20) :
 
       <h2>Funciones esenciales de resumen y orden</h2>
       <div class="tablewrap"><table class="data"><tr><th>Función</th><th>Qué hace</th><th>Ejemplo con <code>x <- c(30, 10, 20)</code></th></tr><tr><td><code>sum(x)</code> / <code>mean(x)</code></td><td>Suma / promedio</td><td><code>60</code> / <code>20</code></td></tr><tr><td><code>cumsum(x)</code></td><td>Suma acumulada</td><td><code>30 40 60</code></td></tr><tr><td><code>diff(x)</code></td><td>Diferencias consecutivas</td><td><code>-20 10</code></td></tr><tr><td><code>sort(x)</code></td><td>Los valores ordenados</td><td><code>10 20 30</code></td></tr><tr><td><code>order(x)</code></td><td>Las POSICIONES que ordenarían</td><td><code>2 3 1</code></td></tr><tr><td><code>rank(x)</code></td><td>El puesto de cada valor</td><td><code>3 1 2</code></td></tr><tr><td><code>rev(x)</code></td><td>Invierte el orden</td><td><code>20 10 30</code></td></tr><tr><td><code>unique(x)</code></td><td>Valores sin duplicados</td><td><code>30 10 20</code></td></tr></table></div>
-      <p>La distinción <code>sort()</code> vs <code>order()</code> confunde al principio: <code>sort()</code> te da los valores ya ordenados; <code>order()</code> te dice <em>en qué orden tomar las posiciones</em> para ordenar. <code>order()</code> es el importante, porque con él puedes ordenar un vector <em>según otro</em>: <code>nombres[order(ventas)]</code> te da los nombres de menor a mayor venta.</p>
+      <p>Verifica las tres más confundibles con tus propios ojos:</p>
+      <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R</span><button class="copy">Copiar</button></div>
+<pre><code class="language-r">x <- c(30, 10, 20)
+sort(x)     # los VALORES ordenados
+order(x)    # las POSICIONES que ordenarían: primero la 2, luego la 3, luego la 1
+rank(x)     # el PUESTO de cada valor: 30 es el 3.º, 10 el 1.º, 20 el 2.º</code></pre>
+<div class="out">[1] 10 20 30
+[1] 2 3 1
+[1] 3 1 2</div></div>
+      <p>La distinción <code>sort()</code> vs <code>order()</code> confunde al principio: <code>sort()</code> te da los valores ya ordenados; <code>order()</code> te dice <em>en qué orden tomar las posiciones</em> para ordenar. <code>order()</code> es el importante, porque con él puedes ordenar un vector <em>según otro</em>: <code>nombres[order(ventas)]</code> te da los nombres de menor a mayor venta — el mismo mecanismo con el que en el capítulo de data frames ordenarás tablas completas.</p>
 
       <h2>Ejemplo integrador: analizando una serie de ventas</h2>
       <p>Junta todo lo anterior con un caso típico de análisis económico: ventas mensuales del primer semestre (en millones de pesos).</p>
@@ -1589,7 +1645,15 @@ feb mar abr may jun
 14.7 -2.3 16.1  7.7 19.0
 [1] "jun"
 [1] 0.5</div></div>
-      <p>Fíjate en el último truco: <code>mean()</code> de un vector lógico da la <em>proporción</em> de <code>TRUE</code> (porque <code>TRUE</code> vale 1 y <code>FALSE</code> vale 0). Igual, <code>sum()</code> de un lógico cuenta cuántos cumplen la condición. Son dos de los modismos (idioms) más usados del análisis de datos en R.</p>
+      <p>Cada línea responde una pregunta de negocio real:</p>
+      <ul>
+        <li><strong><code>cumsum(ventas)</code>:</strong> la venta acumulada mes a mes; al cierre de junio van 1.145 millones. Es la curva que un gerente compara contra la meta anual.</li>
+        <li><strong><code>diff(ventas)</code>:</strong> la variación absoluta de cada mes contra el anterior. El resultado tiene 5 elementos, no 6 —no hay "variación de enero"— y marzo fue el único mes en retroceso (−4).</li>
+        <li><strong>Crecimiento porcentual:</strong> divide cada variación entre el mes <em>base</em> (<code>ventas[-6]</code>, todos menos junio, porque el último mes no es base de nadie) y multiplica por 100. Junio creció 19,0 % sobre mayo.</li>
+        <li><strong><code>which.max()</code>:</strong> devuelve la posición del máximo, y con <code>names(...)[ ]</code> la traduces a su etiqueta: el mejor mes fue junio.</li>
+        <li><strong><code>mean(ventas &gt; 180)</code>:</strong> la mitad de los meses (3 de 6) superó la meta de 180.</li>
+      </ul>
+      <p>Fíjate en el último truco: <code>mean()</code> de un vector lógico da la <em>proporción</em> de <code>TRUE</code> (porque <code>TRUE</code> vale 1 y <code>FALSE</code> vale 0). Igual, <code>sum()</code> de un lógico cuenta cuántos cumplen la condición. Son dos de los modismos (idioms) más usados del análisis de datos en R. Y observa la alineación de <code>diff()</code> con <code>ventas[-6]</code>: emparejar bien el numerador y la base es la diferencia entre un crecimiento correcto y uno desfasado un mes.</p>
 
       <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>Buena práctica:</strong> antes de calcular nada con un vector nuevo, inspecciónalo: <code>length()</code>, <code>summary()</code> y <code>head()</code> te dicen en segundos si tiene la longitud esperada, valores raros o <code>NA</code>. Recuerda que si hay <code>NA</code>, funciones como <code>mean()</code> devuelven <code>NA</code> salvo que uses <code>mean(x, na.rm = TRUE)</code>.</p></div>
 
@@ -1605,9 +1669,9 @@ names(notas)[notas >= 3.0]  # "ana" "beto" "dani" "eli"
 names(notas)[order(notas, decreasing = TRUE)]
 # "dani" "ana" "eli" "beto" "caro"</code></pre></div></div></details>
 
-      <div class="challenge"><div class="xhead"><svg class="ci"><use href="#i-trophy"/></svg>Reto</div><p>Con el vector <code>ventas</code> del ejemplo integrador, calcula en una sola línea el crecimiento porcentual promedio mensual del semestre. Pista: combina <code>mean()</code>, <code>diff()</code> y la indexación negativa <code>ventas[-6]</code>.</p></div>
+      <div class="challenge"><div class="xhead"><svg class="ci"><use href="#i-trophy"/></svg>Reto</div><p>El gerente comercial te pide un párrafo con tres cifras para su junta de mitad de año, usando el vector <code>ventas</code> del ejemplo integrador: (1) el crecimiento porcentual promedio mensual del semestre, en una sola línea (pista: combina <code>mean()</code>, <code>diff()</code> y la indexación negativa <code>ventas[-6]</code>); (2) cuántos meses crecieron respecto al mes anterior (pista: <code>sum()</code> sobre una condición con <code>diff()</code>); y (3) qué porcentaje de la venta del semestre se concentró en el mejor mes. Entregable: las tres líneas de código y el párrafo de dos frases que las traduce para alguien que no usa R.</p></div>
 
-      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>En resumen:</strong> el vector es la estructura central de R (no existen los escalares): se crea con <code>c()</code>, <code>seq()</code> y <code>rep()</code>, se indexa desde 1 de cinco formas, y las operaciones se aplican a todos sus elementos a la vez. Cuidado con el reciclaje silencioso cuando las longitudes encajan por casualidad: verifica con <code>length()</code>.</p></div>
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>En resumen:</strong> el vector es la estructura central de R (no existen los escalares): se crea con <code>c()</code>, <code>seq()</code> y <code>rep()</code>, se indexa desde 1 de cinco formas —y esa misma indexación también modifica—, y las operaciones se aplican a todos sus elementos a la vez. Cuidado con el reciclaje silencioso cuando las longitudes encajan por casualidad: verifica con <code>length()</code>. En el siguiente capítulo el vector gana una segunda dimensión: la matriz, filas y columnas del mismo tipo.</p></div>
 
       <div class="pager"><a data-go="operadores"><small>Anterior</small><b>← Operadores</b></a><a class="next" data-go="matrices"><small>Siguiente</small><b>Matrices →</b></a></div>
     </section>

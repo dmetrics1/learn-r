@@ -1263,6 +1263,8 @@ typeof(real_salary)</code></pre>
       <div class="breadcrumbs"><a data-nav="inicio">Home</a><span class="sep">/</span><span>Basic Level</span><span class="sep">/</span><span>Operators</span></div>
       <h1 class="page-title">Operators</h1>
       <p class="lead">Operators are the verbs of the language: they calculate, compare and combine conditions. Here they all are, including the two almost nobody explains well (<code>%%</code> and <code>%in%</code>) and the three traps that sooner or later bite every analyst.</p>
+      <p>So far you have values with a type and objects with a name. What is missing are the verbs: the operations that turn still data into answers. Every analysis question you will ever ask yourself —how many salaries are above the minimum? which months fall in the quarter? is this a leap year?— is written, deep down, with the operators in this chapter.</p>
+      <p>Why devote a whole chapter to them, if "everyone knows how to add"? For two reasons. First: R ships operators that do not exist on a calculator and that do an analyst's heavy lifting —the modulo <code>%%</code>, integer division <code>%/%</code>, membership <code>%in%</code>—. Second: behind the operators there are invisible rules (precedence, vectorization, <code>NA</code> propagation) that, when ignored, produce results that are wrong but look normal: the worst kind of error. This chapter is a catalog and a trap map at the same time.</p>
       <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>By the end you'll know how to:</strong> use the arithmetic, comparison, logical and membership operators, put <code>%%</code>, <code>%/%</code> and <code>%in%</code> to real work, choose between vectorized <code>&amp;</code>/<code>|</code> and scalar <code>&amp;&amp;</code>/<code>||</code>, and apply operator precedence (and parentheses) to avoid surprises like <code>-2^2</code>.</p></div>
 
       <div class="tabs">
@@ -1293,6 +1295,7 @@ code %/% 10    # the number without its last digit</code></pre>
 [1]  1  6 12  1
 [1] 9
 [1] 458</div></div>
+<p>Read the three outputs: even years leave remainder 0 when divided by 2 (2020 and 2022 flag <code>TRUE</code>); running month 13 wraps back to January (1), 18 is June (6) and 25 starts another year in January; and from the code 4589, the remainder mod 10 delivers the last digit (9) while the quotient delivers the rest of the number (458). In real projects this pattern shows up when validating check digits, converting cumulative periods into calendar ones, and building cycles.</p>
 <p>And <code>%/%</code> shines for grouping: <code>(month - 1) %/% 3 + 1</code> turns any month into its quarter.</p>
         </div>
         <div class="tabpane">
@@ -1312,6 +1315,7 @@ salaries > 2000000</code></pre>
 [1] FALSE
 [1] TRUE
 [1] FALSE  TRUE  TRUE FALSE</div></div>
+<p>The last line is the one that matters for analysis: comparing a vector of four salaries against two million does not return one result but <em>four</em> —one per person—. That logical vector is the raw material of every filter you will write: in the vectors chapter you will use it inside <code>[ ]</code>, and in the tidyverse inside <code>filter()</code>. Note as well that strings compare alphabetically, which lets you sort names and codes.</p>
 <p>The trap in this group: <code>==</code> with decimals. Because of the floating-point precision you saw in data types, two calculations "equal on paper" can differ at the 16th digit:</p>
 <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R</span><button class="copy">Copy</button></div>
 <pre><code class="language-r">1.1 - 0.7 == 0.4                    # FALSE, painful as it is
@@ -1353,6 +1357,7 @@ c(TRUE, FALSE) && TRUE</code></pre>
 <div class="out">[1] TRUE
 [1] FALSE
 Error in c(TRUE, FALSE) && TRUE : 'length = 2' in coercion to 'logical(1)'</div></div>
+<p>The second example deserves a second read: it is the <em>guard</em> pattern. Because <code>&amp;&amp;</code> evaluates <code>!is.null(x)</code> first and that side is already <code>FALSE</code>, the right side <code>x &gt; 0</code> —which would have failed on a <code>NULL</code>— never runs. You will use it constantly when validating function arguments: first check that the object exists, then ask about its value.</p>
         </div>
         <div class="tabpane">
 <p><code>%in%</code> asks whether each element on the left belongs to the set on the right. It is the elegant replacement for endless chains of <code>==</code> glued together with <code>|</code>:</p>
@@ -1373,6 +1378,7 @@ income_na %in% 100        # %in% always answers TRUE/FALSE</code></pre>
 [1]  TRUE FALSE  TRUE  TRUE FALSE
 [1]  TRUE    NA FALSE
 [1]  TRUE FALSE FALSE</div></div>
+<p>Look at the final contrast: for the unknown income, <code>== 100</code> answers <code>NA</code> ("I don't know whether it is 100"), but <code>%in% 100</code> answers <code>FALSE</code>, because the question is different: "is this value among the set's values?" and an <code>NA</code> is not in <code>{100}</code>. That firmness is what makes <code>%in%</code> so comfortable in filters.</p>
 <p>Rule of thumb: if you are comparing against two or more values, or if your vector may contain <code>NA</code>, use <code>%in%</code>. In data filters (the Caribbean region, the months of a quarter, the ISIC codes of interest) it is the operator you will use most.</p>
         </div>
       </div>
@@ -1380,6 +1386,23 @@ income_na %in% 100        # %in% always answers TRUE/FALSE</code></pre>
       <div class="callout warn"><span class="cic"><svg class="ci"><use href="#i-alert"/></svg></span><p><strong>One vs. two:</strong> <code>&amp;</code> and <code>|</code> operate element by element on vectors (for filtering data); <code>&amp;&amp;</code> and <code>||</code> return a single value and are used in <code>if</code> conditionals. Since R 4.3, applying <code>&amp;&amp;</code> or <code>||</code> to vectors longer than 1 throws an error, which is a blessing: it used to silently take the first element and hide bugs.</p></div>
 
       <div class="callout danger"><span class="cic"><svg class="ci"><use href="#i-stop"/></svg></span><p><strong>Classic mistake:</strong> using <code>=</code> instead of <code>==</code>. <code>x = 5</code> assigns; <code>x == 5</code> compares. Inside an <code>if</code>, the first usually raises a syntax error, but inside a function call it can slip through as an argument and produce baffling behavior.</p></div>
+
+      <h2>NA in logical operations: three-valued logic</h2>
+      <p>In the types chapter you saw that <code>NA</code> means "unknown value". The logical operators treat it with a coherence that surprises you the first time: R does not always answer <code>NA</code>, but <em>only when the unknown could change the answer</em>. Think of it as a witness who will not testify: sometimes their silence leaves the case open, and sometimes the other evidence is enough.</p>
+      <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R</span><button class="copy">Copy</button></div>
+<pre><code class="language-r">NA & TRUE     # NA:    the result depends on the unknown
+NA & FALSE    # FALSE: one FALSE already sinks the "and", whatever NA is
+NA | TRUE     # TRUE:  one TRUE already saves the "or"
+NA | FALSE    # NA:    everything is left in the unknown's hands
+NA > 5        # NA:    comparing against an unknown decides nothing
+NA == NA      # NA:    two unknowns are not even "equal"</code></pre>
+<div class="out">[1] NA
+[1] FALSE
+[1] TRUE
+[1] NA
+[1] NA
+[1] NA</div></div>
+      <p>The reading: <code>NA &amp; FALSE</code> is <code>FALSE</code> because an "and" with one false side is false no matter the other side; <code>NA | TRUE</code> is <code>TRUE</code> for the symmetric reason. In the four remaining cases the unknown decides, so the answer is "I don't know". In practice, this explains why conditions involving <code>NA</code> sneak into some filters and vanish from others: the combined condition may or may not resolve, depending on which side carries the missing value. When a filter gives you strange results on incomplete data, evaluate the condition alone in the console and hunt the <code>NA</code>s with <code>sum(is.na(...))</code>.</p>
 
       <h2>Precedence: why -2^2 is -4</h2>
       <p>When an expression mixes operators, R applies them in a fixed order, not left to right. From highest to lowest priority:</p>
@@ -1406,6 +1429,7 @@ income_na %in% 100        # %in% always answers TRUE/FALSE</code></pre>
 [1] 4
 [1] 0 1 2 3 4
 [1] 1 2 3 4</div></div>
+      <p>The two pairs of lines summarize the whole lesson: the power beats the sign (which is why <code>-2^2</code> is −4) and the sequence beats the subtraction (which is why <code>1:5 - 1</code> subtracts 1 <em>from every element</em> of the sequence instead of shortening it). In both cases the parentheses turn what R does into what you meant. That second case shows up constantly when building indices: <code>1:n - 1</code> and <code>1:(n - 1)</code> are different vectors, and the difference is usually discovered as an off-by-one shift in the results.</p>
 
       <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>Best practice:</strong> do not memorize the full table: whenever an expression combines three or more operators, use parentheses even if they are redundant. <code>((year %% 4) == 0) &amp; ((year %% 100) != 0)</code> reads effortlessly and removes all ambiguity, for R and for the colleague who inherits your code.</p></div>
 
@@ -1432,7 +1456,7 @@ months %in% c(1, 6, 7, 12)       # (c) high season</code></pre>
 
       <div class="challenge"><div class="xhead"><svg class="ci"><use href="#i-trophy"/></svg>Challenge</div><p>Without running it, predict the result of <code>-1:3^2 %% 2 == 0 | FALSE</code>. Break it down operator by operator using the precedence table and then verify it in the console. Hint: <code>^</code> goes first, then <code>:</code>... and the unary <code>-</code> applies before <code>:</code>, so the sequence is <code>(-1):9</code>.</p></div>
 
-      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>In short:</strong> beyond basic arithmetic, <code>%%</code> (modulo) and <code>%/%</code> (integer division) drive cycles and grouping, and <code>%in%</code> cleanly tests membership. Use <code>&amp;</code> and <code>|</code> for vectors (filtering) and <code>&amp;&amp;</code> and <code>||</code> for single conditions (<code>if</code>). Precedence is fixed, not left-to-right, so add parentheses whenever three or more operators mix.</p></div>
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>In short:</strong> beyond basic arithmetic, <code>%%</code> (modulo) and <code>%/%</code> (integer division) drive cycles and grouping, and <code>%in%</code> cleanly tests membership. Use <code>&amp;</code> and <code>|</code> for vectors (filtering) and <code>&amp;&amp;</code> and <code>||</code> for single conditions (<code>if</code>). Precedence is fixed, not left-to-right, so add parentheses whenever three or more operators mix. In the next chapter these operators deploy at scale: the vector, the structure where a single comparison filters a thousand data points at once.</p></div>
 
       <div class="pager"><a data-go="variables"><small>Previous</small><b>← Variables and objects</b></a><a class="next" data-go="vectores"><small>Next</small><b>Vectors →</b></a></div>
     </section>
@@ -1441,6 +1465,8 @@ months %in% c(1, 6, 7, 12)       # (c) high season</code></pre>
       <div class="breadcrumbs"><a data-nav="inicio">Home</a><span class="sep">/</span><span>Basic Level</span><span class="sep">/</span><span>Vectors</span></div>
       <h1 class="page-title">Vectors</h1>
       <p class="lead">The vector is THE central structure of R: an ordered sequence of values <strong>of the same type</strong>. It is not just one structure among many: in R, <em>everything</em> else (matrices, factors, data frames) is built on top of vectors. Understanding vectors is, quite literally, understanding R.</p>
+      <p>Look back for a moment: in data types you learned what a value is; in variables, what it is called; in operators, how two values combine. The vector is where all of that scales up: a single object holding a hundred salaries, a thousand prices or a million survey answers, with a common type, a name, and the ability to operate on them <em>all at once</em>. That is why this is the most important chapter of the level: it is not one more structure, it is the language's native tongue.</p>
+      <p>The payoff for mastering it is concrete. Every column of a data frame is a vector; every filter you write will be a condition on a vector; every summary function (<code>mean()</code>, <code>sum()</code>, <code>max()</code>) takes a vector. When you reach the tidyverse, you will discover that its elegant verbs are, underneath, vectorized operations like the ones in this chapter. Invest whatever time it takes here: everything that follows rests on this foundation.</p>
       <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>By the end you'll know how to:</strong> create vectors with <code>c()</code>, <code>seq()</code> and <code>rep()</code>, index them five ways (position, negative, logical, name and <code>which()</code>), use vectorization to operate on every element at once, and recognize how recycling and 1-based indexing can bite you.</p></div>
 
       <p>Here is the key mental model: in R <strong>there are no scalars</strong>. When you type <code>5</code>, R treats it as a numeric vector of length 1. That is why printing it shows <code>[1] 5</code>: that <code>[1]</code> tells you "this is the element in position 1". Every R function is designed with vectors in mind, and that explains why the language feels so natural for data analysis: a column of sales, a series of prices, or the answers to a survey <em>are</em> vectors.</p>
@@ -1478,6 +1504,7 @@ seq_along(sales)                   # 1 2 3 4 (one index per element)</code></pre
 [1]   0  25  50  75 100
 [1] 1 2 3 4
 [1] 1 2 3 4</div></div>
+      <p>Each creator has its specialty: <code>c()</code> combines loose values (and whole vectors too: <code>c(v1, v2)</code> concatenates them); <code>:</code> is the shortcut for integer sequences with step 1; <code>seq()</code> lets you control the step (<code>by</code>) or the number of elements (<code>length.out</code>), handy for scenario grids and plot axes; and <code>seq_len()</code>/<code>seq_along()</code> are the edge-proof versions you will use in loops. Notice the first line printed nothing: it was an assignment, as you learned in variables.</p>
 
       <p>To repeat values, <code>rep()</code> has two arguments people mix up: <code>times</code> repeats the <em>whole block</em>; <code>each</code> repeats <em>each element</em> before moving on to the next. Compare them side by side:</p>
       <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R</span><button class="copy">Copy</button></div>
@@ -1487,6 +1514,7 @@ rep(c("A", "B"), times = c(2, 4))  # different repetitions per element</code></p
 <div class="out">[1] "T1" "T2" "T1" "T2" "T1" "T2"
 [1] "T1" "T1" "T1" "T2" "T2" "T2"
 [1] "A" "A" "B" "B" "B" "B"</div></div>
+      <p>Where does <code>rep()</code> show up in real life? When building period labels (each quarter repeated three times to pair with twelve months), when assigning groups in an experimental design, and when creating constant columns. The vector form of <code>times</code> —the third line— is the most flexible one: each element carries its own repetition count.</p>
 
       <div class="callout tip"><span class="cic"><svg class="ci"><use href="#i-bulb"/></svg></span><p><strong>seq_along() will save you later on:</strong> when you write loops, use <code>for (i in seq_along(x))</code> instead of <code>for (i in 1:length(x))</code>. If <code>x</code> is empty, <code>1:length(x)</code> produces <code>1 0</code> (the loop runs twice with invalid indices!), whereas <code>seq_along(x)</code> produces an empty vector and the loop never runs. It is the difference between a robust script and a silent bug.</p></div>
 
@@ -1513,12 +1541,30 @@ mar
 168
 feb mar apr
   2   3   4</div></div>
+      <p>Let's walk through the five ways with the output in view:</p>
+      <ul>
+        <li><strong>Positive position:</strong> <code>sales[1]</code> returns January with its name and value (150); <code>sales[c(2, 4)]</code> asks for two positions at once.</li>
+        <li><strong>Negative position:</strong> <code>sales[-1]</code> means "everything except position 1": February, March and April remain. Useful for dropping the first or last point of a series.</li>
+        <li><strong>Logical condition:</strong> <code>sales[sales &gt; 165]</code> keeps the months above 165. It is the filter in its purest form.</li>
+        <li><strong>By name:</strong> <code>sales["mar"]</code> asks for March by its label, regardless of its position. More robust than positions when the order can change.</li>
+        <li><strong><code>which()</code>:</strong> returns not the values but their <em>positions</em> (2, 3 and 4). You will need it when the question is "where?" instead of "which ones?".</li>
+      </ul>
 
       <p>Logical indexing deserves a moment of your attention: <code>sales > 165</code> produces the vector <code>FALSE TRUE TRUE TRUE</code>, and when you use it inside <code>[ ]</code> R keeps only the positions with <code>TRUE</code>. This pattern — build a condition and filter with it — is the heart of every data filter you will ever write in R, including <code>filter()</code> from the tidyverse.</p>
 
       <div class="callout danger"><span class="cic"><svg class="ci"><use href="#i-stop"/></svg></span><p><strong>Very common mistake:</strong> in R, indices <strong>start at 1</strong>, not at 0 (unlike Python or C). <code>v[0]</code> does not throw an error: it returns an empty vector of length 0, which is worse because the bug goes unnoticed. And asking for a position that does not exist, like <code>v[10]</code> on a vector of 4, returns <code>NA</code> without complaint.</p></div>
 
       <div class="callout note"><span class="cic"><svg class="ci"><use href="#i-info"/></svg></span><p><strong>Named vectors:</strong> <code>names(sales)</code> returns <code>"jan" "feb" "mar" "apr"</code>, and you can also assign names afterwards with <code>names(v) <- c(...)</code>. A named vector works like a mini dictionary: it is the simplest way to pair a label with a value without needing a data frame yet.</p></div>
+
+      <h2>Indexing to modify</h2>
+      <p>Square brackets don't just read: they also write. If you assign a value to an indexing expression with <code>&lt;-</code>, R replaces <em>exactly those positions</em> and leaves the rest untouched. It is the standard way to fix individual data points and to flag problem values, and it works with any of the five indexing forms:</p>
+      <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R</span><button class="copy">Copy</button></div>
+<pre><code class="language-r">sales["mar"] <- 170            # fix one value by name
+sales[sales < 160] <- NA       # flag the suspicious ones as missing
+sales</code></pre>
+<div class="out">jan feb mar apr
+ NA 172 170 195</div></div>
+      <p>The first line corrects March from 168 to 170 (a typical data-entry error); the second uses a condition to flag every value below 160 —here, January— as missing in one stroke. In real data cleaning this pattern is constant: "negative incomes become <code>NA</code>", "codes outside the catalog become <code>NA</code>". Note the order of operations: the condition is evaluated <em>before</em> assigning, over the vector's current values.</p>
 
       <h2>Vectorization: R's superpower</h2>
       <p>In most languages, applying VAT to 4 prices would mean writing a loop. In R, operations act on <em>the whole vector at once</em>. Compare the same calculation done both ways:</p>
@@ -1547,6 +1593,7 @@ margin
 margin / prices * 100           # percentage margin of each product</code></pre>
 <div class="out">[1] 20 60 20 25
 [1] 20.00000 24.00000 25.00000 20.83333</div></div>
+      <p>Here vectorization operates between <em>two</em> vectors: R pairs position with position (price 1 minus cost 1, price 2 minus cost 2…) and returns a vector of the same length. The second line chains two vectorized operations to get each product's percentage margin, and the two views tell different stories: the second product leaves the largest absolute margin (60), but it is the third one that has the best relative margin (25%). This pairwise arithmetic is exactly what you will do between data frame columns: <code>sales - costs</code>, <code>income / population</code>, <code>price * (1 + rate)</code>.</p>
 
       <h2>Recycling: the rule and the danger</h2>
       <p>What happens if you operate on two vectors of different lengths? R <strong>recycles</strong> the shorter one: it repeats it until it reaches the length of the longer one. That is what makes <code>prices * 1.19</code> work (the <code>1.19</code>, a vector of length 1, gets recycled 4 times). The rule: if the longer length is an exact multiple of the shorter one, R recycles silently; if it is not, R recycles anyway but issues a warning.</p>
@@ -1563,7 +1610,16 @@ In c(1, 2, 3) + c(10, 20) :
 
       <h2>Essential summary and ordering functions</h2>
       <div class="tablewrap"><table class="data"><tr><th>Function</th><th>What it does</th><th>Example with <code>x <- c(30, 10, 20)</code></th></tr><tr><td><code>sum(x)</code> / <code>mean(x)</code></td><td>Sum / average</td><td><code>60</code> / <code>20</code></td></tr><tr><td><code>cumsum(x)</code></td><td>Cumulative sum</td><td><code>30 40 60</code></td></tr><tr><td><code>diff(x)</code></td><td>Consecutive differences</td><td><code>-20 10</code></td></tr><tr><td><code>sort(x)</code></td><td>The values, sorted</td><td><code>10 20 30</code></td></tr><tr><td><code>order(x)</code></td><td>The POSITIONS that would sort them</td><td><code>2 3 1</code></td></tr><tr><td><code>rank(x)</code></td><td>The rank of each value</td><td><code>3 1 2</code></td></tr><tr><td><code>rev(x)</code></td><td>Reverses the order</td><td><code>20 10 30</code></td></tr><tr><td><code>unique(x)</code></td><td>Values without duplicates</td><td><code>30 10 20</code></td></tr></table></div>
-      <p>The <code>sort()</code> vs <code>order()</code> distinction is confusing at first: <code>sort()</code> gives you the values already sorted; <code>order()</code> tells you <em>in what order to take the positions</em> to sort them. <code>order()</code> is the important one, because it lets you sort one vector <em>according to another</em>: <code>labels[order(sales)]</code> gives you the labels from lowest to highest sales.</p>
+      <p>Verify the three most confusable ones with your own eyes:</p>
+      <div class="codewrap"><div class="cbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="clang">R</span><button class="copy">Copy</button></div>
+<pre><code class="language-r">x <- c(30, 10, 20)
+sort(x)     # the VALUES, sorted
+order(x)    # the POSITIONS that would sort them: first 2, then 3, then 1
+rank(x)     # each value's PLACE: 30 is 3rd, 10 is 1st, 20 is 2nd</code></pre>
+<div class="out">[1] 10 20 30
+[1] 2 3 1
+[1] 3 1 2</div></div>
+      <p>The <code>sort()</code> vs <code>order()</code> distinction is confusing at first: <code>sort()</code> gives you the values already sorted; <code>order()</code> tells you <em>in what order to take the positions</em> to sort them. <code>order()</code> is the important one, because it lets you sort one vector <em>according to another</em>: <code>labels[order(sales)]</code> gives you the labels from lowest to highest sales — the same mechanism you will use in the data frames chapter to sort entire tables.</p>
 
       <h2>Putting it all together: analyzing a sales series</h2>
       <p>Bring everything together with a typical economic-analysis case: monthly sales for the first half of the year (in millions of pesos).</p>
@@ -1583,7 +1639,15 @@ feb mar apr may jun
 14.7 -2.3 16.1  7.7 19.0
 [1] "jun"
 [1] 0.5</div></div>
-      <p>Note the last trick: <code>mean()</code> of a logical vector gives the <em>proportion</em> of <code>TRUE</code> values (because <code>TRUE</code> counts as 1 and <code>FALSE</code> as 0). Likewise, <code>sum()</code> of a logical counts how many meet the condition. They are two of the most-used idioms in R data analysis.</p>
+      <p>Each line answers a real business question:</p>
+      <ul>
+        <li><strong><code>cumsum(sales)</code>:</strong> cumulative sales month by month; by the end of June the total is 1,145 million. It is the curve a manager compares against the annual target.</li>
+        <li><strong><code>diff(sales)</code>:</strong> each month's absolute change versus the previous one. The result has 5 elements, not 6 —there is no "January change"— and March was the only month in decline (−4).</li>
+        <li><strong>Percentage growth:</strong> divide each change by its <em>base</em> month (<code>sales[-6]</code>, all but June, because the last month is nobody's base) and multiply by 100. June grew 19.0% over May.</li>
+        <li><strong><code>which.max()</code>:</strong> returns the position of the maximum, and with <code>names(...)[ ]</code> you translate it into its label: the best month was June.</li>
+        <li><strong><code>mean(sales &gt; 180)</code>:</strong> half of the months (3 of 6) beat the 180 target.</li>
+      </ul>
+      <p>Note the last trick: <code>mean()</code> of a logical vector gives the <em>proportion</em> of <code>TRUE</code> values (because <code>TRUE</code> counts as 1 and <code>FALSE</code> as 0). Likewise, <code>sum()</code> of a logical counts how many meet the condition. They are two of the most-used idioms in R data analysis. And watch the alignment of <code>diff()</code> with <code>sales[-6]</code>: pairing the numerator with the right base is the difference between a correct growth rate and one shifted by a month.</p>
 
       <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>Best practice:</strong> before computing anything with a new vector, inspect it: <code>length()</code>, <code>summary()</code>, and <code>head()</code> tell you in seconds whether it has the expected length, odd values, or <code>NA</code>s. Remember that if there are <code>NA</code>s, functions like <code>mean()</code> return <code>NA</code> unless you use <code>mean(x, na.rm = TRUE)</code>.</p></div>
 
@@ -1599,9 +1663,9 @@ names(grades)[grades >= 3.0]  # "ana" "beto" "dani" "eli"
 names(grades)[order(grades, decreasing = TRUE)]
 # "dani" "ana" "eli" "beto" "caro"</code></pre></div></div></details>
 
-      <div class="challenge"><div class="xhead"><svg class="ci"><use href="#i-trophy"/></svg>Challenge</div><p>Using the <code>sales</code> vector from the integrated example, compute in a single line the average monthly percentage growth for the half-year. Hint: combine <code>mean()</code>, <code>diff()</code>, and the negative indexing <code>sales[-6]</code>.</p></div>
+      <div class="challenge"><div class="xhead"><svg class="ci"><use href="#i-trophy"/></svg>Challenge</div><p>The sales manager asks you for a paragraph with three figures for the mid-year board meeting, using the <code>sales</code> vector from the integrated example: (1) the average monthly percentage growth for the half-year, in a single line (hint: combine <code>mean()</code>, <code>diff()</code>, and the negative indexing <code>sales[-6]</code>); (2) how many months grew relative to the previous one (hint: <code>sum()</code> over a condition on <code>diff()</code>); and (3) what percentage of the half-year's sales was concentrated in the best month. Deliverable: the three lines of code and the two-sentence paragraph that translates them for someone who does not use R.</p></div>
 
-      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>In short:</strong> the vector is R's core structure — an ordered sequence of one type, with no true scalars. Build vectors with <code>c()</code>, <code>seq()</code> and <code>rep()</code>, subset them five ways, and lean on vectorization instead of loops. Stay alert to 1-based indexing and to recycling, which can produce wrong-but-plausible numbers without a warning when lengths align.</p></div>
+      <div class="callout best"><span class="cic"><svg class="ci"><use href="#i-check"/></svg></span><p><strong>In short:</strong> the vector is R's core structure — an ordered sequence of one type, with no true scalars. Build vectors with <code>c()</code>, <code>seq()</code> and <code>rep()</code>, subset them five ways —and remember the same indexing also modifies—, and lean on vectorization instead of loops. Stay alert to 1-based indexing and to recycling, which can produce wrong-but-plausible numbers without a warning when lengths align. In the next chapter the vector gains a second dimension: the matrix, rows and columns of a single type.</p></div>
 
       <div class="pager"><a data-go="operadores"><small>Previous</small><b>← Operators</b></a><a class="next" data-go="matrices"><small>Next</small><b>Matrices →</b></a></div>
     </section>
